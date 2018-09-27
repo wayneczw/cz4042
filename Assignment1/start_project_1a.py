@@ -1,6 +1,8 @@
 #
 # Project 1, starter code part a
 #
+# import matplotlib
+# matplotlib.use('Agg')
 import math
 import tensorflow as tf
 import numpy as np
@@ -332,7 +334,6 @@ def main():
     train_time.append(_train_time)
 
     # plot train_err against epoch
-    train_err, train_time = train(train_test)
     plt.figure('Training Error: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
     plt.plot(range(epochs), train_err)
     plt.xlabel(str(epochs) + ' iterations')
