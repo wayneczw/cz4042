@@ -13,7 +13,8 @@ import time
 
 NUM_FEATURES = 36
 NUM_CLASSES = 6
-
+X_MIN = None
+X_MAX = None
 # learning_rate = 0.01
 epochs = 1000
 # batch_size = 32
@@ -98,12 +99,12 @@ def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_s
         V = tf.Variable(tf.truncated_normal([num_neurons, num_neurons], stddev=1.0/math.sqrt(float(num_neurons))), name='weights')
         C = tf.Variable(tf.zeros([num_neurons]), name='biases')
         U = tf.matmul(H, V) + C  #synaptic input to output-layer
-        G = tf.nn.sigmoid(U)
+        G = tf.nn.relu(U)
 
         R = tf.Variable(tf.truncated_normal([num_neurons, NUM_CLASSES], stddev=1.0/math.sqrt(float(num_neurons))), name='weights')
         D = tf.Variable(tf.zeros([NUM_CLASSES]), name='biases')
         O = tf.matmul(G, R) + D  #synaptic input to output-layer
-        K = tf.nn.sigmoid(O)
+        K = tf.nn.relu(O)
 
         cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(labels=y_, logits=K)
         regularization = tf.nn.l2_loss(W) + tf.nn.l2_loss(V) + tf.nn.l2_loss(R)
@@ -157,26 +158,30 @@ def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_s
 #end def
 
 
-def _read_data(file_name):
+def _read_data(file_name, x_min=None, x_max=None, train=False):
     _input = np.loadtxt(file_name, delimiter=' ')
     X, _Y = _input[:, :36], _input[:, -1].astype(int)
-    X = scale(X, np.min(X, axis=0), np.max(X, axis=0))
+    if train:
+        x_min = np.min(X, axis=0)
+        x_max = np.max(X, axis=0)
+
+    X = scale(X, x_min, x_max)
     _Y[_Y == 7] = 6
 
     # one hot matrix
     Y = np.zeros((_Y.shape[0], NUM_CLASSES))
     Y[np.arange(_Y.shape[0]), _Y-1] = 1
-
-    return X, Y
+    if train: return X, Y, x_min, x_max
+    else: return X, Y
 #end def
 
 
 def main():
     # read train data
-    trainX, trainY = _read_data('sat_train.txt')
+    trainX, trainY, x_min, x_max = _read_data('sat_train.txt', train=True)
 
     # read test data
-    testX, testY = _read_data('sat_test.txt')
+    testX, testY = _read_data('sat_test.txt', x_min=x_min, x_max=x_max)
 
     train_test = dict(trainX=trainX, trainY=trainY, testX=testX, testY=testY)
 
