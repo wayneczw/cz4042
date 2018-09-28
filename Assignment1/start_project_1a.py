@@ -13,13 +13,7 @@ import time
 
 NUM_FEATURES = 36
 NUM_CLASSES = 6
-X_MIN = None
-X_MAX = None
-# learning_rate = 0.01
 epochs = 1000
-# batch_size = 32
-# num_neurons = 10
-# l2_beta = 10**(-6)
 seed = 10
 np.random.seed(seed)
 
@@ -352,6 +346,7 @@ def main():
     plt.ylabel('Test Accuracy')
     plt.show()
 #end def
+
 
 if __name__ == '__main__': main()
 
