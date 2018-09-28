@@ -7,7 +7,6 @@ import math
 import tensorflow as tf
 import numpy as np
 import matplotlib.pylab as plt
-import multiprocessing as mp
 import time
 
 
@@ -34,7 +33,7 @@ def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_s
         W = tf.Variable(tf.truncated_normal([NUM_FEATURES, num_neurons], stddev=1.0/math.sqrt(float(NUM_FEATURES))), name='weights')
         B  = tf.Variable(tf.zeros([num_neurons]), name='biases')
         Z  = tf.matmul(x, W) + B  #synaptic input to hidden-layer
-        H = tf.nn.sigmoid(Z)
+        H = tf.nn.relu(Z)
 
         V = tf.Variable(tf.truncated_normal([num_neurons, NUM_CLASSES], stddev=1.0/math.sqrt(float(num_neurons))), name='weights')
         C = tf.Variable(tf.zeros([NUM_CLASSES]), name='biases')
