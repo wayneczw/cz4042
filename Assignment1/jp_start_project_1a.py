@@ -108,8 +108,7 @@ def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_s
                     print('batch size: %d: hidden neurons: [%d] decay parameters: %g iter: %d, test accuracy  : %g'%(batch_size, num_neurons, beta, i, test_acc[i]))
                     print('-'*50)
 
-        time_taken = time.time() - t
-        time_taken_one_epoch = (time_taken/epochs) * 1000
+        time_taken_one_epoch = (time_to_update/epochs) * 1000
 
         return train_err, test_acc, time_taken_one_epoch
 
@@ -138,8 +137,7 @@ def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_s
         y = tf.matmul(h2, w3) + b3
 
         with tf.name_scope('cross_entropy'):
-            cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(
-                labels=y_, logits=y)
+            cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(labels=y_, logits=y)
 
         regularization = tf.nn.l2_loss(w1) + tf.nn.l2_loss(w2) + tf.nn.l2_loss(w3)
 
@@ -185,8 +183,7 @@ def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_s
                     print('batch size: %d: hidden neurons: [%d %d] decay parameters: %g iter: %d, test accuracy  : %g'%(batch_size, num_neurons, num_neurons, beta, i, test_acc[i]))
                     print('-'*50)
 
-        time_taken = time.time() - t
-        time_taken_one_epoch = (time_taken/epochs) * 1000
+        time_taken_one_epoch = (time_to_update/epochs) * 1000
 
         return train_err, test_acc, time_taken_one_epoch
 
@@ -234,17 +231,22 @@ def main():
     train_err_ffn1, test_acc_ffn1, time_taken_one_epoch_ffn1 = train(**train_test)
     # plot train_err against epoch
     plt.figure('Training Error: 1 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
+    plt.title('Training Error')
     plt.plot(range(epochs), train_err_ffn1)
     plt.xlabel(str(epochs) + ' iterations')
     plt.ylabel('Train Accuracy')
+    plt.grid(b=True)
     plt.savefig('figures/1a_train_error_with_3_layer_network.png')
 
     # plot test_acc against epoch
     plt.figure('Test Accuracy: 1 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
+    plt.title('Test Accuracy')
     plt.plot(range(epochs), test_acc_ffn1)
     plt.xlabel(str(epochs) + ' iterations')
     plt.ylabel('Test Accuracy')
+    plt.grid(b=True)
     plt.savefig('figures/1a_test_accuracy_with_3_layer_network.png')
+
 
     # =====================Q2 Determine optimal batch size=====================
 
@@ -262,31 +264,49 @@ def main():
 
     # Plot Training Errors
     plt.figure("Train Error against Epoch with different Batch Sizes")
+    plt.title("Train Error against Epoch with different Batch Sizes")
     for i in range(len(batch_sizes)):
         plt.plot(range(epochs), train_err_list[i], label = 'batch_size = {}'.format(batch_sizes[i]))
         plt.xlabel(str(epochs) + ' iterations')
         plt.ylabel('Train Error')
         plt.legend()
+        plt.grid(b=True)
         plt.savefig('figures/2a_train_error_vs_epoch_for_diff_batch_size.png')
 
     # Plot Test Accuracy
     plt.figure("Test Accuracy against Epoch with different Batch Sizes")
+    plt.title("Test Accuracy against Epoch with different Batch Sizes")
     for i in range(len(batch_sizes)):
         plt.plot(range(epochs), test_acc_list[i], label = 'batch_size = {}'.format(batch_sizes[i]))
         plt.xlabel(str(epochs) + ' iterations')
         plt.ylabel('Test Accuracy')
         plt.legend()
+        plt.grid(b=True)
         plt.savefig('figures/2a_test_accuracy_vs_epoch_for_diff_batch_size.png')
 
     # Plot Time Taken for One Epoch
     plt.figure("Time Taken for One Epoch againt Batch Size")
+    plt.title("Time Taken for One Epoch againt Batch Size")
     plt.plot(batch_sizes, time_taken_one_epoch_list)
     plt.xlabel('Batch Size')
     plt.ylabel('Time/ms')
+    plt.grid(b=True)
     plt.savefig('figures/2b_time_taken_for_one_epoch_vs_batch_size.png')
 
+    #plot converged test accuracy against Number of Neurons
+    final_acc = [acc[-1] for acc in test_acc_list]
+    plt.figure('Accuracy against Batch Size')
+    plt.title('Accuracy against Batch Size')
+    plt.plot(batch_sizes, final_acc)
+    plt.xlabel('Batch Size')
+    plt.ylabel('Test Accuracy')
+    plt.grid(b=True)
+    plt.savefig('figures/2c_Converged Accuracy against Batch Size.png')
+
+    plt.show()
+
     optimal_batch_size = 32
-    
+
     # =====================Q3 Determine optimal number of hidden neurons=====================
 
     # plot learning curves
@@ -303,39 +323,47 @@ def main():
 
     # Plot Training Errors
     plt.figure("Train Error against Epoch with different Number of Neurons")
+    plt.title("Train Error against Epoch with different Number of Neurons")
     for i in range(len(num_hidden_neurons)):
         plt.plot(range(epochs), train_err_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
         plt.xlabel(str(epochs) + ' iterations')
         plt.ylabel('Train Error')
         plt.legend()
+        plt.grid(b=True)
         plt.savefig('figures/3a_train_error_vs_epoch_for_diff_num_neurons.png')
 
     # Plot Test Accuracy
     plt.figure("Test Accuracy against Epoch with different Number of Neurons")
+    plt.title("Test Accuracy against Epoch with different Number of Neurons")
     for i in range(len(num_hidden_neurons)):
         plt.plot(range(epochs), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
         plt.xlabel(str(epochs) + ' iterations')
         plt.ylabel('Test Accuracy')
         plt.legend()
+        plt.grid(b=True)
         plt.savefig('figures/3a_test_accuracy_vs_epoch_for_diff_num_neurons.png')
 
     # Plot Time Taken for One Epoch
     plt.figure("Time Taken for One Epoch againt Number of Neurons")
+    plt.title("Time Taken for One Epoch againt Number of Neurons")
     plt.plot(num_hidden_neurons, time_taken_one_epoch_list)
     plt.xlabel('Number of Neurons')
     plt.ylabel('Time/ms')
+    plt.grid(b=True)
     plt.savefig('figures/3b_time_taken_for_one_epoch_vs_num_neurons.png')
 
     # plot final test accuracy against Number of Neurons
     final_acc = [acc[-1] for acc in test_acc_list]
     plt.figure('Accuracy against Number of Neurons')
+    plt.title('Accuracy against Number of Neurons')
     plt.plot(num_hidden_neurons, final_acc)
     plt.xlabel('Number of Neurons')
     plt.ylabel('Test Accuracy')
+    plt.grid(b=True)
     plt.savefig('figures/3c_Accuracy against Number of Neurons.png')
 
     optimal_num_neurons = 10
-
+#
     # =====================Q4 Determine optimal decay parameter=====================
 
     # plot learning curves
@@ -352,36 +380,25 @@ def main():
 
     # Plot Training Errors
     plt.figure("Train Error against Epoch with Different Decay Parameters")
+    plt.title("Train Error against Epoch with Different Decay Parameters")
     for i in range(len(beta_list)):
         plt.plot(range(epochs), train_err_list[i], label = 'beta = {}'.format(beta_list[i]))
         plt.xlabel(str(epochs) + ' iterations')
         plt.ylabel('Train Error')
         plt.legend()
+        plt.grid(b=True)
         plt.savefig('figures/4a_train_error_vs_epoch_for_diff_beta.png')
 
-    # Plot Test Accuracy
-    plt.figure("Test Accuracy against Epoch with different Decay Parameters")
-    for i in range(len(beta_list)):
-        plt.plot(range(epochs), test_acc_list[i], label = 'beta = {}'.format(beta_list[i]))
-        plt.xlabel(str(epochs) + ' iterations')
-        plt.ylabel('Test Accuracy')
-        plt.legend()
-        plt.savefig('figures/4a_test_accuracy_vs_epoch_for_diff_beta.png')
-
-    # Plot Time Taken for One Epoch
-    plt.figure("Time Taken for One Epoch againt Decay Parameters")
-    plt.plot(beta_list, time_taken_one_epoch_list)
-    plt.xlabel('Decay Parameters')
-    plt.ylabel('Time/ms')
-    plt.savefig('figures/4b_time_taken_for_one_epoch_vs_beta.png')
-
-    # plot final test accuracy against Decay Parameters
+    # Plot Test Accuracy against Decay Parameters
     final_acc = [acc[-1] for acc in test_acc_list]
-    plt.figure('Accuracy against Decay Parameters')
-    plt.plot(beta_list, final_acc)
+    plt.figure('Test Accuracy against Decay Parameters')
+    plt.title('Test Accuracy against Decay Parameters')
+    plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
+    plt.scatter([str(beta) for beta in beta_list], final_acc)
     plt.xlabel('Decay Parameters')
     plt.ylabel('Test Accuracy')
-    plt.savefig('figures/4c_Accuracy against Decay Parameters.png')
+    plt.grid(b=True)
+    plt.savefig('figures/4b_Test Accuracy against Decay Parameters.png')
 
     optimal_beta = 1e-6
 
@@ -402,35 +419,43 @@ def main():
 
     # plot train_err against epoch
     plt.figure('Training Error: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
+    plt.title('Training Error: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
     plt.plot(range(epochs), train_err_ffn2)
     plt.xlabel(str(epochs) + ' iterations')
     plt.ylabel('Train Accuracy')
+    plt.grid(b=True)
     plt.savefig('figures/5a_train_error_with_4_layer_network.png')
 
     # plot test_acc against epoch
     plt.figure('Test Accuracy: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
+    plt.title('Test Accuracy: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
     plt.plot(range(epochs), test_acc_ffn2)
     plt.xlabel(str(epochs) + ' iterations')
     plt.ylabel('Test Accuracy')
+    plt.grid(b=True)
     plt.savefig('figures/5a_test_accuracy_with_4_layer_network.png')
 
     # Q5(2)
     # Plot Training Errors
     plt.figure("Train Error against Epoch with Different Number of Hidden Layers")
+    plt.title("Train Error against Epoch with Different Number of Hidden Layers")
     for i in range(len(train_err_ffn_list)):
         plt.plot(range(epochs), train_err_ffn_list[i], label = 'Number of Hidden Layers = {}'.format(i))
         plt.xlabel(str(epochs) + ' iterations')
         plt.ylabel('Train Error')
         plt.legend()
+        plt.grid(b=True)
         plt.savefig('figures/5b_train_error_vs_epoch_for_diff_num_hidden_layers.png')
 
     # Plot Test Accuracy
     plt.figure("Test Accuracy against Epoch with Different Number of Hidden Layers")
-    for i in range(len(train_err_ffn_list)):
+    plt.title("Test Accuracy against Epoch with Different Number of Hidden Layers")
+    for i in range(len(test_acc_ffn_list)):
         plt.plot(range(epochs), test_acc_ffn_list[i], label = 'Number of Hidden Layers = {}'.format(i))
         plt.xlabel(str(epochs) + ' iterations')
         plt.ylabel('Test Accuracy')
         plt.legend()
+        plt.grid(b=True)
         plt.savefig('figures/5b_test_accuracy_vs_epoch_for_diff_num_hidden_layers.png')
 
     print ("Time taken for 3_layer: %g \nTime taken for 4_layer: %g" % (time_taken_one_epoch_ffn_list[0],time_taken_one_epoch_ffn_list[1]))
