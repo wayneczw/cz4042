@@ -12,31 +12,19 @@ if not os.path.isdir('figures'):
     print('creating the figures folder')
     os.makedirs('figures')
 
-# scale data
-def scale(X, X_min, X_max):
-    return (X - X_min)/(X_max-X_min)
 
 NUM_FEATURES = 36
 NUM_CLASSES = 6
 
 # learning_rate = 0.01
 epochs = 1000
-# batch_size = 32
-# num_neurons = 10
 seed = 10
 np.random.seed(seed)
 
-
-
-
-# #read train data
-# train_input = np.loadtxt('sat_train.txt',delimiter=' ')
-# trainX, train_Y = train_input[:,:36], train_input[:,-1].astype(int)
-# trainX = scale(trainX, np.min(trainX, axis=0), np.max(trainX, axis=0))
-# train_Y[train_Y == 7] = 6
-#
-# trainY = np.zeros((train_Y.shape[0], NUM_CLASSES))
-# trainY[np.arange(train_Y.shape[0]), train_Y-1] = 1 #one hot matrix
+# scale data
+def scale(X, X_min, X_max):
+    return (X - X_min)/(X_max-X_min)
+#end def
 
 def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_size=32, num_neurons=10, learning_rate=0.01, beta=10**(-6), **kwargs):
     # Create the model
@@ -99,7 +87,7 @@ def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_s
                 t = time.time()
                 for start, end in zip(range(0, no_data, batch_size), range(batch_size, no_data, batch_size)):
                     train_op.run(feed_dict={x: train_X[start:end], y_: train_Y[start:end]})
-                time_to_update += time.time() - t
+                time_to_update += (time.time() - t)
                 train_err.append(loss.eval(feed_dict={x: train_X, y_: train_Y}))
                 test_acc.append(accuracy.eval(feed_dict={x: testX, y_: testY}))
 
@@ -109,7 +97,6 @@ def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_s
                     print('-'*50)
 
         time_taken_one_epoch = (time_to_update/epochs) * 1000
-
         return train_err, test_acc, time_taken_one_epoch
 
     def ffn_2():
@@ -200,6 +187,7 @@ def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_s
 
     return train_err, test_acc, time_taken_one_epoch
 #end def
+
 
 def _read_data(file_name, x_min=None, x_max=None, train=False):
     _input = np.loadtxt(file_name, delimiter=' ')
@@ -303,9 +291,7 @@ def main():
     plt.grid(b=True)
     plt.savefig('figures/2c_Converged Accuracy against Batch Size.png')
 
-    plt.show()
-
-    optimal_batch_size = 32
+    optimal_batch_size = 16
 
     # =====================Q3 Determine optimal number of hidden neurons=====================
 
@@ -362,12 +348,12 @@ def main():
     plt.grid(b=True)
     plt.savefig('figures/3c_Accuracy against Number of Neurons.png')
 
-    optimal_num_neurons = 10
-#
+    optimal_num_neurons = 25
+
     # =====================Q4 Determine optimal decay parameter=====================
 
     # plot learning curves
-    beta_list = [0,1e-3,1e-6,1e-9,1e-12]
+    beta_list = [0,1e-12,1e-9,1e-6,1e-3]
     train_err_list = []
     test_acc_list = []
     time_taken_one_epoch_list = []
@@ -394,15 +380,15 @@ def main():
     plt.figure('Test Accuracy against Decay Parameters')
     plt.title('Test Accuracy against Decay Parameters')
     plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
-    plt.scatter([str(beta) for beta in beta_list], final_acc)
+    plt.plot([str(beta) for beta in beta_list], final_acc)
     plt.xlabel('Decay Parameters')
     plt.ylabel('Test Accuracy')
     plt.grid(b=True)
     plt.savefig('figures/4b_Test Accuracy against Decay Parameters.png')
 
-    optimal_beta = 1e-6
+    optimal_beta = 0
 
-    # =====================Q5 Determine optimal decay parameter=====================
+    # =====================Q5=====================
 
     train_err_ffn_list = []
     test_acc_ffn_list = []
@@ -440,7 +426,7 @@ def main():
     plt.figure("Train Error against Epoch with Different Number of Hidden Layers")
     plt.title("Train Error against Epoch with Different Number of Hidden Layers")
     for i in range(len(train_err_ffn_list)):
-        plt.plot(range(epochs), train_err_ffn_list[i], label = 'Number of Hidden Layers = {}'.format(i))
+        plt.plot(range(epochs), train_err_ffn_list[i], label = 'Number of Hidden Layers = {}'.format(i+1))
         plt.xlabel(str(epochs) + ' iterations')
         plt.ylabel('Train Error')
         plt.legend()
@@ -451,7 +437,7 @@ def main():
     plt.figure("Test Accuracy against Epoch with Different Number of Hidden Layers")
     plt.title("Test Accuracy against Epoch with Different Number of Hidden Layers")
     for i in range(len(test_acc_ffn_list)):
-        plt.plot(range(epochs), test_acc_ffn_list[i], label = 'Number of Hidden Layers = {}'.format(i))
+        plt.plot(range(epochs), test_acc_ffn_list[i], label = 'Number of Hidden Layers = {}'.format(i+1))
         plt.xlabel(str(epochs) + ' iterations')
         plt.ylabel('Test Accuracy')
         plt.legend()
@@ -459,8 +445,6 @@ def main():
         plt.savefig('figures/5b_test_accuracy_vs_epoch_for_diff_num_hidden_layers.png')
 
     print ("Time taken for 3_layer: %g \nTime taken for 4_layer: %g" % (time_taken_one_epoch_ffn_list[0],time_taken_one_epoch_ffn_list[1]))
-
-
-    #end def
+#end def
 
 if __name__ == '__main__': main()

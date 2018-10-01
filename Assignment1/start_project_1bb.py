@@ -173,8 +173,8 @@ class CVRegressor():
 
 
 # scale data
-def scale(X, X_min, X_max):
-    return (X - X_min)/(X_max-X_min)
+def scale(X, X_mean, X_std):
+    return (X - X_mean) / X_std
 #end def
 
 
@@ -187,16 +187,16 @@ def _read_data(file_name):
     X_test, Y_test = _input_test[:, :8], _input_test[:, -1].astype(float)
 
     # scaling
-    x_min = np.min(X_train, axis=0)
-    x_max = np.max(X_train, axis=0)
-    y_min = np.min(Y_train)
-    y_max = np.max(Y_train)
+    x_mean = np.mean(X_train, axis=0)
+    x_std = np.std(X_train, axis=0)
+    y_mean = np.mean(Y_train)
+    y_std = np.std(Y_train)
 
-    X_train = scale(X_train, x_min, x_max)
-    Y_train = scale(Y_train, y_min, y_max)
+    X_train = scale(X_train, x_mean, x_std)
+    Y_train = scale(Y_train, y_mean, y_std)
 
-    X_test = scale(X_test, x_min, x_max)
-    Y_test = scale(Y_test, y_min, y_max)
+    X_test = scale(X_test, x_mean, x_std)
+    Y_test = scale(Y_test, y_mean, y_std)
 
     return X_train, Y_train.reshape(len(Y_train), 1), X_test, Y_test.reshape(len(Y_test), 1)
 #end def
