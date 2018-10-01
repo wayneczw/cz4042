@@ -4,18 +4,12 @@
 
 # import matplotlib
 # matplotlib.use('Agg')
-from keras import backend as K
-import logging
 import math
 import tensorflow as tf
 import numpy as np
 import matplotlib.pylab as plt
-from numpy.polynomial.polynomial import polyfit
-
 from sklearn.model_selection import train_test_split
 import time
-
-logger = logging.getLogger(__name__)
 
 TEST_SIZE = 0.3
 NUM_FEATURES = 8
@@ -224,103 +218,103 @@ def main():
     # read data
     X_train, Y_train, X_test, Y_test = _read_data('cal_housing.data')
 
-    # ########### Q1 3-layer Feedforward Network ############
-    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-    #                         hidden_layer_dict={1: 30})
-    # regressor = regressor.train(trainX=X_train, trainY=Y_train,
-    #                             small=False)
+    ########### Q1 3-layer Feedforward Network ############
+    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+                            hidden_layer_dict={1: 30})
+    regressor = regressor.train(trainX=X_train, trainY=Y_train,
+                                small=False)
 
-    # plt.figure('Validation Error against Epochs')
-    # plt.title('Validation Error against Epochs')
-    # plt.grid(b=True)
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Validation Error')
-    # plt.plot(range(1, 1001), regressor.val_err)
-    # plt.savefig('figures/1b/1a_validation_error_with_epochs.png')
+    plt.figure('Validation Error against Epochs')
+    plt.title('Validation Error against Epochs')
+    plt.grid(b=True)
+    plt.xlabel('Epochs')
+    plt.ylabel('Validation Error')
+    plt.plot(range(1, 1001), regressor.val_err)
+    plt.savefig('figures/1b/1a_validation_error_with_epochs.png')
 
-    # Y_predict, Y_true = regressor.predict(X_test[:50]), Y_test[:50]
-    # Y_predict = [l[0] for l in Y_predict]
-    # Y_true = [l[0] for l in Y_true]
-    # a, b = best_fit(Y_true, Y_predict)
-    # # plot points and fit line
-    # plt.figure('Predicted Value against True Value')
-    # plt.title('Predicted Value against True Value')
-    # plt.scatter(Y_true, Y_predict)
-    # yfit = [a + b * xi for xi in Y_true]
-    # plt.plot(Y_true, yfit)
-    # plt.grid(b=True)
-    # plt.xlabel('True Value')
-    # plt.ylabel('Predicted Value')
-    # plt.savefig('figures/1b/1b_Predicted_against_True.png')
+    Y_predict, Y_true = regressor.predict(X_test[:50]), Y_test[:50]
+    Y_predict = [l[0] for l in Y_predict]
+    Y_true = [l[0] for l in Y_true]
+    a, b = best_fit(Y_true, Y_predict)
+    # plot points and fit line
+    plt.figure('Predicted Value against True Value')
+    plt.title('Predicted Value against True Value')
+    plt.scatter(Y_true, Y_predict)
+    yfit = [a + b * xi for xi in Y_true]
+    plt.plot(Y_true, yfit)
+    plt.grid(b=True)
+    plt.xlabel('True Value')
+    plt.ylabel('Predicted Value')
+    plt.savefig('figures/1b/1b_Predicted_against_True.png')
 
-    # ########### Q2 Optimal Learning Rate ############
-    # learning_rate_list = [10**(-10), 10**(-9), 0.5 * 10**(-8), 0.5 * 10**(-7), 10**(-7)]
+    ########### Q2 Optimal Learning Rate ############
+    learning_rate_list = [10**(-10), 10**(-9), 0.5 * 10**(-8), 0.5 * 10**(-7), 10**(-7)]
 
-    # CV_list = []
-    # test_error_list = []
-    # for learning_rate in learning_rate_list:
-    #     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-    #                             hidden_layer_dict={1: 30}, learning_rate=learning_rate)
-    #     regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-    #                             small=False)
-    #     CV_list.append(regressor.cv_err)
-    #     test_error_list.append(regressor.test_err)
-    # #end for
+    CV_list = []
+    test_error_list = []
+    for learning_rate in learning_rate_list:
+        regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+                                hidden_layer_dict={1: 30}, learning_rate=learning_rate)
+        regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+                                small=False)
+        CV_list.append(regressor.cv_err)
+        test_error_list.append(regressor.test_err)
+    #end for
 
-    # plt.figure('CV Error against Learning Rate')
-    # plt.title('CV Error against Learning Rate')
-    # plt.grid(b=True)
-    # plt.xlabel('Learning Rate')
-    # plt.ylabel('CV Error')
-    # plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
-    # plt.plot([str(l) for l in learning_rate_list], CV_list)
-    # plt.savefig('figures/1b/2aCV_error_against_learning_rate.png')
+    plt.figure('CV Error against Learning Rate')
+    plt.title('CV Error against Learning Rate')
+    plt.grid(b=True)
+    plt.xlabel('Learning Rate')
+    plt.ylabel('CV Error')
+    plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
+    plt.plot([str(l) for l in learning_rate_list], CV_list)
+    plt.savefig('figures/1b/2aCV_error_against_learning_rate.png')
 
-    # plt.figure('Test Error against Epochs')
-    # plt.title('Test Error against Epochs')
-    # plt.grid(b=True)
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Test Error')
-    # for i in range(len(learning_rate_list)):
-    #     plt.plot(range(1, 1001), test_error_list[i], label='Learning Rate {}'.format(learning_rate_list[i]))
-    #     plt.legend()
-    # #end for
-    # plt.savefig('figures/1b/2bTest_error_against_epochs.png')
+    plt.figure('Test Error against Epochs')
+    plt.title('Test Error against Epochs')
+    plt.grid(b=True)
+    plt.xlabel('Epochs')
+    plt.ylabel('Test Error')
+    for i in range(len(learning_rate_list)):
+        plt.plot(range(1, 1001), test_error_list[i], label='Learning Rate {}'.format(learning_rate_list[i]))
+        plt.legend()
+    #end for
+    plt.savefig('figures/1b/2bTest_error_against_epochs.png')
      
     optimal_learning_rate = 0.5 * 10**(-7)
 
-    # ############ Q3 3-layer Feedforward Network ############
-    # num_neurons_list = [20, 40, 60, 80, 100]
-    # CV_list = []
-    # test_error_list = []
-    # for num_neurons in num_neurons_list:
-    #     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-    #                             hidden_layer_dict={1: num_neurons}, learning_rate=optimal_learning_rate)
-    #     regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-    #                             small=False)
-    #     CV_list.append(regressor.cv_err)
-    #     test_error_list.append(regressor.test_err)
-    # #end for
+    ############ Q3 3-layer Feedforward Network ############
+    num_neurons_list = [20, 40, 60, 80, 100]
+    CV_list = []
+    test_error_list = []
+    for num_neurons in num_neurons_list:
+        regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+                                hidden_layer_dict={1: num_neurons}, learning_rate=optimal_learning_rate)
+        regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+                                small=False)
+        CV_list.append(regressor.cv_err)
+        test_error_list.append(regressor.test_err)
+    #end for
 
-    # plt.figure('CV Error against Number of Neurons')
-    # plt.title('CV Error against Number of Neurons')
-    # plt.grid(b=True)
-    # plt.xlabel('Number of Neurons')
-    # plt.ylabel('CV Error')
-    # plt.xticks(np.arange(5), [str(l) for l in num_neurons_list])
-    # plt.plot([str(l) for l in num_neurons_list], CV_list)
-    # plt.savefig('figures/1b/3aCV_error_against_num_neurons.png')
+    plt.figure('CV Error against Number of Neurons')
+    plt.title('CV Error against Number of Neurons')
+    plt.grid(b=True)
+    plt.xlabel('Number of Neurons')
+    plt.ylabel('CV Error')
+    plt.xticks(np.arange(5), [str(l) for l in num_neurons_list])
+    plt.plot([str(l) for l in num_neurons_list], CV_list)
+    plt.savefig('figures/1b/3aCV_error_against_num_neurons.png')
 
-    # plt.figure('Test Error against Epochs')
-    # plt.title('Test Error against Epochs')
-    # plt.grid(b=True)
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Test Error')
-    # for i in range(len(num_neurons_list)):
-    #     plt.plot(range(1, 1001), test_error_list[i], label='Number of Neurons {}'.format(num_neurons_list[i]))
-    #     plt.legend()
-    # #end for
-    # plt.savefig('figures/1b/3bTest_error_against_epochs.png')
+    plt.figure('Test Error against Epochs')
+    plt.title('Test Error against Epochs')
+    plt.grid(b=True)
+    plt.xlabel('Epochs')
+    plt.ylabel('Test Error')
+    for i in range(len(num_neurons_list)):
+        plt.plot(range(1, 1001), test_error_list[i], label='Number of Neurons {}'.format(num_neurons_list[i]))
+        plt.legend()
+    #end for
+    plt.savefig('figures/1b/3bTest_error_against_epochs.png')
 
     optimal_num_neurons = 100
 
