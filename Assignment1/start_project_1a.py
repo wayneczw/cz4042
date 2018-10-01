@@ -31,13 +31,13 @@ def train(trainX, trainY, testX, testY, small=False, num_hidden_layer=1, batch_s
 
         # Build the graph for the deep net
         W = tf.Variable(tf.truncated_normal([NUM_FEATURES, num_neurons], stddev=1.0/math.sqrt(float(NUM_FEATURES))), name='weights')
-        B  = tf.Variable(tf.zeros([num_neurons]), name='biases')
-        Z  = tf.matmul(x, W) + B  #synaptic input to hidden-layer
+        B = tf.Variable(tf.zeros([num_neurons]), name='biases')
+        Z = tf.matmul(x, W) + B  #synaptic input to hidden-layer
         H = tf.nn.relu(Z)
 
         V = tf.Variable(tf.truncated_normal([num_neurons, NUM_CLASSES], stddev=1.0/math.sqrt(float(num_neurons))), name='weights')
         C = tf.Variable(tf.zeros([NUM_CLASSES]), name='biases')
-        U  = tf.matmul(H, V) + C  #synaptic input to output-layer
+        U = tf.matmul(H, V) + C  #synaptic input to output-layer
 
         cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(labels=y_, logits=U)
         regularization = tf.nn.l2_loss(W) + tf.nn.l2_loss(V)
