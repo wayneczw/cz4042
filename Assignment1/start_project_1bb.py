@@ -232,7 +232,7 @@ def main():
 
     plt.figure('Validation Error against Epochs')
     plt.title('Validation Error against Epochs')
-    plt.grid()
+    plt.grid(b=True)
     plt.xlabel('Epochs')
     plt.ylabel('Validation Error')
     # for fold in range(5):
@@ -253,7 +253,7 @@ def main():
     plt.scatter(Y_true, Y_predict)
     yfit = [a + b * xi for xi in Y_true]
     plt.plot(Y_true, yfit)
-    plt.grid()
+    plt.grid(b=True)
     plt.xlabel('True Value')
     plt.ylabel('Predicted Value')
     plt.savefig('figures/1b/1b_Predicted_against_True.png')
@@ -274,7 +274,7 @@ def main():
 
     plt.figure('CV Error against Learning Rate')
     plt.title('CV Error against Learning Rate')
-    plt.grid()
+    plt.grid(b=True)
     plt.xlabel('Learning Rate')
     plt.ylabel('CV Error')
     plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
@@ -283,7 +283,7 @@ def main():
 
     plt.figure('Test Error against Epochs')
     plt.title('Test Error against Epochs')
-    plt.grid()
+    plt.grid(b=True)
     plt.xlabel('Epochs')
     plt.ylabel('Test Error')
     for i in range(len(learning_rate_list)):
@@ -310,7 +310,7 @@ def main():
 
     plt.figure('CV Error against Number of Neurons')
     plt.title('CV Error against Number of Neurons')
-    plt.grid()
+    plt.grid(b=True)
     plt.xlabel('Number of Neurons')
     plt.ylabel('CV Error')
     plt.xticks(np.arange(5), [str(l) for l in num_neurons_list])
@@ -319,7 +319,7 @@ def main():
 
     plt.figure('Test Error against Epochs')
     plt.title('Test Error against Epochs')
-    plt.grid()
+    plt.grid(b=True)
     plt.xlabel('Epochs')
     plt.ylabel('Test Error')
     for i in range(len(num_neurons_list)):
@@ -369,7 +369,7 @@ def main():
 
     plt.figure('Test Error')
     plt.title('Test Error')
-    plt.grid()
+    plt.grid(b=True)
     plt.ylabel('Test Error')
     plt.xticks(np.arange(4), state_list)
     plt.plot(state_list, test_error_list)
