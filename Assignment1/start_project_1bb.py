@@ -224,109 +224,109 @@ def main():
     # read data
     X_train, Y_train, X_test, Y_test = _read_data('cal_housing.data')
 
-    # ########### Q1 3-layer Feedforward Network ############
-    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-    #                         hidden_layer_dict={1: 30})
-    # regressor = regressor.train(trainX=X_train, trainY=Y_train,
-    #                             small=True)
+    ########### Q1 3-layer Feedforward Network ############
+    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+                            hidden_layer_dict={1: 30})
+    regressor = regressor.train(trainX=X_train, trainY=Y_train,
+                                small=False)
 
-    # plt.figure('Validation Error against Epochs')
-    # plt.title('Validation Error against Epochs')
-    # plt.grid()
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Validation Error')
-    # # for fold in range(5):
-    # #     plt.plot(range(1, 1001), fold_error_dict[fold], label='Fold {}'.format(fold))
-    # #     plt.legend()
-    # # #end for
-    # plt.plot(range(1, 1001), regressor.val_err)
-    # plt.savefig('figures/1b/1a_validation_error_with_epochs.png')
-
-    # plt.figure('Predicted Value against True Value')
-    # plt.title('Predicted Value against True Value')
-
-    # Y_predict, Y_true = regressor.predict(X_test[:50]), Y_test[:50]
-    # Y_predict = [l[0] for l in Y_predict]
-    # Y_true = [l[0] for l in Y_true]
-    # a, b = best_fit(Y_true, Y_predict)
-    # # plot points and fit line
-    # plt.scatter(Y_true, Y_predict)
-    # yfit = [a + b * xi for xi in Y_true]
-    # plt.plot(Y_true, yfit)
-    # plt.grid()
-    # plt.xlabel('True Value')
-    # plt.ylabel('Predicted Value')
-    # plt.savefig('figures/1b/1b_Predicted_against_True.png')
-
-    # ########### Q2 Optimal Learning Rate ############
-    # learning_rate_list = [0.5 * 10**(-7), 10**(-7), 0.5 * 10**(-8), 10**(-9), 10**(-10)]
-
-    # CV_list = []
-    # test_error_list = []
-    # for learning_rate in learning_rate_list:
-    #     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-    #                             hidden_layer_dict={1: 30}, learning_rate=learning_rate)
-    #     regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-    #                             small=True)
-    #     CV_list.append(regressor.cv_err)
-    #     test_error_list.append(regressor.test_err)
-    # #end for
-
-    # plt.figure('CV Error against Learning Rate')
-    # plt.title('CV Error against Learning Rate')
-    # plt.grid()
-    # plt.xlabel('Learning Rate')
-    # plt.ylabel('CV Error')
-    # plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
-    # plt.plot([str(l) for l in learning_rate_list], CV_list)
-    # plt.savefig('figures/1b/2aCV_error_against_learning_rate.png')
-
-    # plt.figure('Test Error against Epochs')
-    # plt.title('Test Error against Epochs')
-    # plt.grid()
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Test Error')
-    # for i in range(len(learning_rate_list)):
-    #     plt.plot(range(1, 1001), test_error_list[i], label='Learning Rate {}'.format(learning_rate_list[i]))
+    plt.figure('Validation Error against Epochs')
+    plt.title('Validation Error against Epochs')
+    plt.grid()
+    plt.xlabel('Epochs')
+    plt.ylabel('Validation Error')
+    # for fold in range(5):
+    #     plt.plot(range(1, 1001), fold_error_dict[fold], label='Fold {}'.format(fold))
     #     plt.legend()
     # #end for
-    # plt.savefig('figures/1b/2bTest_error_against_epochs.png')
+    plt.plot(range(1, 1001), regressor.val_err)
+    plt.savefig('figures/1b/1a_validation_error_with_epochs.png')
+
+    plt.figure('Predicted Value against True Value')
+    plt.title('Predicted Value against True Value')
+
+    Y_predict, Y_true = regressor.predict(X_test[:50]), Y_test[:50]
+    Y_predict = [l[0] for l in Y_predict]
+    Y_true = [l[0] for l in Y_true]
+    a, b = best_fit(Y_true, Y_predict)
+    # plot points and fit line
+    plt.scatter(Y_true, Y_predict)
+    yfit = [a + b * xi for xi in Y_true]
+    plt.plot(Y_true, yfit)
+    plt.grid()
+    plt.xlabel('True Value')
+    plt.ylabel('Predicted Value')
+    plt.savefig('figures/1b/1b_Predicted_against_True.png')
+
+    ########### Q2 Optimal Learning Rate ############
+    learning_rate_list = [0.5 * 10**(-7), 10**(-7), 0.5 * 10**(-8), 10**(-9), 10**(-10)]
+
+    CV_list = []
+    test_error_list = []
+    for learning_rate in learning_rate_list:
+        regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+                                hidden_layer_dict={1: 30}, learning_rate=learning_rate)
+        regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+                                small=False)
+        CV_list.append(regressor.cv_err)
+        test_error_list.append(regressor.test_err)
+    #end for
+
+    plt.figure('CV Error against Learning Rate')
+    plt.title('CV Error against Learning Rate')
+    plt.grid()
+    plt.xlabel('Learning Rate')
+    plt.ylabel('CV Error')
+    plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
+    plt.plot([str(l) for l in learning_rate_list], CV_list)
+    plt.savefig('figures/1b/2aCV_error_against_learning_rate.png')
+
+    plt.figure('Test Error against Epochs')
+    plt.title('Test Error against Epochs')
+    plt.grid()
+    plt.xlabel('Epochs')
+    plt.ylabel('Test Error')
+    for i in range(len(learning_rate_list)):
+        plt.plot(range(1, 1001), test_error_list[i], label='Learning Rate {}'.format(learning_rate_list[i]))
+        plt.legend()
+    #end for
+    plt.savefig('figures/1b/2bTest_error_against_epochs.png')
      
     optimal_learning_rate = 0.5 * 10**(-8)
 
-    # ############ Q3 3-layer Feedforward Network ############
-    # num_neurons_list = [20, 40, 60, 80, 100]
-    # CV_list = []
-    # test_error_list = []
-    # for num_neurons in num_neurons_list:
-    #     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-    #                             hidden_layer_dict={1: num_neurons}, learning_rate=optimal_learning_rate)
-    #     regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-    #                             small=True)
-    #     CV_list.append(regressor.cv_err)
-    #     test_error_list.append(regressor.test_err)
-    # #end for
+    ############ Q3 3-layer Feedforward Network ############
+    num_neurons_list = [20, 40, 60, 80, 100]
+    CV_list = []
+    test_error_list = []
+    for num_neurons in num_neurons_list:
+        regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+                                hidden_layer_dict={1: num_neurons}, learning_rate=optimal_learning_rate)
+        regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+                                small=False)
+        CV_list.append(regressor.cv_err)
+        test_error_list.append(regressor.test_err)
+    #end for
 
 
-    # plt.figure('CV Error against Number of Neurons')
-    # plt.title('CV Error against Number of Neurons')
-    # plt.grid()
-    # plt.xlabel('Number of Neurons')
-    # plt.ylabel('CV Error')
-    # plt.xticks(np.arange(5), [str(l) for l in num_neurons_list])
-    # plt.plot([str(l) for l in num_neurons_list], CV_list)
-    # plt.savefig('figures/1b/3aCV_error_against_num_neurons.png')
+    plt.figure('CV Error against Number of Neurons')
+    plt.title('CV Error against Number of Neurons')
+    plt.grid()
+    plt.xlabel('Number of Neurons')
+    plt.ylabel('CV Error')
+    plt.xticks(np.arange(5), [str(l) for l in num_neurons_list])
+    plt.plot([str(l) for l in num_neurons_list], CV_list)
+    plt.savefig('figures/1b/3aCV_error_against_num_neurons.png')
 
-    # plt.figure('Test Error against Epochs')
-    # plt.title('Test Error against Epochs')
-    # plt.grid()
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Test Error')
-    # for i in range(len(num_neurons_list)):
-    #     plt.plot(range(1, 1001), test_error_list[i], label='Number of Neurons {}'.format(num_neurons_list[i]))
-    #     plt.legend()
-    # #end for
-    # plt.savefig('figures/1b/3bTest_error_against_epochs.png')
+    plt.figure('Test Error against Epochs')
+    plt.title('Test Error against Epochs')
+    plt.grid()
+    plt.xlabel('Epochs')
+    plt.ylabel('Test Error')
+    for i in range(len(num_neurons_list)):
+        plt.plot(range(1, 1001), test_error_list[i], label='Number of Neurons {}'.format(num_neurons_list[i]))
+        plt.legend()
+    #end for
+    plt.savefig('figures/1b/3bTest_error_against_epochs.png')
 
     optimal_num_neurons = 20
 
@@ -338,7 +338,7 @@ def main():
                             hidden_layer_dict={1: optimal_num_neurons, 2: 20},
                             num_hidden_layers=2, learning_rate=10**(-9))
     regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=True)
+                                small=False)
     test_error_list.append(regressor.test(X_test, Y_test))
     
     #### 4-layer with dropout ####
@@ -347,7 +347,7 @@ def main():
                             num_hidden_layers=2, drop_out=True, keep_prob=0.9,
                             learning_rate=10**(-9))
     regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=True)
+                                small=False)
     test_error_list.append(regressor.test(X_test, Y_test))
 
     #### 5-layer without dropout ####
@@ -355,7 +355,7 @@ def main():
                             hidden_layer_dict={1: optimal_num_neurons, 2: 20, 3: 20},
                             num_hidden_layers=3, learning_rate=10**(-9))
     regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=True)
+                                small=False)
     test_error_list.append(regressor.test(X_test, Y_test))
     
     #### 5-layer with dropout ####
@@ -364,7 +364,7 @@ def main():
                             num_hidden_layers=3, drop_out=True, keep_prob=0.9,
                             learning_rate=10**(-9))
     regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=True)
+                                small=False)
     test_error_list.append(regressor.test(X_test, Y_test))
 
     plt.figure('Test Error')
