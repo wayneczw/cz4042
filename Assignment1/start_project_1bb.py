@@ -65,22 +65,20 @@ class CVRegressor():
         if self.num_hidden_layers == 1:
             self.W, self.B, self.H = self._build_layer(self.x, self.features_dim, self.hidden_layer_dict[1], hidden=True)
             self.V, self.C, self.U = self._build_layer(self.H, self.hidden_layer_dict[1], self.output_dim)
-            self.error = tf.reduce_mean(tf.reduce_sum(tf.square(self.U - self.y_), axis = 1))
             self.regularization = tf.nn.l2_loss(self.W) + tf.nn.l2_loss(self.V)
         elif self.num_hidden_layers == 2:
             self.W, self.B, self.H = self._build_layer(self.x, self.features_dim, self.hidden_layer_dict[1], hidden=True)
             self.G, self.J, self.R = self._build_layer(self.H, self.hidden_layer_dict[1], self.hidden_layer_dict[2], hidden=True)
             self.V, self.C, self.U = self._build_layer(self.R, self.hidden_layer_dict[2], self.output_dim)
-            self.error = tf.reduce_mean(tf.reduce_sum(tf.square(self.U - self.y_), axis = 1))
             self.regularization = tf.nn.l2_loss(self.W) + tf.nn.l2_loss(self.G) + tf.nn.l2_loss(self.V)
         elif self.num_hidden_layers == 3:
             self.W, self.B, self.H = self._build_layer(self.x, self.features_dim, self.hidden_layer_dict[1], hidden=True )
             self.G, self.J, self.R = self._build_layer(self.H, self.hidden_layer_dict[1], self.hidden_layer_dict[2], hidden=True)
             self.S, self.A, self.N = self._build_layer(self.R, self.hidden_layer_dict[2], self.hidden_layer_dict[3], hidden=True)
             self.V, self.C, self.U = self._build_layer(self.N, self.hidden_layer_dict[3], self.output_dim)
-            self.error = tf.reduce_mean(tf.reduce_sum(tf.square(self.U - self.y_), axis = 1))
             self.regularization = tf.nn.l2_loss(self.W) + tf.nn.l2_loss(self.G) + tf.nn.l2_loss(self.S) + tf.nn.l2_loss(self.V)
 
+        self.error = tf.reduce_mean(tf.reduce_sum(tf.square(self.U - self.y_), axis = 1))
         self.loss = tf.reduce_mean(self.error + self.l2_beta*self.regularization)
 
         # Create the gradient descent optimizer with the given learning rate.
@@ -119,16 +117,16 @@ class CVRegressor():
                     for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
                         self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
                     
-                    _val_err.append(self.loss.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
+                    _val_err.append(self.error.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
                     
-                    if len(testX)>1: _test_err.append(self.loss.eval(feed_dict={self.x: testX, self.y_: testY}))
+                    if len(testX)>1: _test_err.append(self.error.eval(feed_dict={self.x: testX, self.y_: testY}))
                     if i % 100 == 0:
                         print('fold %g: iter %d: validation error %g'%(fold, i, _val_err[i]))
                         print('----------------------')
 
                 #end for
                 val_err.append(_val_err)
-                _cv_err.append(self.loss.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
+                _cv_err.append(self.error.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
                 if len(testX)>1: test_err.append(_test_err)
             #end for
         #end with
@@ -146,7 +144,7 @@ class CVRegressor():
     def test(self, X_test, Y_test):
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
-            test_error = self.loss.eval(feed_dict={self.x: X_test, self.y_: Y_test})
+            test_error = self.error.eval(feed_dict={self.x: X_test, self.y_: Y_test})
         #end with
 
         return test_error
@@ -248,7 +246,7 @@ def main():
     plt.savefig('figures/1b/1b_Predicted_against_True.png')
 
     ########### Q2 Optimal Learning Rate ############
-    learning_rate_list = [10**(-10), 10**(-9), 0.5 * 10**(-8), 0.5 * 10**(-7), 10**(-7)]
+    learning_rate_list = [10**(-10), 10**(-9), 0.5 * 10**(-8), 10**(-7), 0.5 * 10**(-6)]
 
     CV_list = []
     test_error_list = []
