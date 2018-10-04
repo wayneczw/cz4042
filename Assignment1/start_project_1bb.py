@@ -100,6 +100,7 @@ class CVRegressor():
         start_time = time.time()
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
+            self.saver = tf.train.Saver()
 
             for fold in range(self.num_folds):
                 start, end = int(fold * N), int((fold + 1) * N)
@@ -129,6 +130,7 @@ class CVRegressor():
                 _cv_err.append(self.error.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
                 if len(testX)>1: test_err.append(_test_err)
             #end for
+            self.saver.save(sess, ".ckpt/1bmodel.ckpt")
         #end with
         self.val_err = np.mean(np.array(val_err), axis=0)
         self.cv_err = np.mean(np.array(_cv_err), axis=0)
@@ -138,12 +140,12 @@ class CVRegressor():
         #end if
         self.time_taken = time.time() - start_time
         return self
-    #end def
+   #end def
 
 
     def test(self, X_test, Y_test):
         with tf.Session() as sess:
-            sess.run(tf.global_variables_initializer())
+            self.saver.restore(sess, ".ckpt/1bmodel.ckpt")
             test_error = self.error.eval(feed_dict={self.x: X_test, self.y_: Y_test})
         #end with
 
@@ -153,7 +155,7 @@ class CVRegressor():
 
     def predict(self, X):
         with tf.Session() as sess:
-            sess.run(tf.global_variables_initializer())
+            self.saver.restore(sess, ".ckpt/1bmodel.ckpt")
 
             feed_dict = {self.x: X}
             prediction = self.U.eval(feed_dict)
@@ -214,7 +216,7 @@ def best_fit(X, Y):
 
 def main():
     # read data
-    X_train, Y_train, X_test, Y_test = _read_data('cal_housing.data')
+    X_train, Y_train, X_test, Y_test = _read_data('./data/cal_housing.data')
 
     ########### Q1 3-layer Feedforward Network ############
     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
@@ -268,7 +270,7 @@ def main():
     plt.plot([str(l) for l in learning_rate_list], CV_list)
     plt.savefig('figures/1b/2aCV_error_against_learning_rate.png')
 
-    plt.figure('Test Error against Epochs')
+    plt.figure('Learning Rate - Test Error against Epochs')
     plt.title('Test Error against Epochs')
     plt.grid(b=True)
     plt.xlabel('Epochs')
@@ -303,7 +305,7 @@ def main():
     plt.plot([str(l) for l in num_neurons_list], CV_list)
     plt.savefig('figures/1b/3aCV_error_against_num_neurons.png')
 
-    plt.figure('Test Error against Epochs')
+    plt.figure('Num Neurons - Test Error against Epochs')
     plt.title('Test Error against Epochs')
     plt.grid(b=True)
     plt.xlabel('Epochs')

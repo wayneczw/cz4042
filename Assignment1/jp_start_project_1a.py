@@ -1,6 +1,8 @@
 #
 # Project 1, starter code part a
 #
+from keras import backend as K
+
 import logging
 import math
 import tensorflow as tf
@@ -45,10 +47,8 @@ class Classifier():
         self.learning_rate = learning_rate
         self.l2_beta = l2_beta
         self.epochs = epochs
-
         self._build_model()
     #end def
-
     
     def _build_layer(self, X, input_dim, output_dim, hidden=False):
         W = tf.Variable(tf.truncated_normal([input_dim, output_dim], stddev=1.0/math.sqrt(float(NUM_FEATURES))), name='weights')
@@ -112,7 +112,7 @@ class Classifier():
         time_to_update = 0
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
-
+            self.saver = tf.train.Saver()
             for i in range(self.epochs):
                 np.random.shuffle(idx)
                 X_train = trainX[idx]
@@ -122,7 +122,7 @@ class Classifier():
                 for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
                     self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
                 time_to_update += (time.time() - t)
-  
+
                 self.train_err.append(self.error.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
                 self.train_acc.append(self.accuracy.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
                 self.test_acc.append(self.accuracy.eval(feed_dict={self.x: testX, self.y_: testY}))
@@ -132,6 +132,7 @@ class Classifier():
                     print('batch size: %d: hidden neurons: [%d] decay parameters: %g iter: %d, test accuracy  : %g'%(self.batch_size, self.hidden_layer_dict[1], self.l2_beta, i, self.test_acc[i]))
                     print('-'*50)
             #end for
+            self.saver.save(sess, ".ckpt/1amodel.ckpt")
         #end with
 
         self.time_taken_one_epoch = (time_to_update/epochs) * 1000
@@ -141,7 +142,8 @@ class Classifier():
 
     def test(self, X_test, Y_test):
         with tf.Session() as sess:
-            sess.run(tf.global_variables_initializer())
+            self.saver.restore(sess, ".ckpt/1amodel.ckpt")
+
             test_error = self.error.eval(feed_dict={self.x: X_test, self.y_: Y_test})
         #end with
 
@@ -151,14 +153,16 @@ class Classifier():
 
     def predict(self, X):
         with tf.Session() as sess:
-            sess.run(tf.global_variables_initializer())
-
+            # sess.run(tf.global_variables_initializer())
+            self.saver.restore(sess, ".ckpt/1amodel.ckpt")
             feed_dict = {self.x: X}
-            prediction = self.U.eval(feed_dict)
+            prediction = tf.argmax(self.U, 1)
+            prediction = prediction.eval(feed_dict=feed_dict)
+        print(prediction)
         #end with
 
-        prediction = [[1.0 if _pred >= max(pred) else 0.0 for _pred in pred] for pred in prediction]
-        return np.array(prediction)
+        prediction = [pred + 1 if pred != 5 else pred + 2 for pred in prediction]
+        return prediction
     #end def
 #end class
 
@@ -200,10 +204,10 @@ def _transform_Y(Y):
 
 def main():
     # read train data
-    trainX, trainY, x_min, x_max = _read_data('sat_train.txt', train=True)
+    trainX, trainY, x_min, x_max = _read_data('./data/sat_train.txt', train=True)
 
     # read test data
-    testX, testY = _read_data('sat_test.txt', x_min=x_min, x_max=x_max)
+    testX, testY = _read_data('./data/sat_test.txt', x_min=x_min, x_max=x_max)
 
     train_test = dict(trainX=trainX, trainY=trainY, testX=testX, testY=testY)
     # # =====================Q1 Design a ffn with one hidden layer=====================
@@ -234,8 +238,7 @@ def main():
     # =====================Q2 Determine optimal batch size=====================
 
     # plot learning curves
-    # batch_sizes = [4,8,16,32,64]
-    batch_sizes = [64]
+    batch_sizes = [4,8,16,32,64]
 
     train_err_list = []
     test_acc_list = []
@@ -295,13 +298,71 @@ def main():
     plt.grid(b=True)
     plt.savefig('figures/1a/2c_Converged Accuracy against Batch Size.png')
 
-    target_names = ['1', '2', '3', '4', '5', '7']
+    # _transform_Y(predicted_dict[64])
     for batch_size in batch_sizes:
-        # print(_transform_Y(testY))
-        # print(_transform_Y(predicted_dict[batch_size]))
-        print('Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(testY), _transform_Y(predicted_dict[batch_size]), digits=3, labels=np.unique(_transform_Y(predicted_dict[batch_size])))))
+        print('Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(testY), predicted_dict[batch_size], digits=3, labels=np.unique(predicted_dict[batch_size]))))
 
-    # optimal_batch_size = 32
+    # Batch size 4 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.981     0.989     0.985       461
+    #           2      0.952     0.964     0.958       224
+    #           3      0.878     0.940     0.908       397
+    #           4      0.680     0.493     0.571       211
+    #           5      0.884     0.869     0.877       237
+    #           7      0.811     0.857     0.834       470
+
+    # avg / total      0.874     0.879     0.874      2000
+
+    # Batch size 8 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.972     0.980     0.976       461
+    #           2      0.968     0.960     0.964       224
+    #           3      0.853     0.932     0.890       397
+    #           4      0.611     0.654     0.632       211
+    #           5      0.907     0.827     0.865       237
+    #           7      0.870     0.809     0.838       470
+
+    # avg / total      0.878     0.875     0.876      2000
+
+    # Batch size 16 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.983     0.976     0.979       461
+    #           2      0.959     0.951     0.955       224
+    #           3      0.852     0.945     0.896       397
+    #           4      0.680     0.483     0.565       211
+    #           5      0.874     0.819     0.845       237
+    #           7      0.799     0.864     0.830       470
+
+    # avg / total      0.866     0.870     0.865      2000
+
+    # Batch size 32 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.972     0.980     0.976       461
+    #           2      0.963     0.938     0.950       224
+    #           3      0.879     0.894     0.886       397
+    #           4      0.506     0.370     0.427       211
+    #           5      0.851     0.844     0.847       237
+    #           7      0.773     0.862     0.815       470
+
+    # avg / total      0.842     0.850     0.844      2000
+
+    # Batch size 64 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.970     0.983     0.976       461
+    #           2      0.946     0.938     0.942       224
+    #           3      0.844     0.940     0.889       397
+    #           4      0.521     0.346     0.416       211
+    #           5      0.830     0.743     0.784       237
+    #           7      0.766     0.843     0.802       470
+
+    # avg / total      0.830     0.841     0.832      2000
+
+    optimal_batch_size = 8
 
     # # =====================Q3 Determine optimal number of hidden neurons=====================
 
