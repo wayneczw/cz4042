@@ -118,7 +118,7 @@ class CVRegressor():
                     for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
                         self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
                     
-                    _val_err.append(self.error.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
+                    _val_err.append(self.loss.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
                     
                     if len(testX)>1: _test_err.append(self.error.eval(feed_dict={self.x: testX, self.y_: testY}))
                     if i % 100 == 0:
@@ -127,7 +127,7 @@ class CVRegressor():
 
                 #end for
                 val_err.append(_val_err)
-                _cv_err.append(self.error.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
+                _cv_err.append(self.loss.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
                 if len(testX)>1: test_err.append(_test_err)
             #end for
             self.saver.save(sess, ".ckpt/1bmodel.ckpt")
@@ -146,7 +146,7 @@ class CVRegressor():
     def test(self, X_test, Y_test):
         with tf.Session() as sess:
             self.saver.restore(sess, ".ckpt/1bmodel.ckpt")
-            test_error = self.error.eval(feed_dict={self.x: X_test, self.y_: Y_test})
+            test_error = self.loss.eval(feed_dict={self.x: X_test, self.y_: Y_test})
         #end with
 
         return test_error
