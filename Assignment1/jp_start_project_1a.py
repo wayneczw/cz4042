@@ -56,7 +56,7 @@ class Classifier():
     #end def
     
     def _build_layer(self, X, input_dim, output_dim, hidden=False):
-        W = tf.Variable(tf.truncated_normal([input_dim, output_dim], stddev=1.0/math.sqrt(float(NUM_FEATURES)), seed=10), name='weights')
+        W = tf.Variable(tf.truncated_normal([input_dim, output_dim], stddev=1.0/math.sqrt(float(input_dim)), seed=10), name='weights')
         B = tf.Variable(tf.zeros([output_dim]), name='biases')
         if hidden:
             U = tf.nn.relu(tf.matmul(X, W) + B)
@@ -336,66 +336,6 @@ def main():
     for batch_size in batch_sizes:
         print('Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(testY), predicted_dict[batch_size], digits=3, labels=np.unique(predicted_dict[batch_size]))))
 
-    # Batch size 4 Test set classification report:
-    #              precision    recall  f1-score   support
-       
-    #           1      0.976     0.980     0.978       461
-    #           2      0.973     0.955     0.964       224
-    #           3      0.907     0.859     0.882       397
-    #           4      0.570     0.559     0.565       211
-    #           5      0.886     0.857     0.871       237
-    #           7      0.810     0.870     0.839       470
-       
-    # avg / total      0.870     0.869     0.869      2000
-       
-    # Batch size 8 Test set classification report:
-    #              precision    recall  f1-score   support
-       
-    #           1      0.966     0.989     0.977       461
-    #           2      0.952     0.969     0.960       224
-    #           3      0.859     0.935     0.895       397
-    #           4      0.705     0.441     0.542       211
-    #           5      0.904     0.831     0.866       237
-    #           7      0.807     0.889     0.846       470
-       
-    # avg / total      0.871     0.876     0.869      2000
-       
-    # Batch size 16 Test set classification report:
-    #              precision    recall  f1-score   support
-       
-    #           1      0.976     0.985     0.981       461
-    #           2      0.960     0.969     0.964       224
-    #           3      0.872     0.929     0.900       397
-    #           4      0.551     0.384     0.453       211
-    #           5      0.912     0.835     0.872       237
-    #           7      0.772     0.857     0.812       470
-       
-    # avg / total      0.853     0.861     0.855      2000
-       
-    # Batch size 32 Test set classification report:
-    #              precision    recall  f1-score   support
-       
-    #           1      0.970     0.980     0.975       461
-    #           2      0.951     0.946     0.949       224
-    #           3      0.856     0.940     0.896       397
-    #           4      0.532     0.351     0.423       211
-    #           5      0.868     0.802     0.833       237
-    #           7      0.774     0.851     0.811       470
-       
-    # avg / total      0.841     0.851     0.843      2000
-
-    # Batch size 64 Test set classification report:
-    #              precision    recall  f1-score   support
-       
-    #           1      0.968     0.985     0.976       461
-    #           2      0.946     0.942     0.944       224
-    #           3      0.852     0.942     0.895       397
-    #           4      0.508     0.313     0.387       211
-    #           5      0.844     0.755     0.797       237
-    #           7      0.763     0.855     0.806       470
-
-    # avg / total      0.831     0.843     0.833      2000
-
 
     #### With Early Stopping 
     train_err_list = []
@@ -467,66 +407,6 @@ def main():
     for batch_size in batch_sizes:
         print('Early Stopping Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(testY), predicted_dict[batch_size], digits=3, labels=np.unique(predicted_dict[batch_size]))))
 
-# Early Stopping Batch size 4 Test set classification report:
-#              precision    recall  f1-score   support
-   
-#           1      0.980     0.963     0.972       461
-#           2      0.968     0.933     0.950       224
-#           3      0.880     0.919     0.899       397
-#           4      0.514     0.171     0.256       211
-#           5      0.798     0.882     0.838       237
-#           7      0.735     0.913     0.814       470
-   
-# avg / total      0.830     0.846     0.826      2000
-   
-# Early Stopping Batch size 8 Test set classification report:
-#              precision    recall  f1-score   support
-   
-#           1      0.980     0.970     0.975       461
-#           2      0.938     0.938     0.938       224
-#           3      0.838     0.952     0.892       397
-#           4      0.531     0.204     0.295       211
-#           5      0.834     0.722     0.774       237
-#           7      0.724     0.898     0.802       470
-   
-# avg / total      0.822     0.836     0.818      2000
-
-# Early Stopping Batch size 16 Test set classification report:
-#              precision    recall  f1-score   support
-   
-#           1      0.956     0.983     0.969       461
-#           2      0.933     0.929     0.931       224
-#           3      0.817     0.965     0.885       397
-#           4      0.494     0.190     0.274       211
-#           5      0.786     0.684     0.731       237
-#           7      0.740     0.862     0.796       470
-   
-# avg / total      0.806     0.826     0.806      2000
-   
-# Early Stopping Batch size 32 Test set classification report:
-#              precision    recall  f1-score   support
-   
-#           1      0.950     0.987     0.968       461
-#           2      0.949     0.915     0.932       224
-#           3      0.855     0.952     0.901       397
-#           4      0.490     0.223     0.306       211
-#           5      0.777     0.662     0.715       237
-#           7      0.727     0.874     0.794       470
-   
-# avg / total      0.810     0.827     0.810      2000
-   
-# Early Stopping Batch size 64 Test set classification report:
-#              precision    recall  f1-score   support
-   
-#           1      0.944     0.987     0.965       461
-#           2      0.949     0.915     0.932       224
-#           3      0.821     0.967     0.888       397
-#           4      0.500     0.147     0.227       211
-#           5      0.783     0.624     0.695       237
-#           7      0.719     0.891     0.796       470
-   
-# avg / total      0.801     0.821     0.796      2000
-
 
     optimal_batch_size = 4
 
@@ -595,65 +475,6 @@ def main():
     # for num_neurons in num_hidden_neurons:
     #     print('Number of Neurons {} Test set classification report:\n{}'.format(num_neurons, classification_report(_transform_Y(testY), predicted_dict[num_neurons], digits=3, labels=np.unique(predicted_dict[num_neurons]))))
 
-    # # Number of Neurons 5 Test set classification report:
-    # #              precision    recall  f1-score   support
-       
-    # #           1      0.980     0.974     0.977       461
-    # #           2      0.909     0.933     0.921       224
-    # #           3      0.870     0.924     0.896       397
-    # #           4      0.523     0.374     0.436       211
-    # #           5      0.827     0.785     0.805       237
-    # #           7      0.765     0.836     0.799       470
-       
-    # # avg / total      0.833     0.842     0.835      2000
-       
-    # # Number of Neurons 10 Test set classification report:
-    # #              precision    recall  f1-score   support
-       
-    # #           1      0.981     0.983     0.982       461
-    # #           2      0.964     0.964     0.964       224
-    # #           3      0.834     0.972     0.898       397
-    # #           4      0.724     0.360     0.481       211
-    # #           5      0.917     0.840     0.877       237
-    # #           7      0.783     0.881     0.829       470
-       
-    # # avg / total      0.868     0.872     0.862      2000
-       
-    # # Number of Neurons 15 Test set classification report:
-    # #              precision    recall  f1-score   support
-       
-    # #           1      0.964     0.985     0.974       461
-    # #           2      0.968     0.951     0.959       224
-    # #           3      0.890     0.894     0.892       397
-    # #           4      0.640     0.521     0.574       211
-    # #           5      0.872     0.831     0.851       237
-    # #           7      0.801     0.872     0.835       470
-       
-    # # avg / total      0.866     0.870     0.867      2000
-       
-    # # Number of Neurons 20 Test set classification report:
-    # #              precision    recall  f1-score   support
-       
-    # #           1      0.974     0.987     0.981       461
-    # #           2      0.982     0.955     0.968       224
-    # #           3      0.870     0.907     0.888       397
-    # #           4      0.654     0.725     0.688       211
-    # #           5      0.893     0.878     0.885       237
-    # #           7      0.892     0.823     0.856       470
-       
-    # # avg / total      0.891     0.888     0.889      2000
-
-    # # Number of Neurons 25 Test set classification report:
-    # #              precision    recall  f1-score   support
-       
-    # #           1      0.956     0.996     0.976       461
-    # #           2      0.960     0.973     0.967       224
-    # #           3      0.852     0.970     0.907       397
-    # #           4      0.747     0.531     0.620       211
-    # #           5      0.896     0.869     0.882       237
-    # #           7      0.859     0.843     0.851       470
-       
-    # # avg / total      0.884     0.888     0.883      2000
 
 
     # #### With Early Stopping
@@ -725,65 +546,7 @@ def main():
     # for num_neurons in num_hidden_neurons:
     #     print('Early Stopping Number of Neurons {} Test set classification report:\n{}'.format(num_neurons, classification_report(_transform_Y(testY), predicted_dict[num_neurons], digits=3, labels=np.unique(predicted_dict[num_neurons]))))
 
-    # # Early Stopping Number of Neurons 5 Test set classification report:
-    # #              precision    recall  f1-score   support
-       
-    # #           1      0.956     0.989     0.972       461
-    # #           2      0.946     0.933     0.939       224
-    # #           3      0.920     0.864     0.891       397
-    # #           4      0.476     0.526     0.500       211
-    # #           5      0.785     0.772     0.779       237
-    # #           7      0.810     0.798     0.804       470
-       
-    # # avg / total      0.842     0.839     0.840      2000
-       
-    # # Early Stopping Number of Neurons 10 Test set classification report:
-    # #              precision    recall  f1-score   support
-       
-    # #           1      0.962     0.989     0.975       461
-    # #           2      0.955     0.942     0.948       224
-    # #           3      0.916     0.877     0.896       397
-    # #           4      0.476     0.384     0.425       211
-    # #           5      0.885     0.776     0.827       237
-    # #           7      0.750     0.872     0.806       470
-       
-    # # avg / total      0.842     0.845     0.841      2000
-       
-    # # Early Stopping Number of Neurons 15 Test set classification report:
-    # #              precision    recall  f1-score   support
-       
-    # #           1      0.964     0.987     0.975       461
-    # #           2      0.951     0.955     0.953       224
-    # #           3      0.894     0.909     0.901       397
-    # #           4      0.597     0.569     0.583       211
-    # #           5      0.871     0.772     0.819       237
-    # #           7      0.809     0.840     0.825       470
-       
-    # # avg / total      0.863     0.864     0.863      2000
-       
-    # # Early Stopping Number of Neurons 20 Test set classification report:
-    # #              precision    recall  f1-score   support
-       
-    # #           1      0.981     0.983     0.982       461
-    # #           2      0.972     0.929     0.950       224
-    # #           3      0.927     0.836     0.879       397
-    # #           4      0.514     0.531     0.522       211
-    # #           5      0.838     0.810     0.824       237
-    # #           7      0.782     0.864     0.821       470
-       
-    # # avg / total      0.856     0.852     0.853      2000
 
-    # # Early Stopping Number of Neurons 25 Test set classification report:
-    # #              precision    recall  f1-score   support
-       
-    # #           1      0.987     0.967     0.977       461
-    # #           2      0.960     0.973     0.967       224
-    # #           3      0.829     0.967     0.893       397
-    # #           4      0.712     0.199     0.311       211
-    # #           5      0.869     0.865     0.867       237
-    # #           7      0.751     0.900     0.819       470
-       
-    # # avg / total      0.854     0.859     0.839      2000
 
     optimal_num_neurons = 15
 
