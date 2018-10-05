@@ -467,65 +467,65 @@ def main():
     for batch_size in batch_sizes:
         print('Early Stopping Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(testY), predicted_dict[batch_size], digits=3, labels=np.unique(predicted_dict[batch_size]))))
 
-    # Early Stopping Batch size 4 Test set classification report:
-    #              precision    recall  f1-score   support
+# Early Stopping Batch size 4 Test set classification report:
+#              precision    recall  f1-score   support
+   
+#           1      0.980     0.963     0.972       461
+#           2      0.968     0.933     0.950       224
+#           3      0.880     0.919     0.899       397
+#           4      0.514     0.171     0.256       211
+#           5      0.798     0.882     0.838       237
+#           7      0.735     0.913     0.814       470
+   
+# avg / total      0.830     0.846     0.826      2000
+   
+# Early Stopping Batch size 8 Test set classification report:
+#              precision    recall  f1-score   support
+   
+#           1      0.980     0.970     0.975       461
+#           2      0.938     0.938     0.938       224
+#           3      0.838     0.952     0.892       397
+#           4      0.531     0.204     0.295       211
+#           5      0.834     0.722     0.774       237
+#           7      0.724     0.898     0.802       470
+   
+# avg / total      0.822     0.836     0.818      2000
 
-    #           1      0.954     0.989     0.971       461
-    #           2      0.954     0.933     0.944       224
-    #           3      0.893     0.904     0.899       397
-    #           4      0.500     0.351     0.412       211
-    #           5      0.838     0.785     0.810       237
-    #           7      0.766     0.866     0.813       470
-
-    # avg / total      0.836     0.846     0.839      2000
-
-    # Early Stopping Batch size 8 Test set classification report:
-    #              precision    recall  f1-score   support
-
-    #           1      0.952     0.987     0.969       461
-    #           2      0.942     0.938     0.940       224
-    #           3      0.895     0.904     0.900       397
-    #           4      0.494     0.393     0.438       211
-    #           5      0.819     0.747     0.781       237
-    #           7      0.772     0.845     0.807       470
-
-    # avg / total      0.833     0.841     0.836      2000
-
-    # Early Stopping Batch size 16 Test set classification report:
-    #              precision    recall  f1-score   support
-
-    #           1      0.958     0.983     0.970       461
-    #           2      0.950     0.924     0.937       224
-    #           3      0.863     0.940     0.900       397
-    #           4      0.491     0.251     0.332       211
-    #           5      0.793     0.696     0.742       237
-    #           7      0.731     0.872     0.795       470
-
-    # avg / total      0.816     0.831     0.817      2000
-
-    # Early Stopping Batch size 32 Test set classification report:
-    #              precision    recall  f1-score   support
-
-    #           1      0.944     0.987     0.965       461
-    #           2      0.936     0.920     0.928       224
-    #           3      0.857     0.950     0.901       397
-    #           4      0.486     0.246     0.327       211
-    #           5      0.777     0.646     0.705       237
-    #           7      0.731     0.862     0.791       470
-
-    # avg / total      0.808     0.824     0.809      2000
-
-    # Early Stopping Batch size 64 Test set classification report:
-    #              precision    recall  f1-score   support
-
-    #           1      0.944     0.987     0.965       461
-    #           2      0.941     0.920     0.930       224
-    #           3      0.822     0.967     0.889       397
-    #           4      0.474     0.171     0.251       211
-    #           5      0.787     0.624     0.696       237
-    #           7      0.724     0.874     0.792       470
-
-    # avg / total      0.799     0.820     0.798      2000
+# Early Stopping Batch size 16 Test set classification report:
+#              precision    recall  f1-score   support
+   
+#           1      0.956     0.983     0.969       461
+#           2      0.933     0.929     0.931       224
+#           3      0.817     0.965     0.885       397
+#           4      0.494     0.190     0.274       211
+#           5      0.786     0.684     0.731       237
+#           7      0.740     0.862     0.796       470
+   
+# avg / total      0.806     0.826     0.806      2000
+   
+# Early Stopping Batch size 32 Test set classification report:
+#              precision    recall  f1-score   support
+   
+#           1      0.950     0.987     0.968       461
+#           2      0.949     0.915     0.932       224
+#           3      0.855     0.952     0.901       397
+#           4      0.490     0.223     0.306       211
+#           5      0.777     0.662     0.715       237
+#           7      0.727     0.874     0.794       470
+   
+# avg / total      0.810     0.827     0.810      2000
+   
+# Early Stopping Batch size 64 Test set classification report:
+#              precision    recall  f1-score   support
+   
+#           1      0.944     0.987     0.965       461
+#           2      0.949     0.915     0.932       224
+#           3      0.821     0.967     0.888       397
+#           4      0.500     0.147     0.227       211
+#           5      0.783     0.624     0.695       237
+#           7      0.719     0.891     0.796       470
+   
+# avg / total      0.801     0.821     0.796      2000
 
 
     optimal_batch_size = 4
