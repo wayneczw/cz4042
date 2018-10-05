@@ -773,7 +773,7 @@ def main():
     plt.title("Test Accuracy against Epoch with Different Decay Parameters")
     plt.axis(accuracy_against_epoch)
     for i in range(len(beta_list)):
-        plt.plot(range(epochs), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
+        plt.plot(range(epochs), test_acc_list[i], label = 'beta = {}'.format(beta_list[i]))
         plt.xlabel(str(epochs) + ' Epochs')
         plt.ylabel('Test Accuracy')
         plt.legend()
@@ -783,7 +783,8 @@ def main():
     # Plot Time Taken for One Epoch
     plt.figure("Time Taken for One Epoch againt Decay Parameters")
     plt.title("Time Taken for One Epoch againt BeDecay Parametersta")
-    plt.plot(beta_list, time_taken_one_epoch_list)
+    plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
+    plt.plot([str(beta) for beta in beta_list], time_taken_one_epoch_list)
     plt.xlabel('Decay Parameters')
     plt.ylabel('Time/ms')
     plt.grid(b=True)
@@ -799,6 +800,69 @@ def main():
     plt.ylabel('Test Accuracy')
     plt.grid(b=True)
     plt.savefig('figures/1a/4b_test_accuracy_against_decay_parameters.png')
+
+    for beta in beta_list:
+        print('beta {} Test set classification report:\n{}'.format(beta, classification_report(_transform_Y(testY), predicted_dict[beta], digits=3, labels=np.unique(predicted_dict[beta]))))
+
+    # beta 0 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.985     0.972     0.978       461
+    #           2      0.950     0.942     0.946       224
+    #           3      0.870     0.929     0.899       397
+    #           4      0.697     0.502     0.584       211
+    #           5      0.825     0.873     0.848       237
+    #           7      0.821     0.866     0.843       470
+
+    # avg / total      0.870     0.874     0.870      2000
+
+    # beta 1e-12 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.985     0.972     0.978       461
+    #           2      0.950     0.942     0.946       224
+    #           3      0.870     0.929     0.899       397
+    #           4      0.697     0.502     0.584       211
+    #           5      0.825     0.873     0.848       237
+    #           7      0.821     0.866     0.843       470
+
+    # avg / total      0.870     0.874     0.870      2000
+
+    # beta 1e-09 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.985     0.972     0.978       461
+    #           2      0.950     0.942     0.946       224
+    #           3      0.870     0.929     0.899       397
+    #           4      0.697     0.502     0.584       211
+    #           5      0.825     0.873     0.848       237
+    #           7      0.821     0.866     0.843       470
+
+    # avg / total      0.870     0.874     0.870      2000
+
+    # beta 1e-06 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.985     0.972     0.978       461
+    #           2      0.950     0.942     0.946       224
+    #           3      0.870     0.929     0.899       397
+    #           4      0.697     0.502     0.584       211
+    #           5      0.825     0.873     0.848       237
+    #           7      0.821     0.866     0.843       470
+
+    # avg / total      0.870     0.874     0.870      2000
+
+    # beta 0.001 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.983     0.980     0.982       461
+    #           2      0.963     0.942     0.953       224
+    #           3      0.869     0.940     0.903       397
+    #           4      0.599     0.431     0.501       211
+    #           5      0.840     0.819     0.829       237
+    #           7      0.784     0.849     0.815       470
+
+    # avg / total      0.854     0.860     0.855      2000
 
     #### With Early Stopping
     train_err_list = []
@@ -838,21 +902,22 @@ def main():
     es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
     plt.axis(es_accuracy_against_epoch)
     for i in range(len(beta_list)):
-        plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
+        plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'beta = {}'.format(beta_list[i]))
         plt.xlabel('Epochs')
         plt.ylabel('Test Accuracy')
         plt.legend()
         plt.grid(b=True)
-        plt.savefig('figures/1a/4b_test_accuracy_vs_epoch_for_diff_beta.png')
+        plt.savefig('figures/1a/4b_es_test_accuracy_vs_epoch_for_diff_beta.png')
 
     # Plot Time Taken for One Epoch
     plt.figure("Early Stopping Time Taken for One Epoch againt Decay Parameters")
     plt.title("Early Stopping Time Taken for One Epoch againt Decay Parametersa")
-    plt.plot(beta_list, time_taken_one_epoch_list)
+    plt.xticks(np.arange(5), [str(beta) for beta in beta_list])    
+    plt.plot([str(beta) for beta in beta_list], time_taken_one_epoch_list)
     plt.xlabel('Decay Parameters')
     plt.ylabel('Time/ms')
     plt.grid(b=True)
-    plt.savefig('figures/1a/4b_time_taken_for_one_epoch_vs_num_neurons.png')
+    plt.savefig('figures/1a/4b_es_time_taken_for_one_epoch_vs_num_neurons.png')
 
     # Plot Test Accuracy against Decay Parameters
     final_acc = [acc[-1] for acc in test_acc_list]
@@ -865,7 +930,70 @@ def main():
     plt.grid(b=True)
     plt.savefig('figures/1a/4b_es_test_accuracy_against_decay_arameters.png')
 
-    optimal_beta = 0
+    for beta in beta_list:
+        print('Early Stopping beta {} Test set classification report:\n{}'.format(beta, classification_report(_transform_Y(testY), predicted_dict[beta], digits=3, labels=np.unique(predicted_dict[beta]))))
+
+    # Early Stopping beta 0 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.956     0.985     0.970       461
+    #           2      0.945     0.929     0.937       224
+    #           3      0.868     0.924     0.895       397
+    #           4      0.452     0.265     0.334       211
+    #           5      0.805     0.679     0.737       237
+    #           7      0.731     0.868     0.794       470
+
+    # avg / total      0.813     0.827     0.815      2000
+
+    # Early Stopping beta 1e-12 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.956     0.985     0.970       461
+    #           2      0.945     0.929     0.937       224
+    #           3      0.868     0.924     0.895       397
+    #           4      0.452     0.265     0.334       211
+    #           5      0.805     0.679     0.737       237
+    #           7      0.731     0.868     0.794       470
+
+    # avg / total      0.813     0.827     0.815      2000
+
+    # Early Stopping beta 1e-09 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.956     0.985     0.970       461
+    #           2      0.945     0.929     0.937       224
+    #           3      0.868     0.924     0.895       397
+    #           4      0.452     0.265     0.334       211
+    #           5      0.805     0.679     0.737       237
+    #           7      0.731     0.868     0.794       470
+
+    # avg / total      0.813     0.827     0.815      2000
+
+    # Early Stopping beta 1e-06 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.956     0.989     0.972       461
+    #           2      0.950     0.929     0.939       224
+    #           3      0.886     0.922     0.904       397
+    #           4      0.469     0.322     0.382       211
+    #           5      0.806     0.684     0.740       237
+    #           7      0.741     0.860     0.796       470
+
+    # avg / total      0.822     0.832     0.824      2000
+
+    # Early Stopping beta 0.001 Test set classification report:
+    #              precision    recall  f1-score   support
+
+    #           1      0.946     0.987     0.966       461
+    #           2      0.933     0.929     0.931       224
+    #           3      0.841     0.962     0.898       397
+    #           4      0.513     0.289     0.370       211
+    #           5      0.790     0.650     0.713       237
+    #           7      0.750     0.843     0.794       470
+
+    # avg / total      0.813     0.828     0.815      2000
+
+    optimal_beta = 1e-6
 
     # # =====================Q5=====================
 
