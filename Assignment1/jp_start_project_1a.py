@@ -108,8 +108,10 @@ class Classifier():
         if small:
             trainX = trainX[:100]
             trainY = trainY[:100]
-
-        X_train, X_val, Y_train, Y_val = train_test_split(trainX, trainY, test_size=0.25, random_state=10)
+        if self.early_stop:
+            X_train, X_val, Y_train, Y_val = train_test_split(trainX, trainY, test_size=0.25, random_state=10)
+        else:
+            X_train, Y_train = trainX, trainY
 
         self.train_err = []
         self.val_err = []
@@ -138,7 +140,7 @@ class Classifier():
                 self.train_err.append(self.loss.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
                 self.test_acc.append(self.accuracy.eval(feed_dict={self.x: testX, self.y_: testY}))
                 
-                if i % 100 == 0:
+                if i % 200 == 0:
                     print('batch size: %d: hidden neurons: [%d] decay parameters: %g iter: %d, train error  : %g'%(self.batch_size, self.hidden_layer_dict[1], self.l2_beta, i, self.train_err[i]))
                     print('batch size: %d: hidden neurons: [%d] decay parameters: %g iter: %d, test accuracy  : %g'%(self.batch_size, self.hidden_layer_dict[1], self.l2_beta, i, self.test_acc[i]))
                     print('-'*50)
@@ -151,7 +153,7 @@ class Classifier():
                     if (tmp_best_val_err - _val_err) < self.min_delta:
                         _patience -= 1
                         if _patience == 0:
-                            logger.info('Early stopping at {}th iteration'.format(i))
+                            print('Early stopping at {}th iteration'.format(i))
                             break
                     else: # if (tmp_best_val_err - _val_err) >= self.min_delta
                         _patience = self.patience
@@ -284,6 +286,7 @@ def main():
         train_err_list.append(train_err)
         test_acc_list.append(test_acc)
         time_taken_one_epoch_list.append(time_taken_one_epoch)
+        print('{} batch size took {}ms per epoch'.format(batch_size, time_taken_one_epoch))
         predicted_dict[batch_size] = classifier.predict(testX)
     #end for
 
@@ -336,6 +339,65 @@ def main():
     for batch_size in batch_sizes:
         print('Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(testY), predicted_dict[batch_size], digits=3, labels=np.unique(predicted_dict[batch_size]))))
 
+    # Batch size 4 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.982     0.974     0.978       461
+    #           2      0.947     0.960     0.953       224
+    #           3      0.897     0.924     0.911       397
+    #           4      0.659     0.640     0.649       211
+    #           5      0.848     0.869     0.858       237
+    #           7      0.858     0.838     0.848       470
+       
+    # avg / total      0.882     0.883     0.883      2000
+       
+    # Batch size 8 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.980     0.967     0.974       461
+    #           2      0.956     0.960     0.958       224
+    #           3      0.887     0.929     0.908       397
+    #           4      0.685     0.649     0.667       211
+    #           5      0.850     0.861     0.855       237
+    #           7      0.864     0.853     0.859       470
+       
+    # avg / total      0.885     0.886     0.885      2000
+       
+    # Batch size 16 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.985     0.972     0.978       461
+    #           2      0.950     0.942     0.946       224
+    #           3      0.870     0.929     0.899       397
+    #           4      0.697     0.502     0.584       211
+    #           5      0.825     0.873     0.848       237
+    #           7      0.821     0.866     0.843       470
+       
+    # avg / total      0.870     0.874     0.870      2000
+       
+    # Batch size 32 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.982     0.970     0.976       461
+    #           2      0.959     0.929     0.943       224
+    #           3      0.872     0.927     0.899       397
+    #           4      0.634     0.460     0.533       211
+    #           5      0.806     0.861     0.833       237
+    #           7      0.800     0.851     0.825       470
+       
+    # avg / total      0.857     0.862     0.858      2000
+
+    # Batch size 64 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.978     0.976     0.977       461
+    #           2      0.950     0.938     0.944       224
+    #           3      0.856     0.932     0.893       397
+    #           4      0.521     0.346     0.416       211
+    #           5      0.830     0.806     0.818       237
+    #           7      0.774     0.851     0.811       470
+       
+    # avg / total      0.837     0.847     0.839      2000
 
     #### With Early Stopping 
     train_err_list = []
@@ -351,6 +413,7 @@ def main():
         train_err_list.append(train_err)
         test_acc_list.append(test_acc)
         time_taken_one_epoch_list.append(time_taken_one_epoch)
+        print('{} batch size took {}ms per epoch'.format(batch_size, time_taken_one_epoch))
         predicted_dict[batch_size] = classifier.predict(testX)
     #end for
 
@@ -407,8 +470,68 @@ def main():
     for batch_size in batch_sizes:
         print('Early Stopping Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(testY), predicted_dict[batch_size], digits=3, labels=np.unique(predicted_dict[batch_size]))))
 
+    # Early Stopping Batch size 4 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.980     0.978     0.979       461
+    #           2      0.955     0.938     0.946       224
+    #           3      0.833     0.965     0.894       397
+    #           4      0.553     0.270     0.363       211
+    #           5      0.856     0.781     0.817       237
+    #           7      0.754     0.868     0.807       470
+       
+    # avg / total      0.835     0.847     0.834      2000
+       
+    # Early Stopping Batch size 8 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.956     0.987     0.971       461
+    #           2      0.972     0.920     0.945       224
+    #           3      0.899     0.877     0.888       397
+    #           4      0.429     0.227     0.297       211
+    #           5      0.824     0.730     0.774       237
+    #           7      0.718     0.921     0.807       470
+       
+    # avg / total      0.819     0.832     0.819      2000
+       
+    # Early Stopping Batch size 16 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.956     0.989     0.972       461
+    #           2      0.950     0.929     0.939       224
+    #           3      0.886     0.922     0.904       397
+    #           4      0.469     0.322     0.382       211
+    #           5      0.806     0.684     0.740       237
+    #           7      0.741     0.860     0.796       470
+       
+    # avg / total      0.822     0.832     0.824      2000
 
-    optimal_batch_size = 4
+    # Early Stopping Batch size 32 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.950     0.987     0.968       461
+    #           2      0.932     0.924     0.928       224
+    #           3      0.846     0.955     0.897       397
+    #           4      0.519     0.194     0.283       211
+    #           5      0.788     0.658     0.717       237
+    #           7      0.728     0.889     0.801       470
+       
+    # avg / total      0.811     0.828     0.808      2000
+       
+    # Early Stopping Batch size 64 Test set classification report:
+    #              precision    recall  f1-score   support
+       
+    #           1      0.944     0.987     0.965       461
+    #           2      0.936     0.920     0.928       224
+    #           3      0.841     0.960     0.896       397
+    #           4      0.519     0.190     0.278       211
+    #           5      0.789     0.646     0.710       237
+    #           7      0.730     0.891     0.803       470
+       
+    # avg / total      0.809     0.827     0.806      2000
+        
+
+    optimal_batch_size = 16
 
     # # =====================Q3 Determine optimal number of hidden neurons=====================
     # num_hidden_neurons = [5,10,15,20,25]
@@ -426,6 +549,7 @@ def main():
     #     train_err_list.append(train_err)
     #     test_acc_list.append(test_acc)
     #     time_taken_one_epoch_list.append(time_taken_one_epoch)
+    #     print('{} num_neurons took {}ms per epoch'.format(num_neurons, time_taken_one_epoch))
     #     predicted_dict[num_neurons] = classifier.predict(testX)
 
 
@@ -491,6 +615,7 @@ def main():
     #     train_err_list.append(train_err)
     #     test_acc_list.append(test_acc)
     #     time_taken_one_epoch_list.append(time_taken_one_epoch)
+    #     print('{} num_neurons took {}ms per epoch'.format(num_neurons, time_taken_one_epoch))
     #     predicted_dict[num_neurons] = classifier.predict(testX)
     # #end for
 
@@ -568,6 +693,7 @@ def main():
     #     train_err_list.append(train_err)
     #     test_acc_list.append(test_acc)
     #     time_taken_one_epoch_list.append(time_taken_one_epoch)
+    #     print('{} beta took {}ms per epoch'.format(beta, time_taken_one_epoch))
     #     predicted_dict[beta] = classifier.predict(testX)
     # #end for
 
@@ -632,6 +758,7 @@ def main():
     #     train_err_list.append(train_err)
     #     test_acc_list.append(test_acc)
     #     time_taken_one_epoch_list.append(time_taken_one_epoch)
+    #     print('{} beta took {}ms per epoch'.format(beta, time_taken_one_epoch))
     #     predicted_dict[beta] = classifier.predict(testX)
 
     # # Plot Training Errors
@@ -699,6 +826,7 @@ def main():
     # train_err_list.append(train_err1)
     # test_acc_list.append(test_acc1)
     # time_taken_one_epoch_list.append(time_taken_one_epoch1)
+    # print('3-layer took {}ms per epoch'.format(time_taken_one_epoch1))
 
 
     # #### 4-layer Without Early Stopping
@@ -710,6 +838,7 @@ def main():
     # train_err_list.append(train_err2)
     # test_acc_list.append(test_acc2)
     # time_taken_one_epoch_list.append(time_taken_one_epoch2)
+    # print('4-layer took {}ms per epoch'.format(time_taken_one_epoch2))
 
     # # plot train_err against epoch
     # plt.figure('Training Error: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
@@ -773,7 +902,7 @@ def main():
     # train_err_list.append(train_err1)
     # test_acc_list.append(test_acc1)
     # time_taken_one_epoch_list.append(time_taken_one_epoch1)
-
+    # print('3-layer took {}ms per epoch'.format(time_taken_one_epoch1))
 
     # #### 4-layer With Early Stopping
     # classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
@@ -781,6 +910,7 @@ def main():
     #                         early_stop=True, patience=20, min_delta=0.005).train(small=False, **train_test)
 
     # train_err2, test_acc2, time_taken_one_epoch2 = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch
+    # print('4-layer took {}ms per epoch'.format(time_taken_one_epoch2))
 
     # train_err_list.append(train_err2)
     # test_acc_list.append(test_acc2)
