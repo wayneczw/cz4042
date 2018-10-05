@@ -103,6 +103,7 @@ class Classifier():
     #end def
 
     def train(self, trainX, trainY, testX, testY, small=False, **kwargs):
+        np.random.seed(10)
 
         if small:
             trainX = trainX[:100]
@@ -524,145 +525,8 @@ def main():
 
     optimal_batch_size = 4
 
-    # =====================Q3 Determine optimal number of hidden neurons=====================
-    num_hidden_neurons = [5,10,15,20,25]
-
-    #### Without Early Stopping
-    train_err_list = []
-    test_acc_list = []
-    time_taken_one_epoch_list = []
-    predicted_dict = dict()
-
-    for num_neurons in num_hidden_neurons:
-        classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-                                hidden_layer_dict={1: num_neurons}, batch_size=optimal_batch_size).train(small=False, **train_test)
-        train_err, test_acc, time_taken_one_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch
-        train_err_list.append(train_err)
-        test_acc_list.append(test_acc)
-        time_taken_one_epoch_list.append(time_taken_one_epoch)
-        predicted_dict[num_neurons] = classifier.predict(testX)
-
-
-    # Plot Training Errors
-    plt.figure("Train Error against Epoch with different Number of Neurons")
-    plt.title("Train Error against Epoch with different Number of Neurons")
-    plt.axis(error_against_epoch)
-    for i in range(len(num_hidden_neurons)):
-        plt.plot(range(epochs), train_err_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
-        plt.xlabel(str(epochs) + ' Epochs')
-        plt.ylabel('Train Error')
-        plt.legend()
-        plt.grid(b=True)
-        plt.savefig('figures/1a/3a_train_error_vs_epoch_for_diff_num_neurons.png')
-
-    # Plot Test Accuracy
-    plt.figure("Test Accuracy against Epoch with different Number of Neurons")
-    plt.title("Test Accuracy against Epoch with different Number of Neurons")
-    plt.axis(accuracy_against_epoch)
-    for i in range(len(num_hidden_neurons)):
-        plt.plot(range(epochs), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
-        plt.xlabel(str(epochs) + ' Epochs')
-        plt.ylabel('Test Accuracy')
-        plt.legend()
-        plt.grid(b=True)
-        plt.savefig('figures/1a/3a_test_accuracy_vs_epoch_for_diff_num_neurons.png')
-
-    # Plot Time Taken for One Epoch
-    plt.figure("Time Taken for One Epoch againt Number of Neurons")
-    plt.title("Time Taken for One Epoch againt Number of Neurons")
-    plt.plot(num_hidden_neurons, time_taken_one_epoch_list)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Time/ms')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3b_time_taken_for_one_epoch_vs_num_neurons.png')
-
-    # plot final test accuracy against Number of Neurons
-    final_acc = [acc[-1] for acc in test_acc_list]
-    plt.figure('Converged Accuracy against Number of Neurons')
-    plt.title('Converged Accuracy against Number of Neurons')
-    plt.plot(num_hidden_neurons, final_acc)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Test Accuracy')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3c_accuracy_against_num_neurons.png')
-    
-    for num_neurons in num_hidden_neurons:
-        print('Number of Neurons {} Test set classification report:\n{}'.format(num_neurons, classification_report(_transform_Y(testY), predicted_dict[num_neurons], digits=3, labels=np.unique(predicted_dict[num_neurons]))))
-
-
-    #### With Early Stopping
-    train_err_list = []
-    test_acc_list = []
-    time_taken_one_epoch_list = []
-    predicted_dict = dict()
-
-    for num_neurons in num_hidden_neurons:
-        classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-                                hidden_layer_dict={1: num_neurons}, batch_size=optimal_batch_size,
-                                early_stop=True, patience=20, min_delta=0.005).train(small=False, **train_test)
-        train_err, test_acc, time_taken_one_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch
-        train_err_list.append(train_err)
-        test_acc_list.append(test_acc)
-        time_taken_one_epoch_list.append(time_taken_one_epoch)
-        predicted_dict[num_neurons] = classifier.predict(testX)
-    #end for
-
-    # Plot Training Errors
-    plt.figure("Early Stopping Train Error against Epoch with different Number of Neurons")
-    plt.title("Early Stopping Train Error against Epoch with different Number of Neurons")
-    es_error_against_epoch[1] = max([len(l) for l in train_err_list])
-    plt.axis(es_error_against_epoch)
-
-    for i in range(len(num_hidden_neurons)):
-        plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
-        plt.xlabel('Epochs')
-        plt.ylabel('Train Error')
-        plt.legend()
-        plt.grid(b=True)
-        plt.savefig('figures/1a/3a_es_train_error_vs_epoch_for_diff_num_neurons.png')
-    #end for
-
-    # Plot Test Accuracy
-    plt.figure("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
-    plt.title("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
-    es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
-    plt.axis(es_accuracy_against_epoch)
-
-    for i in range(len(num_hidden_neurons)):
-        plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
-        plt.xlabel('Epochs')
-        plt.ylabel('Test Accuracy')
-        plt.legend()
-        plt.grid(b=True)
-        plt.savefig('figures/1a/3a_es_test_accuracy_vs_epoch_for_diff_num_neurons.png')
-    #end for
-
-    # Plot Time Taken for One Epoch
-    plt.figure("Early Stopping Time Taken for One Epoch againt Number of Neurons")
-    plt.title("Early Stopping Time Taken for One Epoch againt Number of Neurons")
-    plt.plot(num_hidden_neurons, time_taken_one_epoch_list)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Time/ms')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3b_es_time_taken_for_one_epoch_vs_num_neurons.png')
-
-    # plot final test accuracy against Number of Neurons
-    final_acc = [acc[-1] for acc in test_acc_list]
-    plt.figure('Early Stopping Converged Accuracy against Number of Neurons')
-    plt.title('Early Stopping Converged Accuracy against Number of Neurons')
-    plt.plot(num_hidden_neurons, final_acc)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Test Accuracy')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3c_es_accuracy_against_num_neurons.png')
-    
-    for num_neurons in num_hidden_neurons:
-        print('Early Stopping Number of Neurons {} Test set classification report:\n{}'.format(num_neurons, classification_report(_transform_Y(testY), predicted_dict[num_neurons], digits=3, labels=np.unique(predicted_dict[num_neurons]))))
-
-    # optimal_num_neurons = 25
-
-    # # =====================Q4 Determine optimal decay parameter=====================
-    # beta_list = [0,1e-12,1e-9,1e-6,1e-3]
+    # # =====================Q3 Determine optimal number of hidden neurons=====================
+    # num_hidden_neurons = [5,10,15,20,25]
 
     # #### Without Early Stopping
     # train_err_list = []
@@ -670,63 +534,122 @@ def main():
     # time_taken_one_epoch_list = []
     # predicted_dict = dict()
 
-    # for beta in beta_list:
+    # for num_neurons in num_hidden_neurons:
     #     classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-    #                             hidden_layer_dict={1: optimal_num_neurons}, batch_size=optimal_batch_size,
-    #                             l2_beta=beta).train(small=False, **train_test)
-
+    #                             hidden_layer_dict={1: num_neurons}, batch_size=optimal_batch_size).train(small=False, **train_test)
     #     train_err, test_acc, time_taken_one_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch
     #     train_err_list.append(train_err)
     #     test_acc_list.append(test_acc)
     #     time_taken_one_epoch_list.append(time_taken_one_epoch)
-    #     predicted_dict[beta] = classifier.predict(testX)
-    # #end for
+    #     predicted_dict[num_neurons] = classifier.predict(testX)
+
 
     # # Plot Training Errors
-    # plt.figure("Train Error against Epoch with Different Decay Parameters")
-    # plt.title("Train Error against Epoch with Different Decay Parameters")
+    # plt.figure("Train Error against Epoch with different Number of Neurons")
+    # plt.title("Train Error against Epoch with different Number of Neurons")
     # plt.axis(error_against_epoch)
-
-    # for i in range(len(beta_list)):
-    #     plt.plot(range(epochs), train_err_list[i], label = 'beta = {}'.format(beta_list[i]))
-    #     plt.xlabel(str(epochs) + ' iterations')
+    # for i in range(len(num_hidden_neurons)):
+    #     plt.plot(range(epochs), train_err_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
+    #     plt.xlabel(str(epochs) + ' Epochs')
     #     plt.ylabel('Train Error')
     #     plt.legend()
     #     plt.grid(b=True)
-    #     plt.savefig('figures/1a/4a_train_error_vs_epoch_for_diff_beta.png')
-    # #end for
+    #     plt.savefig('figures/1a/3a_train_error_vs_epoch_for_diff_num_neurons.png')
 
     # # Plot Test Accuracy
-    # plt.figure("Test Accuracy against Epoch with Different Decay Parameters")
-    # plt.title("Test Accuracy against Epoch with Different Decay Parameters")
+    # plt.figure("Test Accuracy against Epoch with different Number of Neurons")
+    # plt.title("Test Accuracy against Epoch with different Number of Neurons")
     # plt.axis(accuracy_against_epoch)
-    # for i in range(len(beta_list)):
+    # for i in range(len(num_hidden_neurons)):
     #     plt.plot(range(epochs), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
     #     plt.xlabel(str(epochs) + ' Epochs')
     #     plt.ylabel('Test Accuracy')
     #     plt.legend()
     #     plt.grid(b=True)
-    #     plt.savefig('figures/1a/4b_test_accuracy_vs_epoch_for_diff_beta.png')
+    #     plt.savefig('figures/1a/3a_test_accuracy_vs_epoch_for_diff_num_neurons.png')
 
     # # Plot Time Taken for One Epoch
-    # plt.figure("Time Taken for One Epoch againt Decay Parameters")
-    # plt.title("Time Taken for One Epoch againt BeDecay Parametersta")
-    # plt.plot(beta_list, time_taken_one_epoch_list)
-    # plt.xlabel('Decay Parameters')
+    # plt.figure("Time Taken for One Epoch againt Number of Neurons")
+    # plt.title("Time Taken for One Epoch againt Number of Neurons")
+    # plt.plot(num_hidden_neurons, time_taken_one_epoch_list)
+    # plt.xlabel('Number of Neurons')
     # plt.ylabel('Time/ms')
     # plt.grid(b=True)
-    # plt.savefig('figures/1a/4b_time_taken_for_one_epoch_vs_num_neurons.png')
+    # plt.savefig('figures/1a/3b_time_taken_for_one_epoch_vs_num_neurons.png')
 
-    # # Plot Test Accuracy against Decay Parameters
+    # # plot final test accuracy against Number of Neurons
     # final_acc = [acc[-1] for acc in test_acc_list]
-    # plt.figure('Converged Test Accuracy against Decay Parameters')
-    # plt.title('Converged Test Accuracy against Decay Parameters')
-    # plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
-    # plt.plot([str(beta) for beta in beta_list], final_acc)
-    # plt.xlabel('Decay Parameters')
+    # plt.figure('Converged Accuracy against Number of Neurons')
+    # plt.title('Converged Accuracy against Number of Neurons')
+    # plt.plot(num_hidden_neurons, final_acc)
+    # plt.xlabel('Number of Neurons')
     # plt.ylabel('Test Accuracy')
     # plt.grid(b=True)
-    # plt.savefig('figures/1a/4b_test_accuracy_against_decay_parameters.png')
+    # plt.savefig('figures/1a/3c_accuracy_against_num_neurons.png')
+    
+    # for num_neurons in num_hidden_neurons:
+    #     print('Number of Neurons {} Test set classification report:\n{}'.format(num_neurons, classification_report(_transform_Y(testY), predicted_dict[num_neurons], digits=3, labels=np.unique(predicted_dict[num_neurons]))))
+
+    # # Number of Neurons 5 Test set classification report:
+    # #              precision    recall  f1-score   support
+       
+    # #           1      0.980     0.974     0.977       461
+    # #           2      0.909     0.933     0.921       224
+    # #           3      0.870     0.924     0.896       397
+    # #           4      0.523     0.374     0.436       211
+    # #           5      0.827     0.785     0.805       237
+    # #           7      0.765     0.836     0.799       470
+       
+    # # avg / total      0.833     0.842     0.835      2000
+       
+    # # Number of Neurons 10 Test set classification report:
+    # #              precision    recall  f1-score   support
+       
+    # #           1      0.981     0.983     0.982       461
+    # #           2      0.964     0.964     0.964       224
+    # #           3      0.834     0.972     0.898       397
+    # #           4      0.724     0.360     0.481       211
+    # #           5      0.917     0.840     0.877       237
+    # #           7      0.783     0.881     0.829       470
+       
+    # # avg / total      0.868     0.872     0.862      2000
+       
+    # # Number of Neurons 15 Test set classification report:
+    # #              precision    recall  f1-score   support
+       
+    # #           1      0.964     0.985     0.974       461
+    # #           2      0.968     0.951     0.959       224
+    # #           3      0.890     0.894     0.892       397
+    # #           4      0.640     0.521     0.574       211
+    # #           5      0.872     0.831     0.851       237
+    # #           7      0.801     0.872     0.835       470
+       
+    # # avg / total      0.866     0.870     0.867      2000
+       
+    # # Number of Neurons 20 Test set classification report:
+    # #              precision    recall  f1-score   support
+       
+    # #           1      0.974     0.987     0.981       461
+    # #           2      0.982     0.955     0.968       224
+    # #           3      0.870     0.907     0.888       397
+    # #           4      0.654     0.725     0.688       211
+    # #           5      0.893     0.878     0.885       237
+    # #           7      0.892     0.823     0.856       470
+       
+    # # avg / total      0.891     0.888     0.889      2000
+
+    # # Number of Neurons 25 Test set classification report:
+    # #              precision    recall  f1-score   support
+       
+    # #           1      0.956     0.996     0.976       461
+    # #           2      0.960     0.973     0.967       224
+    # #           3      0.852     0.970     0.907       397
+    # #           4      0.747     0.531     0.620       211
+    # #           5      0.896     0.869     0.882       237
+    # #           7      0.859     0.843     0.851       470
+       
+    # # avg / total      0.884     0.888     0.883      2000
+
 
     # #### With Early Stopping
     # train_err_list = []
@@ -734,65 +657,263 @@ def main():
     # time_taken_one_epoch_list = []
     # predicted_dict = dict()
 
-    # for beta in beta_list:
+    # for num_neurons in num_hidden_neurons:
     #     classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-    #                             hidden_layer_dict={1: optimal_num_neurons}, batch_size=optimal_batch_size,
-    #                             l2_beta=beta, early_stop=True, patience=20, min_delta=0.005).train(small=False, **train_test)
-
+    #                             hidden_layer_dict={1: num_neurons}, batch_size=optimal_batch_size,
+    #                             early_stop=True, patience=20, min_delta=0.005).train(small=False, **train_test)
     #     train_err, test_acc, time_taken_one_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch
     #     train_err_list.append(train_err)
     #     test_acc_list.append(test_acc)
     #     time_taken_one_epoch_list.append(time_taken_one_epoch)
-    #     predicted_dict[beta] = classifier.predict(testX)
+    #     predicted_dict[num_neurons] = classifier.predict(testX)
+    # #end for
 
     # # Plot Training Errors
-    # plt.figure("Early Stopping Train Error against Epoch with Different Decay Parameters")
-    # plt.title("Early Stopping Train Error against Epoch with Different Decay Parameters")
+    # plt.figure("Early Stopping Train Error against Epoch with different Number of Neurons")
+    # plt.title("Early Stopping Train Error against Epoch with different Number of Neurons")
     # es_error_against_epoch[1] = max([len(l) for l in train_err_list])
     # plt.axis(es_error_against_epoch)
 
-    # for i in range(len(beta_list)):
-    #     plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'beta = {}'.format(beta_list[i]))
+    # for i in range(len(num_hidden_neurons)):
+    #     plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
     #     plt.xlabel('Epochs')
     #     plt.ylabel('Train Error')
     #     plt.legend()
     #     plt.grid(b=True)
-    #     plt.savefig('figures/1a/4a_es_train_error_vs_epoch_for_diff_beta.png')
-   
+    #     plt.savefig('figures/1a/3a_es_train_error_vs_epoch_for_diff_num_neurons.png')
+    # #end for
+
     # # Plot Test Accuracy
-    # plt.figure("Early Stopping Test Accuracy against Epoch with Different Decay Parameters")
-    # plt.title("Early Stopping Test Accuracy against Epoch with Different Decay Parameters")
+    # plt.figure("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
+    # plt.title("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
     # es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
     # plt.axis(es_accuracy_against_epoch)
-    # for i in range(len(beta_list)):
+
+    # for i in range(len(num_hidden_neurons)):
     #     plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
     #     plt.xlabel('Epochs')
     #     plt.ylabel('Test Accuracy')
     #     plt.legend()
     #     plt.grid(b=True)
-    #     plt.savefig('figures/1a/4b_test_accuracy_vs_epoch_for_diff_beta.png')
+    #     plt.savefig('figures/1a/3a_es_test_accuracy_vs_epoch_for_diff_num_neurons.png')
+    # #end for
 
     # # Plot Time Taken for One Epoch
-    # plt.figure("Early Stopping Time Taken for One Epoch againt Decay Parameters")
-    # plt.title("Early Stopping Time Taken for One Epoch againt Decay Parametersa")
-    # plt.plot(beta_list, time_taken_one_epoch_list)
-    # plt.xlabel('Decay Parameters')
+    # plt.figure("Early Stopping Time Taken for One Epoch againt Number of Neurons")
+    # plt.title("Early Stopping Time Taken for One Epoch againt Number of Neurons")
+    # plt.plot(num_hidden_neurons, time_taken_one_epoch_list)
+    # plt.xlabel('Number of Neurons')
     # plt.ylabel('Time/ms')
     # plt.grid(b=True)
-    # plt.savefig('figures/1a/4b_time_taken_for_one_epoch_vs_num_neurons.png')
+    # plt.savefig('figures/1a/3b_es_time_taken_for_one_epoch_vs_num_neurons.png')
 
-    # # Plot Test Accuracy against Decay Parameters
+    # # plot final test accuracy against Number of Neurons
     # final_acc = [acc[-1] for acc in test_acc_list]
-    # plt.figure('Early Stopping Test Accuracy against Decay Parameters')
-    # plt.title('Early Stopping Test Accuracy against Decay Parameters')
-    # plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
-    # plt.plot([str(beta) for beta in beta_list], final_acc)
-    # plt.xlabel('Decay Parameters')
+    # plt.figure('Early Stopping Converged Accuracy against Number of Neurons')
+    # plt.title('Early Stopping Converged Accuracy against Number of Neurons')
+    # plt.plot(num_hidden_neurons, final_acc)
+    # plt.xlabel('Number of Neurons')
     # plt.ylabel('Test Accuracy')
     # plt.grid(b=True)
-    # plt.savefig('figures/1a/4b_es_test_accuracy_against_decay_arameters.png')
+    # plt.savefig('figures/1a/3c_es_accuracy_against_num_neurons.png')
+    
+    # for num_neurons in num_hidden_neurons:
+    #     print('Early Stopping Number of Neurons {} Test set classification report:\n{}'.format(num_neurons, classification_report(_transform_Y(testY), predicted_dict[num_neurons], digits=3, labels=np.unique(predicted_dict[num_neurons]))))
 
-    # optimal_beta = 0
+    # # Early Stopping Number of Neurons 5 Test set classification report:
+    # #              precision    recall  f1-score   support
+       
+    # #           1      0.956     0.989     0.972       461
+    # #           2      0.946     0.933     0.939       224
+    # #           3      0.920     0.864     0.891       397
+    # #           4      0.476     0.526     0.500       211
+    # #           5      0.785     0.772     0.779       237
+    # #           7      0.810     0.798     0.804       470
+       
+    # # avg / total      0.842     0.839     0.840      2000
+       
+    # # Early Stopping Number of Neurons 10 Test set classification report:
+    # #              precision    recall  f1-score   support
+       
+    # #           1      0.962     0.989     0.975       461
+    # #           2      0.955     0.942     0.948       224
+    # #           3      0.916     0.877     0.896       397
+    # #           4      0.476     0.384     0.425       211
+    # #           5      0.885     0.776     0.827       237
+    # #           7      0.750     0.872     0.806       470
+       
+    # # avg / total      0.842     0.845     0.841      2000
+       
+    # # Early Stopping Number of Neurons 15 Test set classification report:
+    # #              precision    recall  f1-score   support
+       
+    # #           1      0.964     0.987     0.975       461
+    # #           2      0.951     0.955     0.953       224
+    # #           3      0.894     0.909     0.901       397
+    # #           4      0.597     0.569     0.583       211
+    # #           5      0.871     0.772     0.819       237
+    # #           7      0.809     0.840     0.825       470
+       
+    # # avg / total      0.863     0.864     0.863      2000
+       
+    # # Early Stopping Number of Neurons 20 Test set classification report:
+    # #              precision    recall  f1-score   support
+       
+    # #           1      0.981     0.983     0.982       461
+    # #           2      0.972     0.929     0.950       224
+    # #           3      0.927     0.836     0.879       397
+    # #           4      0.514     0.531     0.522       211
+    # #           5      0.838     0.810     0.824       237
+    # #           7      0.782     0.864     0.821       470
+       
+    # # avg / total      0.856     0.852     0.853      2000
+
+    # # Early Stopping Number of Neurons 25 Test set classification report:
+    # #              precision    recall  f1-score   support
+       
+    # #           1      0.987     0.967     0.977       461
+    # #           2      0.960     0.973     0.967       224
+    # #           3      0.829     0.967     0.893       397
+    # #           4      0.712     0.199     0.311       211
+    # #           5      0.869     0.865     0.867       237
+    # #           7      0.751     0.900     0.819       470
+       
+    # # avg / total      0.854     0.859     0.839      2000
+
+    optimal_num_neurons = 15
+
+    # =====================Q4 Determine optimal decay parameter=====================
+    beta_list = [0,1e-12,1e-9,1e-6,1e-3]
+
+    #### Without Early Stopping
+    train_err_list = []
+    test_acc_list = []
+    time_taken_one_epoch_list = []
+    predicted_dict = dict()
+
+    for beta in beta_list:
+        classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
+                                hidden_layer_dict={1: optimal_num_neurons}, batch_size=optimal_batch_size,
+                                l2_beta=beta).train(small=False, **train_test)
+
+        train_err, test_acc, time_taken_one_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch
+        train_err_list.append(train_err)
+        test_acc_list.append(test_acc)
+        time_taken_one_epoch_list.append(time_taken_one_epoch)
+        predicted_dict[beta] = classifier.predict(testX)
+    #end for
+
+    # Plot Training Errors
+    plt.figure("Train Error against Epoch with Different Decay Parameters")
+    plt.title("Train Error against Epoch with Different Decay Parameters")
+    plt.axis(error_against_epoch)
+
+    for i in range(len(beta_list)):
+        plt.plot(range(epochs), train_err_list[i], label = 'beta = {}'.format(beta_list[i]))
+        plt.xlabel(str(epochs) + ' iterations')
+        plt.ylabel('Train Error')
+        plt.legend()
+        plt.grid(b=True)
+        plt.savefig('figures/1a/4a_train_error_vs_epoch_for_diff_beta.png')
+    #end for
+
+    # Plot Test Accuracy
+    plt.figure("Test Accuracy against Epoch with Different Decay Parameters")
+    plt.title("Test Accuracy against Epoch with Different Decay Parameters")
+    plt.axis(accuracy_against_epoch)
+    for i in range(len(beta_list)):
+        plt.plot(range(epochs), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
+        plt.xlabel(str(epochs) + ' Epochs')
+        plt.ylabel('Test Accuracy')
+        plt.legend()
+        plt.grid(b=True)
+        plt.savefig('figures/1a/4b_test_accuracy_vs_epoch_for_diff_beta.png')
+
+    # Plot Time Taken for One Epoch
+    plt.figure("Time Taken for One Epoch againt Decay Parameters")
+    plt.title("Time Taken for One Epoch againt BeDecay Parametersta")
+    plt.plot(beta_list, time_taken_one_epoch_list)
+    plt.xlabel('Decay Parameters')
+    plt.ylabel('Time/ms')
+    plt.grid(b=True)
+    plt.savefig('figures/1a/4b_time_taken_for_one_epoch_vs_num_neurons.png')
+
+    # Plot Test Accuracy against Decay Parameters
+    final_acc = [acc[-1] for acc in test_acc_list]
+    plt.figure('Converged Test Accuracy against Decay Parameters')
+    plt.title('Converged Test Accuracy against Decay Parameters')
+    plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
+    plt.plot([str(beta) for beta in beta_list], final_acc)
+    plt.xlabel('Decay Parameters')
+    plt.ylabel('Test Accuracy')
+    plt.grid(b=True)
+    plt.savefig('figures/1a/4b_test_accuracy_against_decay_parameters.png')
+
+    #### With Early Stopping
+    train_err_list = []
+    test_acc_list = []
+    time_taken_one_epoch_list = []
+    predicted_dict = dict()
+
+    for beta in beta_list:
+        classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
+                                hidden_layer_dict={1: optimal_num_neurons}, batch_size=optimal_batch_size,
+                                l2_beta=beta, early_stop=True, patience=20, min_delta=0.005).train(small=False, **train_test)
+
+        train_err, test_acc, time_taken_one_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch
+        train_err_list.append(train_err)
+        test_acc_list.append(test_acc)
+        time_taken_one_epoch_list.append(time_taken_one_epoch)
+        predicted_dict[beta] = classifier.predict(testX)
+
+    # Plot Training Errors
+    plt.figure("Early Stopping Train Error against Epoch with Different Decay Parameters")
+    plt.title("Early Stopping Train Error against Epoch with Different Decay Parameters")
+    es_error_against_epoch[1] = max([len(l) for l in train_err_list])
+    plt.axis(es_error_against_epoch)
+
+    for i in range(len(beta_list)):
+        plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'beta = {}'.format(beta_list[i]))
+        plt.xlabel('Epochs')
+        plt.ylabel('Train Error')
+        plt.legend()
+        plt.grid(b=True)
+        plt.savefig('figures/1a/4a_es_train_error_vs_epoch_for_diff_beta.png')
+   
+    # Plot Test Accuracy
+    plt.figure("Early Stopping Test Accuracy against Epoch with Different Decay Parameters")
+    plt.title("Early Stopping Test Accuracy against Epoch with Different Decay Parameters")
+    es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
+    plt.axis(es_accuracy_against_epoch)
+    for i in range(len(beta_list)):
+        plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
+        plt.xlabel('Epochs')
+        plt.ylabel('Test Accuracy')
+        plt.legend()
+        plt.grid(b=True)
+        plt.savefig('figures/1a/4b_test_accuracy_vs_epoch_for_diff_beta.png')
+
+    # Plot Time Taken for One Epoch
+    plt.figure("Early Stopping Time Taken for One Epoch againt Decay Parameters")
+    plt.title("Early Stopping Time Taken for One Epoch againt Decay Parametersa")
+    plt.plot(beta_list, time_taken_one_epoch_list)
+    plt.xlabel('Decay Parameters')
+    plt.ylabel('Time/ms')
+    plt.grid(b=True)
+    plt.savefig('figures/1a/4b_time_taken_for_one_epoch_vs_num_neurons.png')
+
+    # Plot Test Accuracy against Decay Parameters
+    final_acc = [acc[-1] for acc in test_acc_list]
+    plt.figure('Early Stopping Test Accuracy against Decay Parameters')
+    plt.title('Early Stopping Test Accuracy against Decay Parameters')
+    plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
+    plt.plot([str(beta) for beta in beta_list], final_acc)
+    plt.xlabel('Decay Parameters')
+    plt.ylabel('Test Accuracy')
+    plt.grid(b=True)
+    plt.savefig('figures/1a/4b_es_test_accuracy_against_decay_arameters.png')
+
+    optimal_beta = 0
 
     # # =====================Q5=====================
 
