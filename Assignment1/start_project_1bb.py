@@ -23,8 +23,8 @@ class CVRegressor():
         features_dim=None, output_dim=None, drop_out=False,
         keep_prob=0.9, num_folds=5, num_hidden_layers=1,
         hidden_layer_dict={1: 30},
-        batch_size=32, learning_rate=10**(-7),
-        l2_beta=10**(-3), epochs=500, set_session=True, tf_config=None,
+        batch_size=32, learning_rate=1e-7,
+        l2_beta=1e-3, epochs=500, set_session=True, tf_config=None,
         **kwargs
     ):
 
@@ -86,15 +86,13 @@ class CVRegressor():
         self.train_op = optimizer.minimize(self.loss)
     #end def
 
-    def train(self, trainX, trainY, testX=[], testY=[], small=False):
+    def trainCV(self, trainX, trainY, small=False):
         np.random.seed(10)
         if small:
             trainX = trainX[:300]
             trainY = trainY[:300]
 
         _cv_err = []
-        test_err = []
-        val_err = []
         N = int(len(trainX) / self.num_folds)  # number of instances in each fold
         idx = np.arange(N)
         time_to_update = 0
@@ -114,8 +112,6 @@ class CVRegressor():
                 X_train = scale(X_train, x_mean, x_std)
                 X_val = scale(X_val, x_mean, x_std)
 
-                _val_err = []
-                _test_err = []
                 for i in range(self.epochs):
                     np.random.shuffle(idx)
                     X_train = X_train[idx]
@@ -126,43 +122,79 @@ class CVRegressor():
                         self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
                     time_to_update += (time.time() - t)
 
-                    _val_err.append(self.loss.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
-
-                    if len(testX)>1:
-                        # prediction = self.U.eval({self.x: testX})
-                        # _test_err.append(tf.losses.mean_squared_error(testY, prediction))
-                        _test_err.append(self.error.eval(feed_dict={self.x: testX, self.y_: testY}))
                     if i % 100 == 0:
-                        print('fold %g: iter %d: validation error %g'%(fold, i, _val_err[i]))
+                        print('fold %g: iter %d'%(fold, i))
                         print('----------------------')
 
                 #end for
-                val_err.append(_val_err)
                 _cv_err.append(self.loss.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
-                if len(testX)>1: test_err.append(_test_err)
             #end for
             self.saver.save(sess, ".ckpt/1bmodel.ckpt")
         #end with
-        self.val_err = np.mean(np.array(val_err), axis=0)
         self.cv_err = np.mean(np.array(_cv_err), axis=0)
-        if len(testX)>1:
-            test_err = np.array(test_err)
-            self.test_err = np.mean(test_err, axis=0)
-        #end if
         self.time_taken_one_epoch = (time_to_update/(self.epochs * self.num_folds)) * 1000
         return self
-   #end def
+    #end def
 
+
+    def train(self, trainX, trainY, testX, testY, small=False):
+        np.random.seed(10)
+        if small:
+            trainX = trainX[:300]
+            trainY = trainY[:300]
+
+        N = len(trainX)
+        idx = np.arange(N)
+        time_to_update = 0
+        with tf.Session() as sess:
+            sess.run(tf.global_variables_initializer())
+            self.saver = tf.train.Saver()
+
+            # scale
+            x_mean = np.mean(trainX, axis=0)
+            x_std = np.std(trainX, axis=0)
+
+            X_train = scale(trainX, x_mean, x_std)
+            X_test = testX
+            Y_train = trainY
+            Y_test = testY
+
+            self.train_err = []
+            self.test_err = []
+            for i in range(self.epochs):
+                np.random.shuffle(idx)
+                X_train = X_train[idx]
+                Y_train = Y_train[idx]
+
+                t = time.time()
+                for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
+                    self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
+                time_to_update += (time.time() - t)
+
+                self.train_err.append(self.loss.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
+                self.test_err.append(self.error.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
+                if i % 100 == 0:
+                    print('iter %d: validation error %g'%(i, self.train_err[i]))
+                    print('----------------------')
+
+            #end for
+            self.saver.save(sess, ".ckpt/1bmodel.ckpt")
+        #end with
+
+        self.time_taken_one_epoch = (time_to_update/self.epochs) * 1000
+        return self
+    #end def
 
     def test(self, X_test, Y_test):
         with tf.Session() as sess:
             self.saver.restore(sess, ".ckpt/1bmodel.ckpt")
-            test_error = self.error.eval(feed_dict={self.x: X_test, self.y_: Y_test})
+            feed_dict = {self.x: X_test, self.y_: Y_test}
+            test_error = self.error.eval(feed_dict)
         #end with
 
         return test_error
     #end def
-
+       
 
     def predict(self, X):
         with tf.Session() as sess:
@@ -190,8 +222,8 @@ def _read_data(file_name):
     # split data
     X_train, Y_train = _input_train[:, :8], _input_train[:, -1].astype(float)
     X_test, Y_test = _input_test[:, :8], _input_test[:, -1].astype(float)
-
-    # scaling test data only
+    
+    # scale
     x_mean = np.mean(X_train, axis=0)
     x_std = np.std(X_train, axis=0)
     X_test = scale(X_test, x_mean, x_std)
@@ -226,6 +258,7 @@ def main():
     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
                             hidden_layer_dict={1: 30})
     regressor = regressor.train(trainX=X_train, trainY=Y_train,
+                                testX=X_test, testY=Y_test,
                                 small=False)
 
     plt.figure('Validation Error against Epochs')
@@ -233,7 +266,7 @@ def main():
     plt.grid(b=True)
     plt.xlabel('Epochs')
     plt.ylabel('Validation Error')
-    plt.plot(range(1, 501), regressor.val_err)
+    plt.plot(range(1, 501), regressor.train_err)
     plt.savefig('figures/1b/1a_validation_error_with_epochs.png')
 
     idx = np.random.choice(len(X_test), 50, replace=True)
@@ -256,16 +289,13 @@ def main():
     learning_rate_list = [10**(-10), 10**(-9), 0.5 * 10**(-8), 10**(-7), 0.5 * 10**(-6)]
 
     CV_list = []
-    test_error_list = []
     time_taken_one_epoch_list = []
 
     for learning_rate in learning_rate_list:
         regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
                                 hidden_layer_dict={1: 30}, learning_rate=learning_rate)
-        regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=False)
+        regressor = regressor.trainCV(trainX=X_train, trainY=Y_train, small=False)
         CV_list.append(regressor.cv_err)
-        test_error_list.append(regressor.test_err)
         time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
     #end for
 
@@ -276,18 +306,7 @@ def main():
     plt.ylabel('CV Error')
     plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
     plt.plot([str(l) for l in learning_rate_list], CV_list)
-    plt.savefig('figures/1b/2aCV_error_against_learning_rate.png')
-
-    plt.figure('Test Error against Epochs for each Learning Rate')
-    plt.title('Test Error against Epochs')
-    plt.grid(b=True)
-    plt.xlabel('Epochs')
-    plt.ylabel('Test Error')
-    for i in range(len(learning_rate_list)):
-        plt.plot(range(1, 501), test_error_list[i], label='Learning Rate {}'.format(learning_rate_list[i]))
-        plt.legend()
-    #end for
-    plt.savefig('figures/1b/2bTest_error_against_epochs.png')
+    plt.savefig('figures/1b/2a_CV_error_against_learning_rate.png')
 
     # Plot Time Taken for One Epoch
     plt.figure("Time Taken for One Epoch against Learning Rate")
@@ -299,24 +318,14 @@ def main():
     plt.grid(b=True)
     plt.savefig('figures/1b/2b_time_taken_for_one_epoch_vs_learning_rate.png')
 
-    # plot final test error against learning rate
-    final_err = [err[-1] for err in test_error_list]
-    plt.figure('Converged Error against Learning Rate')
-    plt.title('Converged Error against Learning Rate')
-    plt.xlabel('Learning Rate')
-    plt.ylabel('Test Error')
-    plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
-    plt.plot([str(l) for l in learning_rate_list], final_err)
-    plt.grid(b=True)
-    plt.savefig('figures/1a/2b_error_against_learning_rate.png')
 
     print("="*50)
     print("="*25 + "Results" + "="*25 )
     print("="*50)
     for i in range(len(learning_rate_list)):
         print('Learning Rate: {}'.format(learning_rate_list[i]))
+        print('CV error: {}'.format(CV_list[i]))
         print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-        print('Convergence Test Error: {}'.format(final_err[i]))
         print('-'*50)
     #end for
 
@@ -324,41 +333,52 @@ def main():
     # =========================Results=========================
     # ==================================================
     # Learning Rate: 1e-10
-    # Time per epoch: 52.906027984619136ms
-    # Convergence Test Error: 31665864704.0
+    # CV error: 31243259904.0
+    # Time per epoch: 25.867809009552005ms
     # --------------------------------------------------
     # Learning Rate: 1e-09
-    # Time per epoch: 50.655290031433104ms
-    # Convergence Test Error: 4719691264.0
+    # CV error: 4593163264.0
+    # Time per epoch: 26.00145034790039ms
     # --------------------------------------------------
     # Learning Rate: 5e-09
-    # Time per epoch: 50.2107159614563ms
-    # Convergence Test Error: 4405347328.0
+    # CV error: 4248844800.0
+    # Time per epoch: 25.7764760017395ms
     # --------------------------------------------------
     # Learning Rate: 1e-07
-    # Time per epoch: 50.12419328689575ms
-    # Convergence Test Error: 4175657728.0
+    # CV error: 4062203904.0
+    # Time per epoch: 25.954257774353028ms
     # --------------------------------------------------
     # Learning Rate: 5e-07
-    # Time per epoch: 49.85496969223022ms
-    # Convergence Test Error: 4366656512.0
+    # CV error: 4227072000.0
+    # Time per epoch: 26.08066396713257ms
     # --------------------------------------------------
 
     optimal_learning_rate = 1 * 10**(-7)
 
+    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+                            hidden_layer_dict={1: 30}, learning_rate=optimal_learning_rate)
+    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+                                small=False)
+
+    plt.figure('{}: Test Error against Epochs'.format(optimal_learning_rate))
+    plt.title('{}: Test Error against Epochs'.format(optimal_learning_rate))
+    plt.grid(b=True)
+    plt.xlabel('Epochs')
+    plt.ylabel('Test Error')
+    plt.plot(range(1, 501), regressor.test_err)
+    plt.savefig('figures/1b/2b_test_error_with_epochs.png')    
+
+
     ############ Q3 3-layer Feedforward Network ############
     num_neurons_list = [20, 40, 60, 80, 100]
     CV_list = []
-    test_error_list = []
     time_taken_one_epoch_list = []
 
     for num_neurons in num_neurons_list:
         regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
                                 hidden_layer_dict={1: num_neurons}, learning_rate=optimal_learning_rate)
-        regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=False)
+        regressor = regressor.trainCV(trainX=X_train, trainY=Y_train, small=False)
         CV_list.append(regressor.cv_err)
-        test_error_list.append(regressor.test_err)
         time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
     #end for
 
@@ -369,18 +389,7 @@ def main():
     plt.ylabel('CV Error')
     plt.xticks(np.arange(5), [str(l) for l in num_neurons_list])
     plt.plot([str(l) for l in num_neurons_list], CV_list)
-    plt.savefig('figures/1b/3aCV_error_against_num_neurons.png')
-
-    plt.figure('Num Neurons - Test Error against Epochs')
-    plt.title('Test Error against Epochs')
-    plt.grid(b=True)
-    plt.xlabel('Epochs')
-    plt.ylabel('Test Error')
-    for i in range(len(num_neurons_list)):
-        plt.plot(range(1, 501), test_error_list[i], label='Number of Neurons {}'.format(num_neurons_list[i]))
-        plt.legend()
-    #end for
-    plt.savefig('figures/1b/3bTest_error_against_epochs.png')
+    plt.savefig('figures/1b/3a_CV_error_against_num_neurons.png')
 
     # Plot Time Taken for One Epoch
     plt.figure("Time Taken for One Epoch against Number of Neurons")
@@ -391,49 +400,55 @@ def main():
     plt.grid(b=True)
     plt.savefig('figures/1b/3c_time_taken_for_one_epoch_vs_num_neurons.png')
 
-    # plot final test error against num neurons
-    final_err = [err[-1] for err in test_error_list]
-    plt.figure('Converged Error against Number of Neurons')
-    plt.title('Converged Error against Number of Neurons')
-    plt.plot(num_neurons_list, final_err)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Test Error')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3c_error_against_num_neurons.png')
-
     print("="*50)
     print("="*25 + "Results" + "="*25 )
     print("="*50)
     for i in range(len(num_neurons_list)):
         print('Number of Neurons: {}'.format(num_neurons_list[i]))
+        print('CV error: {}'.format(CV_list[i]))
         print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-        print('Convergence Test Error: {}'.format(final_err[i]))
         print('-'*50)
     #end for
+
     # ==================================================
     # =========================Results=========================
     # ==================================================
     # Number of Neurons: 20
-    # Time per epoch: 26.007418441772458ms
-    # Convergence Test Error: 4205488128.0
+    # CV error: 4066696448.0
+    # Time per epoch: 26.411721992492676ms
     # --------------------------------------------------
     # Number of Neurons: 40
-    # Time per epoch: 25.636677455902102ms
-    # Convergence Test Error: 4129115648.0
+    # CV error: 3968453120.0
+    # Time per epoch: 27.138696956634522ms
     # --------------------------------------------------
     # Number of Neurons: 60
-    # Time per epoch: 25.988332271575928ms
-    # Convergence Test Error: 4167387648.0
+    # CV error: 4019897088.0
+    # Time per epoch: 27.93471021652222ms
     # --------------------------------------------------
     # Number of Neurons: 80
-    # Time per epoch: 26.08174295425415ms
-    # Convergence Test Error: 4216478976.0
+    # CV error: 4070825984.0
+    # Time per epoch: 27.435161781311038ms
     # --------------------------------------------------
     # Number of Neurons: 100
-    # Time per epoch: 27.182005214691163ms
-    # Convergence Test Error: 4066954496.0
+    # CV error: 3924401408.0
+    # Time per epoch: 26.041232967376708ms
     # --------------------------------------------------
+
     optimal_num_neurons = 40
+
+    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+                            hidden_layer_dict={1: optimal_num_neurons}, learning_rate=optimal_learning_rate)
+    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+                                small=False)
+
+    plt.figure('{}: Test Error against Epochs'.format(optimal_num_neurons))
+    plt.title('{}: Test Error against Epochs'.format(optimal_num_neurons))
+    plt.grid(b=True)
+    plt.xlabel('Epochs')
+    plt.ylabel('Test Error')
+    plt.plot(range(1, 501), regressor.test_err)
+    plt.savefig('figures/1b/3b_test_error_with_epochs.png')    
+
 
     ############ Q4 3-layer Feedforward Network ############
     state_list = ['3L w/o dp', '3L w/ dp', '4L w/o dp', '4L w/ dp', '5L w/o dp', '5L w/ dp']
@@ -500,6 +515,15 @@ def main():
     for i in range(len(state_list)):
         print("state list: {}, test_error: {}".format(state_list[i],test_error_list[i]))
 
+    # Plot Time Taken for One Epoch
+    plt.figure("Time Taken for One Epoch againt state")
+    plt.title("Time Taken for One Epoch againt state")
+    plt.grid(b=True)
+    plt.ylabel('Time/ms')
+    plt.xticks(np.arange(6), state_list)
+    plt.plot(state_list, time_taken_one_epoch_list)
+    plt.savefig('figures/1b/4Time.png')
+
     plt.figure('Test Error')
     plt.title('Test Error')
     plt.grid(b=True)
@@ -514,36 +538,37 @@ def main():
     for i in range(len(state_list)):
         print('State: {}'.format(state_list[i]))
         print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-        print('Convergence Test Error: {}'.format(test_error_list[i]))
+        print('Test Error: {}'.format(test_error_list[i]))
         print('-'*50)
     #end for
     # ==================================================
     # =========================Results=========================
     # ==================================================
     # State: 3L w/o dp
-    # Time per epoch: 47.23421764373779ms
-    # Convergence Test Error: 4540545536.0
+    # Time per epoch: 130.07637357711792ms
+    # Test Error: 4537192960.0
     # --------------------------------------------------
     # State: 3L w/ dp
-    # Time per epoch: 53.36572380065918ms
-    # Convergence Test Error: 4972498944.0
+    # Time per epoch: 140.2339859008789ms
+    # Test Error: 4766731776.0
     # --------------------------------------------------
     # State: 4L w/o dp
-    # Time per epoch: 56.572142887115476ms
-    # Convergence Test Error: 3475232256.0
+    # Time per epoch: 148.27375411987305ms
+    # Test Error: 3136303616.0
     # --------------------------------------------------
     # State: 4L w/ dp
-    # Time per epoch: 64.23646202087401ms
-    # Convergence Test Error: 4715468800.0
+    # Time per epoch: 167.2393307685852ms
+    # Test Error: 4517381120.0
     # --------------------------------------------------
     # State: 5L w/o dp
-    # Time per epoch: 64.29392166137696ms
-    # Convergence Test Error: 3774078976.0
+    # Time per epoch: 170.28093481063843ms
+    # Test Error: 2851418624.0
     # --------------------------------------------------
     # State: 5L w/ dp
-    # Time per epoch: 76.36065416336059ms
-    # Convergence Test Error: 4738519552.0
+    # Time per epoch: 200.09658479690552ms
+    # Test Error: 4558581248.0
     # --------------------------------------------------
+
 
 #end def
 
