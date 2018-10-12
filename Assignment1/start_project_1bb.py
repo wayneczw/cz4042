@@ -122,7 +122,7 @@ class CVRegressor():
 
                     _val_err.append(self.loss.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
 
-                    if len(testX)>1: _test_err.append(self.error.eval(feed_dict={self.x: testX, self.y_: testY}))
+                    if len(testX)>1: _test_err.append(self.loss.eval(feed_dict={self.x: testX, self.y_: testY}))
                     if i % 100 == 0:
                         print('fold %g: iter %d: validation error %g'%(fold, i, _val_err[i]))
                         print('----------------------')
