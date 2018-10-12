@@ -232,11 +232,11 @@ def main():
 
     train_test_val = dict(X_train=X_train, Y_train=Y_train, X_test=X_test, Y_test=Y_test, X_val=X_val, Y_val = Y_val)
     # =====================Q1 Design a ffn with one hidden layer=====================
-    classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-                            hidden_layer_dict={1: 10},
-                            ).train(**train_test_val)
+    # classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
+    #                         hidden_layer_dict={1: 10},
+    #                         ).train(**train_test_val)
 
-    train_err1, test_acc1, time_taken_one_epoch1, early_stop_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
+    # train_err1, test_acc1, time_taken_one_epoch1, early_stop_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
 
     # # plot train_err against epoch
     # plt.figure('Training Error: 1 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
@@ -256,253 +256,311 @@ def main():
     # plt.grid(b=True)
     # plt.savefig('figures/1a/1a_test_accuracy_with_3_layer_network.png')
 
-    # =====================Q2 Determine optimal batch size=====================
-    batch_sizes = [4,8,16,32,64]
+    # # =====================Q2 Determine optimal batch size=====================
+    # batch_sizes = [4,8,16,32,64]
 
-    #### With Early Stopping
-    train_err_list = []
-    test_acc_list = []
-    time_taken_one_epoch_list = []
-    early_stop_epoch_list = []
-    predicted_dict = dict()
+    # #### With Early Stopping
+    # train_err_list = []
+    # test_acc_list = []
+    # time_taken_one_epoch_list = []
+    # early_stop_epoch_list = []
+    # predicted_dict = dict()
 
-    for batch_size in batch_sizes:
-        classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-                                hidden_layer_dict={1: 10}, batch_size=batch_size,
-                                early_stop=True, patience=20, min_delta=0.001).train(**train_test_val)
-        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
-        train_err_list.append(train_err)
-        test_acc_list.append(test_acc)
-        time_taken_one_epoch_list.append(time_taken_one_epoch)
-        early_stop_epoch_list.append(early_stop_epoch)
-        predicted_dict[batch_size] = classifier.predict(X_test)
-    #end for
+    # for batch_size in batch_sizes:
+    #     classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
+    #                             hidden_layer_dict={1: 10}, batch_size=batch_size,
+    #                             early_stop=True, patience=20, min_delta=0.001).train(**train_test_val)
+    #     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
+    #     train_err_list.append(train_err)
+    #     test_acc_list.append(test_acc)
+    #     time_taken_one_epoch_list.append(time_taken_one_epoch)
+    #     early_stop_epoch_list.append(early_stop_epoch)
+    #     predicted_dict[batch_size] = classifier.predict(X_test)
+    # #end for
 
-    # Plot Training Errors
-    plt.figure("Early Stopping Train Error against Epoch with different Batch Sizes")
-    plt.title("Early Stopping Train Error against Epoch with different Batch Sizes")
-    es_error_against_epoch[1] = max([len(l) for l in train_err_list])
-    plt.axis(es_error_against_epoch)
-    for i in range(len(batch_sizes)):
-        plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'batch_size = {}'.format(batch_sizes[i]))
-        plt.xlabel('Epochs')
-        plt.ylabel('Train Error')
-        plt.legend()
-        plt.grid(b=True)
-    #end for
-    plt.savefig('figures/1a/2a_es_train_error_vs_epoch_for_diff_batch_size.png')
+    # # Plot Training Errors
+    # plt.figure("Early Stopping Train Error against Epoch with different Batch Sizes")
+    # plt.title("Early Stopping Train Error against Epoch with different Batch Sizes")
+    # es_error_against_epoch[1] = max([len(l) for l in train_err_list])
+    # plt.axis(es_error_against_epoch)
+    # for i in range(len(batch_sizes)):
+    #     plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'batch_size = {}'.format(batch_sizes[i]))
+    #     plt.xlabel('Epochs')
+    #     plt.ylabel('Train Error')
+    #     plt.legend()
+    #     plt.grid(b=True)
+    # #end for
+    # plt.savefig('figures/1a/2a_es_train_error_vs_epoch_for_diff_batch_size.png')
 
-    # Plot Test Accuracy
-    plt.figure("Early Stopping Test Accuracy against Epoch with different Batch Sizes")
-    plt.title("Early Stopping Test Accuracy against Epoch with different Batch Sizes")
-    es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
-    plt.axis(es_accuracy_against_epoch)
-    for i in range(len(batch_sizes)):
-        plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'batch_size = {}'.format(batch_sizes[i]))
-        plt.xlabel('Epochs')
-        plt.ylabel('Test Accuracy')
-        plt.legend()
-        plt.grid(b=True)
-    plt.savefig('figures/1a/2a_es_test_accuracy_vs_epoch_for_diff_batch_size.png')
-    #end for
+    # # Plot Test Accuracy
+    # plt.figure("Early Stopping Test Accuracy against Epoch with different Batch Sizes")
+    # plt.title("Early Stopping Test Accuracy against Epoch with different Batch Sizes")
+    # es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
+    # plt.axis(es_accuracy_against_epoch)
+    # for i in range(len(batch_sizes)):
+    #     plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'batch_size = {}'.format(batch_sizes[i]))
+    #     plt.xlabel('Epochs')
+    #     plt.ylabel('Test Accuracy')
+    #     plt.legend()
+    #     plt.grid(b=True)
+    # plt.savefig('figures/1a/2a_es_test_accuracy_vs_epoch_for_diff_batch_size.png')
+    # #end for
 
-    # Plot Time Taken for One Epoch
-    plt.figure("Early Stopping Time Taken for One Epoch against Batch Size")
-    plt.title("Early Stopping Time Taken for One Epoch against Batch Size")
-    plt.plot(batch_sizes, time_taken_one_epoch_list)
-    plt.xlabel('Batch Size')
-    plt.ylabel('Time/ms')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/2b_es_time_taken_for_one_epoch_vs_batch_size.png')
+    # # Plot Time Taken for One Epoch
+    # plt.figure("Early Stopping Time Taken for One Epoch against Batch Size")
+    # plt.title("Early Stopping Time Taken for One Epoch against Batch Size")
+    # plt.plot(batch_sizes, time_taken_one_epoch_list)
+    # plt.xlabel('Batch Size')
+    # plt.ylabel('Time/ms')
+    # plt.grid(b=True)
+    # plt.savefig('figures/1a/2b_es_time_taken_for_one_epoch_vs_batch_size.png')
 
-    total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
-    # Plot Total Time Taken
-    plt.figure("Early Stopping Total Time Taken against Batch Size")
-    plt.title("Early Stopping Total Time Taken against Batch Size")
-    plt.plot(batch_sizes, total_time_taken_list)
-    plt.xlabel('Batch Size')
-    plt.ylabel('Time/ms')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/2b_es_total_time_taken_vs_batch_size.png')
+    # total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
+    # # Plot Total Time Taken
+    # plt.figure("Early Stopping Total Time Taken against Batch Size")
+    # plt.title("Early Stopping Total Time Taken against Batch Size")
+    # plt.plot(batch_sizes, total_time_taken_list)
+    # plt.xlabel('Batch Size')
+    # plt.ylabel('Time/ms')
+    # plt.grid(b=True)
+    # plt.savefig('figures/1a/2b_es_total_time_taken_vs_batch_size.png')
 
-    #plot converged test accuracy against Number of Neurons
-    final_acc = [acc[-1] for acc in test_acc_list]
-    plt.figure('Early Stopping Converged Accuracy against Batch Size')
-    plt.title('Early Stopping Converged Accuracy against Batch Size')
-    plt.plot(batch_sizes, final_acc)
-    plt.xlabel('Batch Size')
-    plt.ylabel('Test Accuracy')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/2c_es_converged_accuracy_against_batch_size.png')
+    # #plot converged test accuracy against Number of Neurons
+    # final_acc = [acc[-1] for acc in test_acc_list]
+    # plt.figure('Early Stopping Converged Accuracy against Batch Size')
+    # plt.title('Early Stopping Converged Accuracy against Batch Size')
+    # plt.plot(batch_sizes, final_acc)
+    # plt.xlabel('Batch Size')
+    # plt.ylabel('Test Accuracy')
+    # plt.grid(b=True)
+    # plt.savefig('figures/1a/2c_es_converged_accuracy_against_batch_size.png')
 
-    for i in range(len(batch_sizes)):
-        print('Batch Size: {}'.format(batch_sizes[i]))
-        print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-        print('Total Time: {}ms'.format(total_time_taken_list[i]))
-        print('Convergence Test Accuracy: {}'.format(final_acc[i]))
-        print('-'*50)
+    # for i in range(len(batch_sizes)):
+    #     print('Batch Size: {}'.format(batch_sizes[i]))
+    #     print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
+    #     print('Total Time: {}ms'.format(total_time_taken_list[i]))
+    #     print('Convergence Test Accuracy: {}'.format(final_acc[i]))
+    #     print('-'*50)
 
-    # _transform_Y(predicted_dict[64])
-    for batch_size in batch_sizes:
-        print('Early Stopping Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(Y_test), predicted_dict[batch_size], digits=3, labels=np.unique(predicted_dict[batch_size]))))
+    # # _transform_Y(predicted_dict[64])
+    # for batch_size in batch_sizes:
+    #     print('Early Stopping Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(Y_test), predicted_dict[batch_size], digits=3, labels=np.unique(predicted_dict[batch_size]))))
 
-    # --------------------------------------------------
-    #     Early Stopping Batch size 4 Test set classification report:
-    #              precision    recall  f1-score   support
-    #
-    #           1      0.970     0.987     0.978       461
-    #           2      0.956     0.969     0.962       224
-    #           3      0.912     0.859     0.885       397
-    #           4      0.542     0.768     0.635       211
-    #           5      0.871     0.857     0.864       237
-    #           7      0.902     0.764     0.827       470
-    #
-    # avg / total      0.884     0.869     0.873      2000
-    #
-    # Early Stopping Batch size 8 Test set classification report:
-    #              precision    recall  f1-score   support
-    #
-    #           1      0.976     0.974     0.975       461
-    #           2      0.952     0.964     0.958       224
-    #           3      0.823     0.957     0.885       397
-    #           4      0.598     0.318     0.415       211
-    #           5      0.847     0.865     0.856       237
-    #           7      0.795     0.840     0.817       470
-    #
-    # avg / total      0.845     0.856     0.845      2000
-    #
-    # Early Stopping Batch size 16 Test set classification report:
-    #              precision    recall  f1-score   support
-    #
-    #           1      0.962     0.985     0.973       461
-    #           2      0.942     0.942     0.942       224
-    #           3      0.891     0.902     0.896       397
-    #           4      0.461     0.308     0.369       211
-    #           5      0.841     0.734     0.784       237
-    #           7      0.740     0.872     0.801       470
-    #
-    # avg / total      0.826     0.836     0.828      2000
-    #
-    # Early Stopping Batch size 32 Test set classification report:
-    #              precision    recall  f1-score   support
-    #
-    #           1      0.964     0.985     0.974       461
-    #           2      0.941     0.929     0.935       224
-    #           3      0.866     0.924     0.894       397
-    #           4      0.463     0.265     0.337       211
-    #           5      0.806     0.717     0.759       237
-    #           7      0.737     0.866     0.796       470
-    #
-    # avg / total      0.817     0.831     0.819      2000
-    #
-    # Early Stopping Batch size 64 Test set classification report:
-    #              precision    recall  f1-score   support
-    #
-    #           1      0.954     0.987     0.970       461
-    #           2      0.941     0.929     0.935       224
-    #           3      0.870     0.942     0.904       397
-    #           4      0.469     0.251     0.327       211
-    #           5      0.790     0.667     0.723       237
-    #           7      0.728     0.866     0.791       470
-    #
-    # avg / total      0.812     0.828     0.814      2000
+    # # --------------------------------------------------
+    # #     Early Stopping Batch size 4 Test set classification report:
+    # #              precision    recall  f1-score   support
+    # #
+    # #           1      0.970     0.987     0.978       461
+    # #           2      0.956     0.969     0.962       224
+    # #           3      0.912     0.859     0.885       397
+    # #           4      0.542     0.768     0.635       211
+    # #           5      0.871     0.857     0.864       237
+    # #           7      0.902     0.764     0.827       470
+    # #
+    # # avg / total      0.884     0.869     0.873      2000
+    # #
+    # # Early Stopping Batch size 8 Test set classification report:
+    # #              precision    recall  f1-score   support
+    # #
+    # #           1      0.976     0.974     0.975       461
+    # #           2      0.952     0.964     0.958       224
+    # #           3      0.823     0.957     0.885       397
+    # #           4      0.598     0.318     0.415       211
+    # #           5      0.847     0.865     0.856       237
+    # #           7      0.795     0.840     0.817       470
+    # #
+    # # avg / total      0.845     0.856     0.845      2000
+    # #
+    # # Early Stopping Batch size 16 Test set classification report:
+    # #              precision    recall  f1-score   support
+    # #
+    # #           1      0.962     0.985     0.973       461
+    # #           2      0.942     0.942     0.942       224
+    # #           3      0.891     0.902     0.896       397
+    # #           4      0.461     0.308     0.369       211
+    # #           5      0.841     0.734     0.784       237
+    # #           7      0.740     0.872     0.801       470
+    # #
+    # # avg / total      0.826     0.836     0.828      2000
+    # #
+    # # Early Stopping Batch size 32 Test set classification report:
+    # #              precision    recall  f1-score   support
+    # #
+    # #           1      0.964     0.985     0.974       461
+    # #           2      0.941     0.929     0.935       224
+    # #           3      0.866     0.924     0.894       397
+    # #           4      0.463     0.265     0.337       211
+    # #           5      0.806     0.717     0.759       237
+    # #           7      0.737     0.866     0.796       470
+    # #
+    # # avg / total      0.817     0.831     0.819      2000
+    # #
+    # # Early Stopping Batch size 64 Test set classification report:
+    # #              precision    recall  f1-score   support
+    # #
+    # #           1      0.954     0.987     0.970       461
+    # #           2      0.941     0.929     0.935       224
+    # #           3      0.870     0.942     0.904       397
+    # #           4      0.469     0.251     0.327       211
+    # #           5      0.790     0.667     0.723       237
+    # #           7      0.728     0.866     0.791       470
+    # #
+    # # avg / total      0.812     0.828     0.814      2000
     optimal_batch_size = 4
 
 
-    # =====================Q3 Determine optimal number of hidden neurons=====================
-    num_hidden_neurons = [5,10,15,20,25]
+    # # =====================Q3 Determine optimal number of hidden neurons=====================
+    # num_hidden_neurons = [5,10,15,20,25]
 
-    #### With Early Stopping
-    train_err_list = []
-    test_acc_list = []
-    time_taken_one_epoch_list = []
-    early_stop_epoch_list = []
-    predicted_dict = dict()
+    # #### With Early Stopping
+    # train_err_list = []
+    # test_acc_list = []
+    # time_taken_one_epoch_list = []
+    # early_stop_epoch_list = []
+    # predicted_dict = dict()
 
-    for num_neurons in num_hidden_neurons:
-        classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-                                hidden_layer_dict={1: num_neurons}, batch_size=optimal_batch_size,
-                                early_stop=True, patience=20, min_delta=0.001).train(**train_test_val)
-        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
-        train_err_list.append(train_err)
-        test_acc_list.append(test_acc)
-        time_taken_one_epoch_list.append(time_taken_one_epoch)
-        early_stop_epoch_list.append(early_stop_epoch)
-        predicted_dict[num_neurons] = classifier.predict(X_test)
-    #end for
+    # for num_neurons in num_hidden_neurons:
+    #     classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
+    #                             hidden_layer_dict={1: num_neurons}, batch_size=optimal_batch_size,
+    #                             early_stop=True, patience=20, min_delta=0.001).train(**train_test_val)
+    #     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
+    #     train_err_list.append(train_err)
+    #     test_acc_list.append(test_acc)
+    #     time_taken_one_epoch_list.append(time_taken_one_epoch)
+    #     early_stop_epoch_list.append(early_stop_epoch)
+    #     predicted_dict[num_neurons] = classifier.predict(X_test)
+    # #end for
 
-    # Plot Training Errors
-    plt.figure("Early Stopping Train Error against Epoch with different Number of Neurons")
-    plt.title("Early Stopping Train Error against Epoch with different Number of Neurons")
-    es_error_against_epoch[1] = max([len(l) for l in train_err_list])
-    plt.axis(es_error_against_epoch)
+    # # Plot Training Errors
+    # plt.figure("Early Stopping Train Error against Epoch with different Number of Neurons")
+    # plt.title("Early Stopping Train Error against Epoch with different Number of Neurons")
+    # es_error_against_epoch[1] = max([len(l) for l in train_err_list])
+    # plt.axis(es_error_against_epoch)
 
-    for i in range(len(num_hidden_neurons)):
-        plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
-        plt.xlabel('Epochs')
-        plt.ylabel('Train Error')
-        plt.legend()
-        plt.grid(b=True)
-    #end for
-    plt.savefig('figures/1a/3a_es_train_error_vs_epoch_for_diff_num_neurons.png')
-
-
-    # Plot Test Accuracy
-    plt.figure("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
-    plt.title("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
-    es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
-    plt.axis(es_accuracy_against_epoch)
-    for i in range(len(num_hidden_neurons)):
-        plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
-        plt.xlabel('Epochs')
-        plt.ylabel('Test Accuracy')
-        plt.legend()
-        plt.grid(b=True)
-    #end for
-    plt.savefig('figures/1a/3a_es_test_accuracy_vs_epoch_for_diff_num_neurons.png')
+    # for i in range(len(num_hidden_neurons)):
+    #     plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
+    #     plt.xlabel('Epochs')
+    #     plt.ylabel('Train Error')
+    #     plt.legend()
+    #     plt.grid(b=True)
+    # #end for
+    # plt.savefig('figures/1a/3a_es_train_error_vs_epoch_for_diff_num_neurons.png')
 
 
-    # Plot Time Taken for One Epoch
-    plt.figure("Early Stopping Time Taken for One Epoch against Number of Neurons")
-    plt.title("Early Stopping Time Taken for One Epoch against Number of Neurons")
-    plt.plot(num_hidden_neurons, time_taken_one_epoch_list)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Time/ms')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3b_es_time_taken_for_one_epoch_vs_num_neurons.png')
+    # # Plot Test Accuracy
+    # plt.figure("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
+    # plt.title("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
+    # es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
+    # plt.axis(es_accuracy_against_epoch)
+    # for i in range(len(num_hidden_neurons)):
+    #     plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
+    #     plt.xlabel('Epochs')
+    #     plt.ylabel('Test Accuracy')
+    #     plt.legend()
+    #     plt.grid(b=True)
+    # #end for
+    # plt.savefig('figures/1a/3a_es_test_accuracy_vs_epoch_for_diff_num_neurons.png')
 
-    total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
-    # Plot Total Time Taken
-    plt.figure("Early Stopping Total Time Taken against Number of Neurons")
-    plt.title("Early Stopping Total Time Taken against Number of Neurons")
-    plt.plot(num_hidden_neurons, total_time_taken_list)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Time/ms')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3b_es_total_time_taken_vs_num_neurons.png')
 
-    # plot final test accuracy against Number of Neurons
-    final_acc = [acc[-1] for acc in test_acc_list]
-    plt.figure('Early Stopping Converged Accuracy against Number of Neurons')
-    plt.title('Early Stopping Converged Accuracy against Number of Neurons')
-    plt.plot(num_hidden_neurons, final_acc)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Test Accuracy')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3c_es_accuracy_against_num_neurons.png')
+    # # Plot Time Taken for One Epoch
+    # plt.figure("Early Stopping Time Taken for One Epoch against Number of Neurons")
+    # plt.title("Early Stopping Time Taken for One Epoch against Number of Neurons")
+    # plt.plot(num_hidden_neurons, time_taken_one_epoch_list)
+    # plt.xlabel('Number of Neurons')
+    # plt.ylabel('Time/ms')
+    # plt.grid(b=True)
+    # plt.savefig('figures/1a/3b_es_time_taken_for_one_epoch_vs_num_neurons.png')
 
-    for i in range(len(num_hidden_neurons)):
-        print('Number of Neurons: {}'.format(num_hidden_neurons[i]))
-        print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-        print('Total Time: {}ms'.format(total_time_taken_list[i]))
-        print('Convergence Test Accuracy: {}'.format(final_acc[i]))
-        print('-'*50)
+    # total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
+    # # Plot Total Time Taken
+    # plt.figure("Early Stopping Total Time Taken against Number of Neurons")
+    # plt.title("Early Stopping Total Time Taken against Number of Neurons")
+    # plt.plot(num_hidden_neurons, total_time_taken_list)
+    # plt.xlabel('Number of Neurons')
+    # plt.ylabel('Time/ms')
+    # plt.grid(b=True)
+    # plt.savefig('figures/1a/3b_es_total_time_taken_vs_num_neurons.png')
 
-    for num_neurons in num_hidden_neurons:
-        print('Early Stopping Number of Neurons {} Test set classification report:\n{}'.format(num_neurons, classification_report(_transform_Y(Y_test), predicted_dict[num_neurons], digits=3, labels=np.unique(predicted_dict[num_neurons]))))
+    # # plot final test accuracy against Number of Neurons
+    # final_acc = [acc[-1] for acc in test_acc_list]
+    # plt.figure('Early Stopping Converged Accuracy against Number of Neurons')
+    # plt.title('Early Stopping Converged Accuracy against Number of Neurons')
+    # plt.plot(num_hidden_neurons, final_acc)
+    # plt.xlabel('Number of Neurons')
+    # plt.ylabel('Test Accuracy')
+    # plt.grid(b=True)
+    # plt.savefig('figures/1a/3c_es_accuracy_against_num_neurons.png')
 
-    #Early Stopping Number of Neurons 5 Test set classification report:
-    #=======
+    # for i in range(len(num_hidden_neurons)):
+    #     print('Number of Neurons: {}'.format(num_hidden_neurons[i]))
+    #     print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
+    #     print('Total Time: {}ms'.format(total_time_taken_list[i]))
+    #     print('Convergence Test Accuracy: {}'.format(final_acc[i]))
+    #     print('-'*50)
+
+    # for num_neurons in num_hidden_neurons:
+    #     print('Early Stopping Number of Neurons {} Test set classification report:\n{}'.format(num_neurons, classification_report(_transform_Y(Y_test), predicted_dict[num_neurons], digits=3, labels=np.unique(predicted_dict[num_neurons]))))
+
+    # # Early Stopping Number of Neurons 5 Test set classification report:
+    # #              precision    recall  f1-score   support  
+
+    # #           1      0.952     0.991     0.971       461  
+    # #           2      0.929     0.938     0.933       224  
+    # #           3      0.910     0.869     0.889       397  
+    # #           4      0.505     0.507     0.506       211  
+    # #           5      0.830     0.802     0.815       237  
+    # #           7      0.812     0.819     0.816       470  
+
+    # # avg / total      0.847     0.847     0.847      2000  
+
+
+    # # Early Stopping Number of Neurons 10 Test set classification report:
+    # #              precision    recall  f1-score   support  
+
+    # #           1      0.970     0.987     0.978       461  
+    # #           2      0.956     0.969     0.962       224  
+    # #           3      0.912     0.859     0.885       397  
+    # #           4      0.542     0.768     0.635       211  
+    # #           5      0.871     0.857     0.864       237  
+    # #           7      0.902     0.764     0.827       470  
+
+    # # avg / total      0.884     0.869     0.873      2000  
+
+    # # Early Stopping Number of Neurons 15 Test set classification report:
+    # #              precision    recall  f1-score   support  
+
+    # #           1      0.966     0.989     0.977       461  
+    # #           2      0.963     0.929     0.945       224  
+    # #           3      0.894     0.909     0.901       397  
+    # #           4      0.598     0.360     0.450       211  
+    # #           5      0.833     0.861     0.846       237  
+    # #           7      0.767     0.874     0.817       470  
+
+    # # avg / total      0.850     0.858     0.850      2000  
+
+    # # Early Stopping Number of Neurons 20 Test set classification report:
+    # #              precision    recall  f1-score   support  
+
+    # #           1      0.985     0.983     0.984       461  
+    # #           2      0.947     0.964     0.956       224  
+    # #           3      0.869     0.937     0.902       397  
+    # #           4      0.626     0.706     0.664       211  
+    # #           5      0.871     0.823     0.846       237  
+    # #           7      0.865     0.777     0.818       470  
+
+    # # avg / total      0.878     0.875     0.875      2000  
+
+    # # Early Stopping Number of Neurons 25 Test set classification report:
+    # #              precision    recall  f1-score   support  
+
+    # #           1      0.976     0.983     0.979       461  
+    # #           2      0.960     0.973     0.967       224  
+    # #           3      0.860     0.947     0.902       397  
+    # #           4      0.674     0.275     0.391       211  
+    # #           5      0.918     0.802     0.856       237  
+    # #           7      0.739     0.911     0.816       470  
+
+    # # avg / total      0.857     0.862     0.847      2000  
 
     optimal_num_neurons = 20
 
@@ -663,129 +721,137 @@ def main():
 
     optimal_beta = 1e-9
 
-    # =====================Q5=====================
+    # # =====================Q5=====================
 
-    #### With Early Stopping
-    train_err_list = []
-    test_acc_list = []
-    time_taken_one_epoch_list =[]
-    early_stop_epoch_list = []
+    # #### With Early Stopping
+    # train_err_list = []
+    # test_acc_list = []
+    # time_taken_one_epoch_list =[]
+    # early_stop_epoch_list = []
 
-    #### 3-layer With Early Stopping
-    classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-                            hidden_layer_dict={1: 10}, early_stop=True, patience=20, min_delta=0.001
-                            ).train(**train_test_val)
+    # #### 3-layer With Early Stopping
+    # classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
+    #                         hidden_layer_dict={1: 10}, early_stop=True, patience=20, min_delta=0.001
+    #                         ).train(**train_test_val)
 
-    train_err1, test_acc1, time_taken_one_epoch1, early_stop_epoch1 = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
+    # train_err1, test_acc1, time_taken_one_epoch1, early_stop_epoch1 = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
 
-    train_err_list.append(train_err1)
-    test_acc_list.append(test_acc1)
-    time_taken_one_epoch_list.append(time_taken_one_epoch1)
-    early_stop_epoch_list.append(early_stop_epoch1)
-    print('Early Stopping 3-layer took {}ms per epoch'.format(time_taken_one_epoch1))
-    predicted_y = classifier.predict(X_test)
-    print('Early Stopping 3-layer Test set classification report:\n{}'.format(classification_report(_transform_Y(Y_test), predicted_y, digits=3, labels=np.unique(predicted_y))))
-    # Early Stopping 3-layer Test set classification report:
-    #              precision    recall  f1-score   support
+    # train_err_list.append(train_err1)
+    # test_acc_list.append(test_acc1)
+    # time_taken_one_epoch_list.append(time_taken_one_epoch1)
+    # early_stop_epoch_list.append(early_stop_epoch1)
+    # print('Early Stopping 3-layer took {}ms per epoch'.format(time_taken_one_epoch1))
+    # predicted_y = classifier.predict(X_test)
+    # print('Early Stopping 3-layer Test set classification report:\n{}'.format(classification_report(_transform_Y(Y_test), predicted_y, digits=3, labels=np.unique(predicted_y))))
+    # # Early Stopping 3-layer took 36.41304662150721ms per epoch
+    # # Early Stopping 3-layer Test set classification report:
+    # #              precision    recall  f1-score   support
 
-    #           1      0.950     0.987     0.968       461
-    #           2      0.932     0.924     0.928       224
-    #           3      0.846     0.955     0.897       397
-    #           4      0.519     0.194     0.283       211
-    #           5      0.788     0.658     0.717       237
-    #           7      0.728     0.889     0.801       470
+    # #           1      0.964     0.985     0.974       461
+    # #           2      0.941     0.929     0.935       224
+    # #           3      0.866     0.924     0.894       397
+    # #           4      0.463     0.265     0.337       211
+    # #           5      0.806     0.717     0.759       237
+    # #           7      0.737     0.866     0.796       470
 
-    # avg / total      0.811     0.828     0.808      2000
+    # # avg / total      0.817     0.831     0.819      2000
 
-    #### 4-layer With Early Stopping
-    classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-                            hidden_layer_dict={1: 10, 2: 10}, num_hidden_layers=2,
-                            early_stop=True, patience=20, min_delta=0.001).train(**train_test_val)
 
-    train_err2, test_acc2, time_taken_one_epoch2, early_stop_epoch2 = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
-    print('Early stopping 4-layer took {}ms per epoch'.format(time_taken_one_epoch2))
-    predicted_y = classifier.predict(X_test)
-    print('Early Stopping 4-layer Test set classification report:\n{}'.format(classification_report(_transform_Y(Y_test), predicted_y, digits=3, labels=np.unique(predicted_y))))
-    # Early Stopping 4-layer Test set classification report:
-    #              precision    recall  f1-score   support
+    # #### 4-layer With Early Stopping
+    # classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
+    #                         hidden_layer_dict={1: 10, 2: 10}, num_hidden_layers=2,
+    #                         early_stop=True, patience=20, min_delta=0.001).train(**train_test_val)
 
-    #           1      0.970     0.983     0.976       461
-    #           2      0.921     0.938     0.929       224
-    #           3      0.816     0.962     0.883       397
-    #           4      0.517     0.218     0.307       211
-    #           5      0.851     0.700     0.769       237
-    #           7      0.743     0.874     0.804       470
+    # train_err2, test_acc2, time_taken_one_epoch2, early_stop_epoch2 = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
+    # print('Early stopping 4-layer took {}ms per epoch'.format(time_taken_one_epoch2))
+    # predicted_y = classifier.predict(X_test)
+    # print('Early Stopping 4-layer Test set classification report:\n{}'.format(classification_report(_transform_Y(Y_test), predicted_y, digits=3, labels=np.unique(predicted_y))))
+    # # Early stopping 4-layer took 43.69016647338867ms per epoch
+    # # Early Stopping 4-layer Test set classification report:
+    # #              precision    recall  f1-score   support
 
-    # avg / total      0.819     0.834     0.817      2000
+    # #           1      0.954     0.987     0.970       461
+    # #           2      0.950     0.938     0.944       224
+    # #           3      0.854     0.942     0.896       397
+    # #           4      0.542     0.398     0.459       211
+    # #           5      0.847     0.768     0.805       237
+    # #           7      0.791     0.832     0.811       470
 
-    train_err_list.append(train_err2)
-    test_acc_list.append(test_acc2)
-    time_taken_one_epoch_list.append(time_taken_one_epoch2)
-    early_stop_epoch_list.append(early_stop_epoch2)
+    # # avg / total      0.839     0.848     0.842      2000
 
-    # plot train_err against epoch
-    plt.figure('Early Stopping Training Error: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
-    plt.title('Early Stopping Training Error: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
-    plt.plot(range(len(train_err2)), train_err2)
-    plt.xlabel('Epochs')
-    plt.ylabel('Train Error')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/5a_es_train_error_with_4_layer_network.png')
+    # train_err_list.append(train_err2)
+    # test_acc_list.append(test_acc2)
+    # time_taken_one_epoch_list.append(time_taken_one_epoch2)
+    # early_stop_epoch_list.append(early_stop_epoch2)
 
-    # plot test_acc against epoch
-    plt.figure('Early Stopping Test Accuracy: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
-    plt.title('Early Stopping Test Accuracy: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
-    plt.plot(range(len(test_acc2)), test_acc2)
-    plt.xlabel('Epochs')
-    plt.ylabel('Test Accuracy')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/5a_es_test_accuracy_with_4_layer_network.png')
+    # # plot train_err against epoch
+    # plt.figure('Early Stopping Training Error: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
+    # plt.title('Early Stopping Training Error: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
+    # plt.plot(range(len(train_err2)), train_err2)
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Train Error')
+    # plt.grid(b=True)
+    # plt.savefig('figures/1a/5a_es_train_error_with_4_layer_network.png')
 
-    # Q5(2) With Stopping
-    # Plot Training Errors
-    plt.figure("Early Stopping Train Error against Epoch with Different Number of Hidden Layers")
-    plt.title("Early Stopping Train Error against Epoch with Different Number of Hidden Layers")
-    es_error_against_epoch[1] = max([len(l) for l in train_err_list])
-    plt.axis(es_error_against_epoch)
+    # # plot test_acc against epoch
+    # plt.figure('Early Stopping Test Accuracy: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
+    # plt.title('Early Stopping Test Accuracy: 2 hidden-layer/batch size 32/10 hidden perceptrons/beta 10^-6')
+    # plt.plot(range(len(test_acc2)), test_acc2)
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Test Accuracy')
+    # plt.grid(b=True)
+    # plt.savefig('figures/1a/5a_es_test_accuracy_with_4_layer_network.png')
 
-    for i in range(len(train_err_list)):
-        plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'Number of Hidden Layers = {}'.format(i+1))
-        plt.xlabel('Epochs')
-        plt.ylabel('Train Error')
-        plt.legend()
-        plt.grid(b=True)
-    #end for
-    plt.savefig('figures/1a/5b_es_train_error_vs_epoch_for_diff_num_hidden_layers.png')
+    # # Q5(2) With Stopping
+    # # Plot Training Errors
+    # plt.figure("Early Stopping Train Error against Epoch with Different Number of Hidden Layers")
+    # plt.title("Early Stopping Train Error against Epoch with Different Number of Hidden Layers")
+    # es_error_against_epoch[1] = max([len(l) for l in train_err_list])
+    # plt.axis(es_error_against_epoch)
 
-    # Plot Test Accuracy
-    plt.figure("Early Stopping Test Accuracy against Epoch with Different Number of Hidden Layers")
-    plt.title("Early Stopping Test Accuracy against Epoch with Different Number of Hidden Layers")
-    es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
-    plt.axis(es_accuracy_against_epoch)
+    # for i in range(len(train_err_list)):
+    #     plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'Number of Hidden Layers = {}'.format(i+1))
+    #     plt.xlabel('Epochs')
+    #     plt.ylabel('Train Error')
+    #     plt.legend()
+    #     plt.grid(b=True)
+    # #end for
+    # plt.savefig('figures/1a/5b_es_train_error_vs_epoch_for_diff_num_hidden_layers.png')
 
-    for i in range(len(test_acc_list)):
-        plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'Number of Hidden Layers = {}'.format(i+1))
-        plt.xlabel('Epochs')
-        plt.ylabel('Test Accuracy')
-        plt.legend()
-        plt.grid(b=True)
-    #end for
-    plt.savefig('figures/1a/5b_es_test_accuracy_vs_epoch_for_diff_num_hidden_layers.png')
+    # # Plot Test Accuracy
+    # plt.figure("Early Stopping Test Accuracy against Epoch with Different Number of Hidden Layers")
+    # plt.title("Early Stopping Test Accuracy against Epoch with Different Number of Hidden Layers")
+    # es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
+    # plt.axis(es_accuracy_against_epoch)
 
-    # Plot Test Accuracy against num hidden layers
-    final_acc = [acc[-1] for acc in test_acc_list]
-    plt.figure('Early Stopping Converged Test Accuracy against Num Hidden Layers')
-    plt.title('Early Stopping Converged Test Accuracy against Num Hidden Layers')
-    plt.xticks(np.arange(2), ['1-hidden layer', '2-hidden layer'])
-    plt.plot(['1-hidden layer', '2-hidden layer'], final_acc)
-    plt.xlabel('Number of Hidden Layer')
-    plt.ylabel('Test Accuracy')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/5b_es_test_accuracy_against_num_hidden_layers.png')
+    # for i in range(len(test_acc_list)):
+    #     plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'Number of Hidden Layers = {}'.format(i+1))
+    #     plt.xlabel('Epochs')
+    #     plt.ylabel('Test Accuracy')
+    #     plt.legend()
+    #     plt.grid(b=True)
+    # #end for
+    # plt.savefig('figures/1a/5b_es_test_accuracy_vs_epoch_for_diff_num_hidden_layers.png')
 
-    total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
-    print ("Early Stopping Time Taken per Epoch for 3_layer: %g \nTime Taken per Epoch for 4_layer: %g" % (time_taken_one_epoch_list[0],time_taken_one_epoch_list[1]))
-    print ("Early Stopping Time taken for 3_layer: %g \nTime taken for 4_layer: %g" % (total_time_taken_list[0],total_time_taken_list[1]))
+    # # Plot Test Accuracy against num hidden layers
+    # final_acc = [acc[-1] for acc in test_acc_list]
+    # plt.figure('Early Stopping Converged Test Accuracy against Num Hidden Layers')
+    # plt.title('Early Stopping Converged Test Accuracy against Num Hidden Layers')
+    # plt.xticks(np.arange(2), ['1-hidden layer', '2-hidden layer'])
+    # plt.plot(['1-hidden layer', '2-hidden layer'], final_acc)
+    # plt.xlabel('Number of Hidden Layer')
+    # plt.ylabel('Test Accuracy')
+    # plt.grid(b=True)
+    # plt.savefig('figures/1a/5b_es_test_accuracy_against_num_hidden_layers.png')
+
+    # total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
+    # print ("Early Stopping Time Taken per Epoch for 3_layer: %g \nTime Taken per Epoch for 4_layer: %g" % (time_taken_one_epoch_list[0],time_taken_one_epoch_list[1]))
+    # # Early Stopping Time Taken per Epoch for 3_layer: 36.413
+    # # Time Taken per Epoch for 4_layer: 43.6902
+
+    # print ("Early Stopping Time taken for 3_layer: %g \nTime taken for 4_layer: %g" % (total_time_taken_list[0],total_time_taken_list[1]))
+    # # Early Stopping Time taken for 3_layer: 11288
+    # # Time taken for 4_layer: 8738.03
 
 # end def
 
