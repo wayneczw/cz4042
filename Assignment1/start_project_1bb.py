@@ -319,41 +319,41 @@ def main():
     plt.savefig('figures/1b/2b_time_taken_for_one_epoch_vs_learning_rate.png')
 
 
-    print("="*50)
-    print("="*25 + "Results" + "="*25 )
-    print("="*50)
-    for i in range(len(learning_rate_list)):
-        print('Learning Rate: {}'.format(learning_rate_list[i]))
-        print('CV error: {}'.format(CV_list[i]))
-        print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-        print('-'*50)
-    #end for
+    # print("="*50)
+    # print("="*25 + "Results" + "="*25 )
+    # print("="*50)
+    # for i in range(len(learning_rate_list)):
+    #     print('Learning Rate: {}'.format(learning_rate_list[i]))
+    #     print('CV error: {}'.format(CV_list[i]))
+    #     print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
+    #     print('-'*50)
+    # #end for
 
     # ==================================================
     # =========================Results=========================
     # ==================================================
     # Learning Rate: 1e-10
     # CV error: 31243259904.0
-    # Time per epoch: 25.867809009552005ms
+    # Time per epoch: 25.784738540649414ms
     # --------------------------------------------------
     # Learning Rate: 1e-09
     # CV error: 4593163264.0
-    # Time per epoch: 26.00145034790039ms
+    # Time per epoch: 25.553718757629394ms
     # --------------------------------------------------
     # Learning Rate: 5e-09
     # CV error: 4248844800.0
-    # Time per epoch: 25.7764760017395ms
+    # Time per epoch: 25.519759464263917ms
     # --------------------------------------------------
     # Learning Rate: 1e-07
     # CV error: 4062203904.0
-    # Time per epoch: 25.954257774353028ms
+    # Time per epoch: 26.97435426712036ms
     # --------------------------------------------------
     # Learning Rate: 5e-07
     # CV error: 4227072000.0
-    # Time per epoch: 26.08066396713257ms
+    # Time per epoch: 25.491313552856447ms
     # --------------------------------------------------
 
-    optimal_learning_rate = 1 * 10**(-7)
+    optimal_learning_rate = 10**(-7)
 
     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
                             hidden_layer_dict={1: 30}, learning_rate=optimal_learning_rate)
