@@ -342,9 +342,35 @@ def main():
     #     print('Convergence Test Accuracy: {}'.format(final_acc[i]))
     #     print('-'*50)
 
-    # # _transform_Y(predicted_dict[64])
-    # for batch_size in batch_sizes:
-    #     print('Early Stopping Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(Y_test), predicted_dict[batch_size], digits=3, labels=np.unique(predicted_dict[batch_size]))))
+    # # Batch Size: 4
+    # # Time per epoch: 241.12526020582985ms
+    # # Total Time: 65586.07077598572ms
+    # # Convergence Test Accuracy: 0.8684999942779541
+    # # --------------------------------------------------
+    # # Batch Size: 8
+    # # Time per epoch: 125.91645615232503ms
+    # # Total Time: 41048.76470565796ms
+    # # Convergence Test Accuracy: 0.8560000061988831
+    # # --------------------------------------------------
+    # # Batch Size: 16
+    # # Time per epoch: 65.06782950776996ms
+    # # Total Time: 12883.430242538452ms
+    # # Convergence Test Accuracy: 0.8360000252723694
+    # # --------------------------------------------------
+    # # Batch Size: 32
+    # # Time per epoch: 34.805908510761874ms
+    # # Total Time: 10789.831638336182ms
+    # # Convergence Test Accuracy: 0.8309999704360962
+    # # --------------------------------------------------
+    # # Batch Size: 64
+    # # Time per epoch: 20.350156632144895ms
+    # # Total Time: 6898.703098297119ms
+    # # Convergence Test Accuracy: 0.8274999856948853
+    # # --------------------------------------------------
+
+    # # # _transform_Y(predicted_dict[64])
+    # # for batch_size in batch_sizes:
+    # #     print('Early Stopping Batch size {} Test set classification report:\n{}'.format(batch_size, classification_report(_transform_Y(Y_test), predicted_dict[batch_size], digits=3, labels=np.unique(predicted_dict[batch_size]))))
 
     # # --------------------------------------------------
     # #     Early Stopping Batch size 4 Test set classification report:
@@ -409,163 +435,8 @@ def main():
     optimal_batch_size = 4
 
 
-    # =====================Q3 Determine optimal number of hidden neurons=====================
-    num_hidden_neurons = [5,10,15,20,25]
-
-    #### With Early Stopping
-    train_err_list = []
-    test_acc_list = []
-    time_taken_one_epoch_list = []
-    early_stop_epoch_list = []
-    predicted_dict = dict()
-
-    for num_neurons in num_hidden_neurons:
-        classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-                                hidden_layer_dict={1: num_neurons}, batch_size=optimal_batch_size,
-                                early_stop=True, patience=20, min_delta=0.001).train(**train_test_val)
-        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
-        train_err_list.append(train_err)
-        test_acc_list.append(test_acc)
-        time_taken_one_epoch_list.append(time_taken_one_epoch)
-        early_stop_epoch_list.append(early_stop_epoch)
-        predicted_dict[num_neurons] = classifier.predict(X_test)
-    #end for
-
-    # Plot Training Errors
-    plt.figure("Early Stopping Train Error against Epoch with different Number of Neurons")
-    plt.title("Early Stopping Train Error against Epoch with different Number of Neurons")
-    es_error_against_epoch[1] = max([len(l) for l in train_err_list])
-    plt.axis(es_error_against_epoch)
-
-    for i in range(len(num_hidden_neurons)):
-        plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
-        plt.xlabel('Epochs')
-        plt.ylabel('Train Error')
-        plt.legend()
-        plt.grid(b=True)
-    #end for
-    plt.savefig('figures/1a/3a_es_train_error_vs_epoch_for_diff_num_neurons.png')
-
-
-    # Plot Test Accuracy
-    plt.figure("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
-    plt.title("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
-    es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
-    plt.axis(es_accuracy_against_epoch)
-    for i in range(len(num_hidden_neurons)):
-        plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
-        plt.xlabel('Epochs')
-        plt.ylabel('Test Accuracy')
-        plt.legend()
-        plt.grid(b=True)
-    #end for
-    plt.savefig('figures/1a/3a_es_test_accuracy_vs_epoch_for_diff_num_neurons.png')
-
-
-    # Plot Time Taken for One Epoch
-    plt.figure("Early Stopping Time Taken for One Epoch against Number of Neurons")
-    plt.title("Early Stopping Time Taken for One Epoch against Number of Neurons")
-    plt.plot(num_hidden_neurons, time_taken_one_epoch_list)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Time/ms')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3b_es_time_taken_for_one_epoch_vs_num_neurons.png')
-
-    total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
-    # Plot Total Time Taken
-    plt.figure("Early Stopping Total Time Taken against Number of Neurons")
-    plt.title("Early Stopping Total Time Taken against Number of Neurons")
-    plt.plot(num_hidden_neurons, total_time_taken_list)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Time/ms')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3b_es_total_time_taken_vs_num_neurons.png')
-
-    # plot final test accuracy against Number of Neurons
-    final_acc = [acc[-1] for acc in test_acc_list]
-    plt.figure('Early Stopping Converged Accuracy against Number of Neurons')
-    plt.title('Early Stopping Converged Accuracy against Number of Neurons')
-    plt.plot(num_hidden_neurons, final_acc)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Test Accuracy')
-    plt.grid(b=True)
-    plt.savefig('figures/1a/3c_es_accuracy_against_num_neurons.png')
-
-    for i in range(len(num_hidden_neurons)):
-        print('Number of Neurons: {}'.format(num_hidden_neurons[i]))
-        print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-        print('Total Time: {}ms'.format(total_time_taken_list[i]))
-        print('Convergence Test Accuracy: {}'.format(final_acc[i]))
-        print('-'*50)
-
-    for num_neurons in num_hidden_neurons:
-        print('Early Stopping Number of Neurons {} Test set classification report:\n{}'.format(num_neurons, classification_report(_transform_Y(Y_test), predicted_dict[num_neurons], digits=3, labels=np.unique(predicted_dict[num_neurons]))))
-
-    # Early Stopping Number of Neurons 5 Test set classification report:
-    #              precision    recall  f1-score   support  
-
-    #           1      0.952     0.991     0.971       461  
-    #           2      0.929     0.938     0.933       224  
-    #           3      0.910     0.869     0.889       397  
-    #           4      0.505     0.507     0.506       211  
-    #           5      0.830     0.802     0.815       237  
-    #           7      0.812     0.819     0.816       470  
-
-    # avg / total      0.847     0.847     0.847      2000  
-
-
-    # Early Stopping Number of Neurons 10 Test set classification report:
-    #              precision    recall  f1-score   support  
-
-    #           1      0.970     0.987     0.978       461  
-    #           2      0.956     0.969     0.962       224  
-    #           3      0.912     0.859     0.885       397  
-    #           4      0.542     0.768     0.635       211  
-    #           5      0.871     0.857     0.864       237  
-    #           7      0.902     0.764     0.827       470  
-
-    # avg / total      0.884     0.869     0.873      2000  
-
-    # Early Stopping Number of Neurons 15 Test set classification report:
-    #              precision    recall  f1-score   support  
-
-    #           1      0.966     0.989     0.977       461  
-    #           2      0.963     0.929     0.945       224  
-    #           3      0.894     0.909     0.901       397  
-    #           4      0.598     0.360     0.450       211  
-    #           5      0.833     0.861     0.846       237  
-    #           7      0.767     0.874     0.817       470  
-
-    # avg / total      0.850     0.858     0.850      2000  
-
-    # Early Stopping Number of Neurons 20 Test set classification report:
-    #              precision    recall  f1-score   support  
-
-    #           1      0.985     0.983     0.984       461  
-    #           2      0.947     0.964     0.956       224  
-    #           3      0.869     0.937     0.902       397  
-    #           4      0.626     0.706     0.664       211  
-    #           5      0.871     0.823     0.846       237  
-    #           7      0.865     0.777     0.818       470  
-
-    # avg / total      0.878     0.875     0.875      2000  
-
-    # Early Stopping Number of Neurons 25 Test set classification report:
-    #              precision    recall  f1-score   support  
-
-    #           1      0.976     0.983     0.979       461  
-    #           2      0.960     0.973     0.967       224  
-    #           3      0.860     0.947     0.902       397  
-    #           4      0.674     0.275     0.391       211  
-    #           5      0.918     0.802     0.856       237  
-    #           7      0.739     0.911     0.816       470  
-
-    # avg / total      0.857     0.862     0.847      2000  
-
-    optimal_num_neurons = 20
-
-    # # =====================Q4 Determine optimal decay parameter=====================
-    # beta_list = [0,1e-12,1e-9,1e-6,1e-3]
+    # # =====================Q3 Determine optimal number of hidden neurons=====================
+    # num_hidden_neurons = [5,10,15,20,25]
 
     # #### With Early Stopping
     # train_err_list = []
@@ -574,150 +445,354 @@ def main():
     # early_stop_epoch_list = []
     # predicted_dict = dict()
 
-    # for beta in beta_list:
+    # for num_neurons in num_hidden_neurons:
     #     classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
-    #                             hidden_layer_dict={1: optimal_num_neurons}, batch_size=optimal_batch_size,
-    #                             l2_beta=beta, early_stop=True, patience=20, min_delta=0.001).train(**train_test_val)
-
+    #                             hidden_layer_dict={1: num_neurons}, batch_size=optimal_batch_size,
+    #                             early_stop=True, patience=20, min_delta=0.001).train(**train_test_val)
     #     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
     #     train_err_list.append(train_err)
     #     test_acc_list.append(test_acc)
     #     time_taken_one_epoch_list.append(time_taken_one_epoch)
     #     early_stop_epoch_list.append(early_stop_epoch)
-    #     print('{} beta took {}ms per epoch'.format(beta, time_taken_one_epoch))
-    #     predicted_dict[beta] = classifier.predict(X_test)
+    #     predicted_dict[num_neurons] = classifier.predict(X_test)
+    # #end for
 
     # # Plot Training Errors
-    # plt.figure("Early Stopping Train Error against Epoch with Different Decay Parameters")
-    # plt.title("Early Stopping Train Error against Epoch with Different Decay Parameters")
+    # plt.figure("Early Stopping Train Error against Epoch with different Number of Neurons")
+    # plt.title("Early Stopping Train Error against Epoch with different Number of Neurons")
     # es_error_against_epoch[1] = max([len(l) for l in train_err_list])
     # plt.axis(es_error_against_epoch)
 
-    # for i in range(len(beta_list)):
-    #     plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'beta = {}'.format(beta_list[i]))
+    # for i in range(len(num_hidden_neurons)):
+    #     plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
     #     plt.xlabel('Epochs')
     #     plt.ylabel('Train Error')
     #     plt.legend()
     #     plt.grid(b=True)
     # #end for
-    # plt.savefig('figures/1a/4a_es_train_error_vs_epoch_for_diff_beta.png')
+    # plt.savefig('figures/1a/3a_es_train_error_vs_epoch_for_diff_num_neurons.png')
+
 
     # # Plot Test Accuracy
-    # plt.figure("Early Stopping Test Accuracy against Epoch with Different Decay Parameters")
-    # plt.title("Early Stopping Test Accuracy against Epoch with Different Decay Parameters")
+    # plt.figure("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
+    # plt.title("Early Stopping Test Accuracy against Epoch with different Number of Neurons")
     # es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
     # plt.axis(es_accuracy_against_epoch)
-    # for i in range(len(beta_list)):
-    #     plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'beta = {}'.format(beta_list[i]))
+    # for i in range(len(num_hidden_neurons)):
+    #     plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'num_neurons = {}'.format(num_hidden_neurons[i]))
     #     plt.xlabel('Epochs')
     #     plt.ylabel('Test Accuracy')
     #     plt.legend()
     #     plt.grid(b=True)
     # #end for
-    # plt.savefig('figures/1a/4b_es_test_accuracy_vs_epoch_for_diff_beta.png')
+    # plt.savefig('figures/1a/3a_es_test_accuracy_vs_epoch_for_diff_num_neurons.png')
+
 
     # # Plot Time Taken for One Epoch
-    # plt.figure("Early Stopping Time Taken for One Epoch against Decay Parameters")
-    # plt.title("Early Stopping Time Taken for One Epoch against Decay Parametersa")
-    # plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
-    # plt.plot([str(beta) for beta in beta_list], time_taken_one_epoch_list)
-    # plt.xlabel('Decay Parameters')
+    # plt.figure("Early Stopping Time Taken for One Epoch against Number of Neurons")
+    # plt.title("Early Stopping Time Taken for One Epoch against Number of Neurons")
+    # plt.plot(num_hidden_neurons, time_taken_one_epoch_list)
+    # plt.xlabel('Number of Neurons')
     # plt.ylabel('Time/ms')
     # plt.grid(b=True)
-    # plt.savefig('figures/1a/4b_es_time_taken_for_one_epoch_vs_diff_beta.png')
+    # plt.savefig('figures/1a/3b_es_time_taken_for_one_epoch_vs_num_neurons.png')
 
     # total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
     # # Plot Total Time Taken
     # plt.figure("Early Stopping Total Time Taken against Number of Neurons")
     # plt.title("Early Stopping Total Time Taken against Number of Neurons")
-    # plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
-    # plt.plot([str(beta) for beta in beta_list], total_time_taken_list)
-    # plt.xlabel('Decay Parameters')
+    # plt.plot(num_hidden_neurons, total_time_taken_list)
+    # plt.xlabel('Number of Neurons')
     # plt.ylabel('Time/ms')
     # plt.grid(b=True)
-    # plt.savefig('figures/1a/4b_es_total_time_taken_vs_diff_beta.png')
+    # plt.savefig('figures/1a/3b_es_total_time_taken_vs_num_neurons.png')
 
-    # # Plot Test Accuracy against Decay Parameters
+    # # plot final test accuracy against Number of Neurons
     # final_acc = [acc[-1] for acc in test_acc_list]
-    # plt.figure('Early Stopping Test Accuracy against Decay Parameters')
-    # plt.title('Early Stopping Test Accuracy against Decay Parameters')
-    # plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
-    # plt.plot([str(beta) for beta in beta_list], final_acc)
-    # plt.xlabel('Decay Parameters')
+    # plt.figure('Early Stopping Converged Accuracy against Number of Neurons')
+    # plt.title('Early Stopping Converged Accuracy against Number of Neurons')
+    # plt.plot(num_hidden_neurons, final_acc)
+    # plt.xlabel('Number of Neurons')
     # plt.ylabel('Test Accuracy')
     # plt.grid(b=True)
-    # plt.savefig('figures/1a/4b_es_test_accuracy_against_decay_arameters.png')
+    # plt.savefig('figures/1a/3c_es_accuracy_against_num_neurons.png')
 
-    # for i in range(len(beta_list)):
-    #     print('Beta: {}'.format(beta_list[i]))
+    # for i in range(len(num_hidden_neurons)):
+    #     print('Number of Neurons: {}'.format(num_hidden_neurons[i]))
     #     print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
     #     print('Total Time: {}ms'.format(total_time_taken_list[i]))
     #     print('Convergence Test Accuracy: {}'.format(final_acc[i]))
     #     print('-'*50)
+    # # Number of Neurons: 5
+    # # Time per epoch: 223.90767412448147ms
+    # # Total Time: 24405.93647956848ms
+    # # Convergence Test Accuracy: 0.847000002861023
+    # # --------------------------------------------------
+    # # Number of Neurons: 10
+    # # Time per epoch: 241.24092827824987ms
+    # # Total Time: 65617.53249168396ms
+    # # Convergence Test Accuracy: 0.8684999942779541
+    # # --------------------------------------------------
+    # # Number of Neurons: 15
+    # # Time per epoch: 248.12683029847ms
+    # # Total Time: 56324.79047775269ms
+    # # Convergence Test Accuracy: 0.8579999804496765
+    # # --------------------------------------------------
+    # # Number of Neurons: 20
+    # # Time per epoch: 254.77612436863413ms
+    # # Total Time: 58088.956356048584ms
+    # # Convergence Test Accuracy: 0.875
+    # # --------------------------------------------------
+    # # Number of Neurons: 25
+    # # Time per epoch: 253.72774500242423ms
+    # # Total Time: 54044.00968551636ms
+    # # Convergence Test Accuracy: 0.8615000247955322
+    # # --------------------------------------------------
 
-    # for beta in beta_list:
+    # # for num_neurons in num_hidden_neurons:
+    # #     print('Early Stopping Number of Neurons {} Test set classification report:\n{}'.format(num_neurons, classification_report(_transform_Y(Y_test), predicted_dict[num_neurons], digits=3, labels=np.unique(predicted_dict[num_neurons]))))
+
+    # # Early Stopping Number of Neurons 5 Test set classification report:
+    # #              precision    recall  f1-score   support  
+
+    # #           1      0.952     0.991     0.971       461  
+    # #           2      0.929     0.938     0.933       224  
+    # #           3      0.910     0.869     0.889       397  
+    # #           4      0.505     0.507     0.506       211  
+    # #           5      0.830     0.802     0.815       237  
+    # #           7      0.812     0.819     0.816       470  
+
+    # # avg / total      0.847     0.847     0.847      2000  
+
+
+    # # Early Stopping Number of Neurons 10 Test set classification report:
+    # #              precision    recall  f1-score   support  
+
+    # #           1      0.970     0.987     0.978       461  
+    # #           2      0.956     0.969     0.962       224  
+    # #           3      0.912     0.859     0.885       397  
+    # #           4      0.542     0.768     0.635       211  
+    # #           5      0.871     0.857     0.864       237  
+    # #           7      0.902     0.764     0.827       470  
+
+    # # avg / total      0.884     0.869     0.873      2000  
+
+    # # Early Stopping Number of Neurons 15 Test set classification report:
+    # #              precision    recall  f1-score   support  
+
+    # #           1      0.966     0.989     0.977       461  
+    # #           2      0.963     0.929     0.945       224  
+    # #           3      0.894     0.909     0.901       397  
+    # #           4      0.598     0.360     0.450       211  
+    # #           5      0.833     0.861     0.846       237  
+    # #           7      0.767     0.874     0.817       470  
+
+    # # avg / total      0.850     0.858     0.850      2000  
+
+    # # Early Stopping Number of Neurons 20 Test set classification report:
+    # #              precision    recall  f1-score   support  
+
+    # #           1      0.985     0.983     0.984       461  
+    # #           2      0.947     0.964     0.956       224  
+    # #           3      0.869     0.937     0.902       397  
+    # #           4      0.626     0.706     0.664       211  
+    # #           5      0.871     0.823     0.846       237  
+    # #           7      0.865     0.777     0.818       470  
+
+    # # avg / total      0.878     0.875     0.875      2000  
+
+    # # Early Stopping Number of Neurons 25 Test set classification report:
+    # #              precision    recall  f1-score   support  
+
+    # #           1      0.976     0.983     0.979       461  
+    # #           2      0.960     0.973     0.967       224  
+    # #           3      0.860     0.947     0.902       397  
+    # #           4      0.674     0.275     0.391       211  
+    # #           5      0.918     0.802     0.856       237  
+    # #           7      0.739     0.911     0.816       470  
+
+    # # avg / total      0.857     0.862     0.847      2000  
+
+    optimal_num_neurons = 20
+
+    # =====================Q4 Determine optimal decay parameter=====================
+    beta_list = [0,1e-12,1e-9,1e-6,1e-3]
+
+    #### With Early Stopping
+    train_err_list = []
+    test_acc_list = []
+    time_taken_one_epoch_list = []
+    early_stop_epoch_list = []
+    predicted_dict = dict()
+
+    for beta in beta_list:
+        classifier = Classifier(features_dim=NUM_FEATURES, output_dim=NUM_CLASSES,
+                                hidden_layer_dict={1: optimal_num_neurons}, batch_size=optimal_batch_size,
+                                l2_beta=beta, early_stop=True, patience=20, min_delta=0.001).train(**train_test_val)
+
+        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = classifier.train_err, classifier.test_acc, classifier.time_taken_one_epoch, classifier.early_stop_epoch
+        train_err_list.append(train_err)
+        test_acc_list.append(test_acc)
+        time_taken_one_epoch_list.append(time_taken_one_epoch)
+        early_stop_epoch_list.append(early_stop_epoch)
+        print('{} beta took {}ms per epoch'.format(beta, time_taken_one_epoch))
+        predicted_dict[beta] = classifier.predict(X_test)
+
+    # Plot Training Errors
+    plt.figure("Early Stopping Train Error against Epoch with Different Decay Parameters")
+    plt.title("Early Stopping Train Error against Epoch with Different Decay Parameters")
+    es_error_against_epoch[1] = max([len(l) for l in train_err_list])
+    plt.axis(es_error_against_epoch)
+
+    for i in range(len(beta_list)):
+        plt.plot(range(len(train_err_list[i])), train_err_list[i], label = 'beta = {}'.format(beta_list[i]))
+        plt.xlabel('Epochs')
+        plt.ylabel('Train Error')
+        plt.legend()
+        plt.grid(b=True)
+    #end for
+    plt.savefig('figures/1a/4a_es_train_error_vs_epoch_for_diff_beta.png')
+
+    # Plot Test Accuracy
+    plt.figure("Early Stopping Test Accuracy against Epoch with Different Decay Parameters")
+    plt.title("Early Stopping Test Accuracy against Epoch with Different Decay Parameters")
+    es_accuracy_against_epoch[1] = max([len(l) for l in test_acc_list])
+    plt.axis(es_accuracy_against_epoch)
+    for i in range(len(beta_list)):
+        plt.plot(range(len(test_acc_list[i])), test_acc_list[i], label = 'beta = {}'.format(beta_list[i]))
+        plt.xlabel('Epochs')
+        plt.ylabel('Test Accuracy')
+        plt.legend()
+        plt.grid(b=True)
+    #end for
+    plt.savefig('figures/1a/4b_es_test_accuracy_vs_epoch_for_diff_beta.png')
+
+    # Plot Time Taken for One Epoch
+    plt.figure("Early Stopping Time Taken for One Epoch against Decay Parameters")
+    plt.title("Early Stopping Time Taken for One Epoch against Decay Parametersa")
+    plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
+    plt.plot([str(beta) for beta in beta_list], time_taken_one_epoch_list)
+    plt.xlabel('Decay Parameters')
+    plt.ylabel('Time/ms')
+    plt.grid(b=True)
+    plt.savefig('figures/1a/4b_es_time_taken_for_one_epoch_vs_diff_beta.png')
+
+    total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
+    # Plot Total Time Taken
+    plt.figure("Early Stopping Total Time Taken against Number of Neurons")
+    plt.title("Early Stopping Total Time Taken against Number of Neurons")
+    plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
+    plt.plot([str(beta) for beta in beta_list], total_time_taken_list)
+    plt.xlabel('Decay Parameters')
+    plt.ylabel('Time/ms')
+    plt.grid(b=True)
+    plt.savefig('figures/1a/4b_es_total_time_taken_vs_diff_beta.png')
+
+    # Plot Test Accuracy against Decay Parameters
+    final_acc = [acc[-1] for acc in test_acc_list]
+    plt.figure('Early Stopping Test Accuracy against Decay Parameters')
+    plt.title('Early Stopping Test Accuracy against Decay Parameters')
+    plt.xticks(np.arange(5), [str(beta) for beta in beta_list])
+    plt.plot([str(beta) for beta in beta_list], final_acc)
+    plt.xlabel('Decay Parameters')
+    plt.ylabel('Test Accuracy')
+    plt.grid(b=True)
+    plt.savefig('figures/1a/4b_es_test_accuracy_against_decay_arameters.png')
+
+    for i in range(len(beta_list)):
+        print('Beta: {}'.format(beta_list[i]))
+        print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
+        print('Total Time: {}ms'.format(total_time_taken_list[i]))
+        print('Convergence Test Accuracy: {}'.format(final_acc[i]))
+        print('-'*50)
+    # Beta: 0
+    # Time per epoch: 235.09231994026587ms
+    # Total Time: 53601.048946380615ms
+    # Convergence Test Accuracy: 0.8755000233650208
+    # --------------------------------------------------
+    # Beta: 1e-12
+    # Time per epoch: 242.66248627712852ms
+    # Total Time: 55327.0468711853ms
+    # Convergence Test Accuracy: 0.8755000233650208
+    # --------------------------------------------------
+    # Beta: 1e-09
+    # Time per epoch: 243.50313241021675ms
+    # Total Time: 55518.71418952942ms
+    # Convergence Test Accuracy: 0.875
+    # --------------------------------------------------
+    # Beta: 1e-06
+    # Time per epoch: 241.57435538475974ms
+    # Total Time: 55078.95302772522ms
+    # Convergence Test Accuracy: 0.875
+    # --------------------------------------------------
+    # Beta: 0.001
+    # Time per epoch: 242.8918645737019ms
+    # Total Time: 45663.67053985596ms
+    # Convergence Test Accuracy: 0.8514999747276306
+    # --------------------------------------------------
+    #     # for beta in beta_list:
     #     print('Early Stopping beta {} Test set classification report:\n{}'.format(beta, classification_report(_transform_Y(Y_test), predicted_dict[beta], digits=3, labels=np.unique(predicted_dict[beta]))))
 
-    # #--------------------------------------------------
-    # # Early Stopping beta 0 Test set classification report:
-    # #              precision    recall  f1-score   support
-    # #
-    # #           1      0.983     0.983     0.983       461
-    # #           2      0.952     0.964     0.958       224
-    # #           3      0.871     0.937     0.903       397
-    # #           4      0.626     0.706     0.664       211
-    # #           5      0.871     0.823     0.846       237
-    # #           7      0.865     0.779     0.820       470
-    # #
-    # # avg / total      0.879     0.875     0.876      2000
-    # #
-    # # Early Stopping beta 1e-12 Test set classification report:
-    # #              precision    recall  f1-score   support
-    # #
-    # #           1      0.985     0.983     0.984       461
-    # #           2      0.952     0.964     0.958       224
-    # #           3      0.871     0.937     0.903       397
-    # #           4      0.623     0.706     0.662       211
-    # #           5      0.871     0.827     0.848       237
-    # #           7      0.865     0.777     0.818       470
-    # #
-    # # avg / total      0.879     0.875     0.876      2000
-    # #
-    # # Early Stopping beta 1e-09 Test set classification report:
-    # #              precision    recall  f1-score   support
-    # #
-    # #           1      0.985     0.983     0.984       461
-    # #           2      0.947     0.964     0.956       224
-    # #           3      0.869     0.937     0.902       397
-    # #           4      0.626     0.706     0.664       211
-    # #           5      0.871     0.823     0.846       237
-    # #           7      0.865     0.777     0.818       470
-    # #
-    # # avg / total      0.878     0.875     0.875      2000
-    # #
-    # # Early Stopping beta 1e-06 Test set classification report:
-    # #              precision    recall  f1-score   support
-    # #
-    # #           1      0.985     0.983     0.984       461
-    # #           2      0.947     0.964     0.956       224
-    # #           3      0.869     0.937     0.902       397
-    # #           4      0.626     0.706     0.664       211
-    # #           5      0.871     0.823     0.846       237
-    # #           7      0.865     0.777     0.818       470
-    # #
-    # # avg / total      0.878     0.875     0.875      2000
-    # #
-    # # Early Stopping beta 0.001 Test set classification report:
-    # #              precision    recall  f1-score   support
-    # #
-    # #           1      0.962     0.991     0.976       461
-    # #           2      0.963     0.938     0.950       224
-    # #           3      0.896     0.894     0.895       397
-    # #           4      0.543     0.512     0.527       211
-    # #           5      0.856     0.751     0.800       237
-    # #           7      0.784     0.840     0.811       470
-    # #
-    # # avg / total      0.850     0.852     0.850      2000
+    #--------------------------------------------------
+    # Early Stopping beta 0 Test set classification report:
+    #              precision    recall  f1-score   support
+    #
+    #           1      0.983     0.983     0.983       461
+    #           2      0.952     0.964     0.958       224
+    #           3      0.871     0.937     0.903       397
+    #           4      0.626     0.706     0.664       211
+    #           5      0.871     0.823     0.846       237
+    #           7      0.865     0.779     0.820       470
+    #
+    # avg / total      0.879     0.875     0.876      2000
+    #
+    # Early Stopping beta 1e-12 Test set classification report:
+    #              precision    recall  f1-score   support
+    #
+    #           1      0.985     0.983     0.984       461
+    #           2      0.952     0.964     0.958       224
+    #           3      0.871     0.937     0.903       397
+    #           4      0.623     0.706     0.662       211
+    #           5      0.871     0.827     0.848       237
+    #           7      0.865     0.777     0.818       470
+    #
+    # avg / total      0.879     0.875     0.876      2000
+    #
+    # Early Stopping beta 1e-09 Test set classification report:
+    #              precision    recall  f1-score   support
+    #
+    #           1      0.985     0.983     0.984       461
+    #           2      0.947     0.964     0.956       224
+    #           3      0.869     0.937     0.902       397
+    #           4      0.626     0.706     0.664       211
+    #           5      0.871     0.823     0.846       237
+    #           7      0.865     0.777     0.818       470
+    #
+    # avg / total      0.878     0.875     0.875      2000
+    #
+    # Early Stopping beta 1e-06 Test set classification report:
+    #              precision    recall  f1-score   support
+    #
+    #           1      0.985     0.983     0.984       461
+    #           2      0.947     0.964     0.956       224
+    #           3      0.869     0.937     0.902       397
+    #           4      0.626     0.706     0.664       211
+    #           5      0.871     0.823     0.846       237
+    #           7      0.865     0.777     0.818       470
+    #
+    # avg / total      0.878     0.875     0.875      2000
+    #
+    # Early Stopping beta 0.001 Test set classification report:
+    #              precision    recall  f1-score   support
+    #
+    #           1      0.962     0.991     0.976       461
+    #           2      0.963     0.938     0.950       224
+    #           3      0.896     0.894     0.895       397
+    #           4      0.543     0.512     0.527       211
+    #           5      0.856     0.751     0.800       237
+    #           7      0.784     0.840     0.811       470
+    #
+    # avg / total      0.850     0.852     0.850      2000
 
     optimal_beta = 1e-9
 
