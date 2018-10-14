@@ -16,6 +16,10 @@ NUM_FEATURES = 8
 seed = 10
 np.random.seed(seed)
 
+if not os.path.exists('figures'):
+    os.makedirs('figures')
+if not os.path.exists(os.path.join('figures', '1b')):
+    os.makedirs(os.path.join('figures', '1b'))
 
 class CVRegressor():
     def __init__(
@@ -194,7 +198,7 @@ class CVRegressor():
 
         return test_error
     #end def
-       
+
 
     def predict(self, X):
         with tf.Session() as sess:
@@ -222,7 +226,7 @@ def _read_data(file_name):
     # split data
     X_train, Y_train = _input_train[:, :8], _input_train[:, -1].astype(float)
     X_test, Y_test = _input_test[:, :8], _input_test[:, -1].astype(float)
-    
+
     # scale
     x_mean = np.mean(X_train, axis=0)
     x_std = np.std(X_train, axis=0)
@@ -366,7 +370,7 @@ def main():
     # plt.xlabel('Epochs')
     # plt.ylabel('Test Error')
     # plt.plot(range(1, 501), regressor.test_err)
-    # plt.savefig('figures/1b/2b_test_error_with_epochs.png')    
+    # plt.savefig('figures/1b/2b_test_error_with_epochs.png')
 
 
     # ############ Q3 3-layer Feedforward Network ############
@@ -447,7 +451,7 @@ def main():
     plt.xlabel('Epochs')
     plt.ylabel('Test Error')
     plt.plot(range(1, 501), regressor.test_err)
-    plt.savefig('figures/1b/3bb_test_error_with_epochs.png')    
+    plt.savefig('figures/1b/3bb_test_error_with_epochs.png')
 
 
     ############ Q4 3-layer Feedforward Network ############

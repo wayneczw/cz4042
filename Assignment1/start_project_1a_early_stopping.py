@@ -12,10 +12,11 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 import time
 import os
-if not os.path.isdir('figures'):
-    print('creating the figures folder')
-    os.makedirs('figures')
 
+if not os.path.exists('figures'):
+    os.makedirs('figures')
+if not os.path.exists(os.path.join('figures', '1a')):
+    os.makedirs(os.path.join('figures', '1a'))
 
 logger = logging.getLogger(__name__)
 NUM_FEATURES = 36
