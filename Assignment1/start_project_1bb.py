@@ -254,187 +254,187 @@ def main():
     # read data
     X_train, Y_train, X_test, Y_test = _read_data('./data/cal_housing.data')
 
-    ########### Q1 3-layer Feedforward Network ############
-    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                            hidden_layer_dict={1: 30})
-    regressor = regressor.train(trainX=X_train, trainY=Y_train,
-                                testX=X_test, testY=Y_test,
-                                small=False)
+    # ########### Q1 3-layer Feedforward Network ############
+    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                         hidden_layer_dict={1: 30})
+    # regressor = regressor.train(trainX=X_train, trainY=Y_train,
+    #                             testX=X_test, testY=Y_test,
+    #                             small=False)
 
-    plt.figure('Validation Error against Epochs')
-    plt.title('Validation Error against Epochs')
-    plt.grid(b=True)
-    plt.xlabel('Epochs')
-    plt.ylabel('Validation Error')
-    plt.plot(range(1, 501), regressor.train_err)
-    plt.savefig('figures/1b/1a_validation_error_with_epochs.png')
+    # plt.figure('Validation Error against Epochs')
+    # plt.title('Validation Error against Epochs')
+    # plt.grid(b=True)
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Validation Error')
+    # plt.plot(range(1, 501), regressor.train_err)
+    # plt.savefig('figures/1b/1a_validation_error_with_epochs.png')
 
-    idx = np.random.choice(len(X_test), 50, replace=True)
-    Y_predict, Y_true = regressor.predict(X_test[idx]), Y_test[idx]
-    Y_predict = [l[0] for l in Y_predict]
-    Y_true = [l[0] for l in Y_true]
-    a, b = best_fit(Y_true, Y_predict)
-    # plot points and fit line
-    plt.figure('Predicted Value against True Value')
-    plt.title('Predicted Value against True Value')
-    plt.scatter(Y_true, Y_predict)
-    yfit = [a + b * xi for xi in Y_true]
-    plt.plot(Y_true, yfit)
-    plt.grid(b=True)
-    plt.xlabel('True Value')
-    plt.ylabel('Predicted Value')
-    plt.savefig('figures/1b/1b_Predicted_against_True.png')
+    # idx = np.random.choice(len(X_test), 50, replace=True)
+    # Y_predict, Y_true = regressor.predict(X_test[idx]), Y_test[idx]
+    # Y_predict = [l[0] for l in Y_predict]
+    # Y_true = [l[0] for l in Y_true]
+    # a, b = best_fit(Y_true, Y_predict)
+    # # plot points and fit line
+    # plt.figure('Predicted Value against True Value')
+    # plt.title('Predicted Value against True Value')
+    # plt.scatter(Y_true, Y_predict)
+    # yfit = [a + b * xi for xi in Y_true]
+    # plt.plot(Y_true, yfit)
+    # plt.grid(b=True)
+    # plt.xlabel('True Value')
+    # plt.ylabel('Predicted Value')
+    # plt.savefig('figures/1b/1b_Predicted_against_True.png')
 
-    ########### Q2 Optimal Learning Rate ############
-    learning_rate_list = [10**(-10), 10**(-9), 0.5 * 10**(-8), 10**(-7), 0.5 * 10**(-6)]
+    # ########### Q2 Optimal Learning Rate ############
+    # learning_rate_list = [10**(-10), 10**(-9), 0.5 * 10**(-8), 10**(-7), 0.5 * 10**(-6)]
 
-    CV_list = []
-    time_taken_one_epoch_list = []
+    # CV_list = []
+    # time_taken_one_epoch_list = []
 
-    for learning_rate in learning_rate_list:
-        regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                                hidden_layer_dict={1: 30}, learning_rate=learning_rate)
-        regressor = regressor.trainCV(trainX=X_train, trainY=Y_train, small=False)
-        CV_list.append(regressor.cv_err)
-        time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
-    #end for
+    # for learning_rate in learning_rate_list:
+    #     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                             hidden_layer_dict={1: 30}, learning_rate=learning_rate)
+    #     regressor = regressor.trainCV(trainX=X_train, trainY=Y_train, small=False)
+    #     CV_list.append(regressor.cv_err)
+    #     time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
+    # #end for
 
-    plt.figure('CV Error against Learning Rate')
-    plt.title('CV Error against Learning Rate')
-    plt.grid(b=True)
-    plt.xlabel('Learning Rate')
-    plt.ylabel('CV Error')
-    plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
-    plt.plot([str(l) for l in learning_rate_list], CV_list)
-    plt.savefig('figures/1b/2a_CV_error_against_learning_rate.png')
+    # plt.figure('CV Error against Learning Rate')
+    # plt.title('CV Error against Learning Rate')
+    # plt.grid(b=True)
+    # plt.xlabel('Learning Rate')
+    # plt.ylabel('CV Error')
+    # plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
+    # plt.plot([str(l) for l in learning_rate_list], CV_list)
+    # plt.savefig('figures/1b/2a_CV_error_against_learning_rate.png')
 
-    # Plot Time Taken for One Epoch
-    plt.figure("Time Taken for One Epoch against Learning Rate")
-    plt.title("Time Taken for One Epoch against Learning Rate")
-    plt.xlabel('Learning Rate')
-    plt.ylabel('Time/ms')
-    plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
-    plt.plot([str(l) for l in learning_rate_list], time_taken_one_epoch_list)
-    plt.grid(b=True)
-    plt.savefig('figures/1b/2b_time_taken_for_one_epoch_vs_learning_rate.png')
+    # # Plot Time Taken for One Epoch
+    # plt.figure("Time Taken for One Epoch against Learning Rate")
+    # plt.title("Time Taken for One Epoch against Learning Rate")
+    # plt.xlabel('Learning Rate')
+    # plt.ylabel('Time/ms')
+    # plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
+    # plt.plot([str(l) for l in learning_rate_list], time_taken_one_epoch_list)
+    # plt.grid(b=True)
+    # plt.savefig('figures/1b/2b_time_taken_for_one_epoch_vs_learning_rate.png')
 
+
+    # # print("="*50)
+    # # print("="*25 + "Results" + "="*25 )
+    # # print("="*50)
+    # # for i in range(len(learning_rate_list)):
+    # #     print('Learning Rate: {}'.format(learning_rate_list[i]))
+    # #     print('CV error: {}'.format(CV_list[i]))
+    # #     print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
+    # #     print('-'*50)
+    # # #end for
+
+    # # ==================================================
+    # # =========================Results=========================
+    # # ==================================================
+    # # Learning Rate: 1e-10
+    # # CV error: 31243259904.0
+    # # Time per epoch: 25.784738540649414ms
+    # # --------------------------------------------------
+    # # Learning Rate: 1e-09
+    # # CV error: 4593163264.0
+    # # Time per epoch: 25.553718757629394ms
+    # # --------------------------------------------------
+    # # Learning Rate: 5e-09
+    # # CV error: 4248844800.0
+    # # Time per epoch: 25.519759464263917ms
+    # # --------------------------------------------------
+    # # Learning Rate: 1e-07
+    # # CV error: 4062203904.0
+    # # Time per epoch: 26.97435426712036ms
+    # # --------------------------------------------------
+    # # Learning Rate: 5e-07
+    # # CV error: 4227072000.0
+    # # Time per epoch: 25.491313552856447ms
+    # # --------------------------------------------------
+
+    optimal_learning_rate = 10**(-7)
+
+    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                         hidden_layer_dict={1: 30}, learning_rate=optimal_learning_rate)
+    # regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+    #                             small=False)
+
+    # plt.figure('{}: Test Error against Epochs'.format(optimal_learning_rate))
+    # plt.title('{}: Test Error against Epochs'.format(optimal_learning_rate))
+    # plt.grid(b=True)
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Test Error')
+    # plt.plot(range(1, 501), regressor.test_err)
+    # plt.savefig('figures/1b/2b_test_error_with_epochs.png')    
+
+
+    # ############ Q3 3-layer Feedforward Network ############
+    # num_neurons_list = [20, 40, 60, 80, 100]
+    # CV_list = []
+    # time_taken_one_epoch_list = []
+
+    # for num_neurons in num_neurons_list:
+    #     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                             hidden_layer_dict={1: num_neurons}, learning_rate=optimal_learning_rate)
+    #     regressor = regressor.trainCV(trainX=X_train, trainY=Y_train, small=False)
+    #     CV_list.append(regressor.cv_err)
+    #     time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
+    # #end for
+
+    # plt.figure('CV Error against Number of Neurons')
+    # plt.title('CV Error against Number of Neurons')
+    # plt.grid(b=True)
+    # plt.xlabel('Number of Neurons')
+    # plt.ylabel('CV Error')
+    # plt.xticks(np.arange(5), [str(l) for l in num_neurons_list])
+    # plt.plot([str(l) for l in num_neurons_list], CV_list)
+    # plt.savefig('figures/1b/3a_CV_error_against_num_neurons.png')
+
+    # # Plot Time Taken for One Epoch
+    # plt.figure("Time Taken for One Epoch against Number of Neurons")
+    # plt.title("Time Taken for One Epoch against Number of Neurons")
+    # plt.xlabel('Number of Neurons')
+    # plt.ylabel('Time/ms')
+    # plt.plot(num_neurons_list, time_taken_one_epoch_list)
+    # plt.grid(b=True)
+    # plt.savefig('figures/1b/3c_time_taken_for_one_epoch_vs_num_neurons.png')
 
     # print("="*50)
     # print("="*25 + "Results" + "="*25 )
     # print("="*50)
-    # for i in range(len(learning_rate_list)):
-    #     print('Learning Rate: {}'.format(learning_rate_list[i]))
+    # for i in range(len(num_neurons_list)):
+    #     print('Number of Neurons: {}'.format(num_neurons_list[i]))
     #     print('CV error: {}'.format(CV_list[i]))
     #     print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
     #     print('-'*50)
     # #end for
 
-    # ==================================================
-    # =========================Results=========================
-    # ==================================================
-    # Learning Rate: 1e-10
-    # CV error: 31243259904.0
-    # Time per epoch: 25.784738540649414ms
-    # --------------------------------------------------
-    # Learning Rate: 1e-09
-    # CV error: 4593163264.0
-    # Time per epoch: 25.553718757629394ms
-    # --------------------------------------------------
-    # Learning Rate: 5e-09
-    # CV error: 4248844800.0
-    # Time per epoch: 25.519759464263917ms
-    # --------------------------------------------------
-    # Learning Rate: 1e-07
-    # CV error: 4062203904.0
-    # Time per epoch: 26.97435426712036ms
-    # --------------------------------------------------
-    # Learning Rate: 5e-07
-    # CV error: 4227072000.0
-    # Time per epoch: 25.491313552856447ms
-    # --------------------------------------------------
+    # # ==================================================
+    # # =========================Results=========================
+    # # ==================================================
+    # # Number of Neurons: 20
+    # # CV error: 4066696448.0
+    # # Time per epoch: 26.411721992492676ms
+    # # --------------------------------------------------
+    # # Number of Neurons: 40
+    # # CV error: 3968453120.0
+    # # Time per epoch: 27.138696956634522ms
+    # # --------------------------------------------------
+    # # Number of Neurons: 60
+    # # CV error: 4019897088.0
+    # # Time per epoch: 27.93471021652222ms
+    # # --------------------------------------------------
+    # # Number of Neurons: 80
+    # # CV error: 4070825984.0
+    # # Time per epoch: 27.435161781311038ms
+    # # --------------------------------------------------
+    # # Number of Neurons: 100
+    # # CV error: 3924401408.0
+    # # Time per epoch: 26.041232967376708ms
+    # # --------------------------------------------------
 
-    optimal_learning_rate = 10**(-7)
-
-    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                            hidden_layer_dict={1: 30}, learning_rate=optimal_learning_rate)
-    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=False)
-
-    plt.figure('{}: Test Error against Epochs'.format(optimal_learning_rate))
-    plt.title('{}: Test Error against Epochs'.format(optimal_learning_rate))
-    plt.grid(b=True)
-    plt.xlabel('Epochs')
-    plt.ylabel('Test Error')
-    plt.plot(range(1, 501), regressor.test_err)
-    plt.savefig('figures/1b/2b_test_error_with_epochs.png')    
-
-
-    ############ Q3 3-layer Feedforward Network ############
-    num_neurons_list = [20, 40, 60, 80, 100]
-    CV_list = []
-    time_taken_one_epoch_list = []
-
-    for num_neurons in num_neurons_list:
-        regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                                hidden_layer_dict={1: num_neurons}, learning_rate=optimal_learning_rate)
-        regressor = regressor.trainCV(trainX=X_train, trainY=Y_train, small=False)
-        CV_list.append(regressor.cv_err)
-        time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
-    #end for
-
-    plt.figure('CV Error against Number of Neurons')
-    plt.title('CV Error against Number of Neurons')
-    plt.grid(b=True)
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('CV Error')
-    plt.xticks(np.arange(5), [str(l) for l in num_neurons_list])
-    plt.plot([str(l) for l in num_neurons_list], CV_list)
-    plt.savefig('figures/1b/3a_CV_error_against_num_neurons.png')
-
-    # Plot Time Taken for One Epoch
-    plt.figure("Time Taken for One Epoch against Number of Neurons")
-    plt.title("Time Taken for One Epoch against Number of Neurons")
-    plt.xlabel('Number of Neurons')
-    plt.ylabel('Time/ms')
-    plt.plot(num_neurons_list, time_taken_one_epoch_list)
-    plt.grid(b=True)
-    plt.savefig('figures/1b/3c_time_taken_for_one_epoch_vs_num_neurons.png')
-
-    print("="*50)
-    print("="*25 + "Results" + "="*25 )
-    print("="*50)
-    for i in range(len(num_neurons_list)):
-        print('Number of Neurons: {}'.format(num_neurons_list[i]))
-        print('CV error: {}'.format(CV_list[i]))
-        print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-        print('-'*50)
-    #end for
-
-    # ==================================================
-    # =========================Results=========================
-    # ==================================================
-    # Number of Neurons: 20
-    # CV error: 4066696448.0
-    # Time per epoch: 26.411721992492676ms
-    # --------------------------------------------------
-    # Number of Neurons: 40
-    # CV error: 3968453120.0
-    # Time per epoch: 27.138696956634522ms
-    # --------------------------------------------------
-    # Number of Neurons: 60
-    # CV error: 4019897088.0
-    # Time per epoch: 27.93471021652222ms
-    # --------------------------------------------------
-    # Number of Neurons: 80
-    # CV error: 4070825984.0
-    # Time per epoch: 27.435161781311038ms
-    # --------------------------------------------------
-    # Number of Neurons: 100
-    # CV error: 3924401408.0
-    # Time per epoch: 26.041232967376708ms
-    # --------------------------------------------------
-
-    optimal_num_neurons = 40
+    optimal_num_neurons = 100
 
     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
                             hidden_layer_dict={1: optimal_num_neurons}, learning_rate=optimal_learning_rate)
@@ -447,7 +447,7 @@ def main():
     plt.xlabel('Epochs')
     plt.ylabel('Test Error')
     plt.plot(range(1, 501), regressor.test_err)
-    plt.savefig('figures/1b/3b_test_error_with_epochs.png')    
+    plt.savefig('figures/1b/3bb_test_error_with_epochs.png')    
 
 
     ############ Q4 3-layer Feedforward Network ############
@@ -522,7 +522,7 @@ def main():
     plt.ylabel('Time/ms')
     plt.xticks(np.arange(6), state_list)
     plt.plot(state_list, time_taken_one_epoch_list)
-    plt.savefig('figures/1b/4Time.png')
+    plt.savefig('figures/1b/44Time.png')
 
     plt.figure('Test Error')
     plt.title('Test Error')
@@ -530,7 +530,7 @@ def main():
     plt.ylabel('Test Error')
     plt.xticks(np.arange(6), state_list)
     plt.plot(state_list, test_error_list)
-    plt.savefig('figures/1b/4Test_error.png')
+    plt.savefig('figures/1b/44Test_error.png')
 
     print("="*50)
     print("="*25 + "Results" + "="*25 )
@@ -545,28 +545,28 @@ def main():
     # =========================Results=========================
     # ==================================================
     # State: 3L w/o dp
-    # Time per epoch: 130.07637357711792ms
-    # Test Error: 4537192960.0
+    # Time per epoch: 128.44493436813354ms
+    # Test Error: 4523873280.0
     # --------------------------------------------------
     # State: 3L w/ dp
-    # Time per epoch: 140.2339859008789ms
-    # Test Error: 4766731776.0
+    # Time per epoch: 148.26585388183594ms
+    # Test Error: 4634984448.0
     # --------------------------------------------------
     # State: 4L w/o dp
-    # Time per epoch: 148.27375411987305ms
-    # Test Error: 3136303616.0
+    # Time per epoch: 151.63497591018677ms
+    # Test Error: 3021156864.0
     # --------------------------------------------------
     # State: 4L w/ dp
-    # Time per epoch: 167.2393307685852ms
-    # Test Error: 4517381120.0
+    # Time per epoch: 180.52647256851196ms
+    # Test Error: 4204421376.0
     # --------------------------------------------------
     # State: 5L w/o dp
-    # Time per epoch: 170.28093481063843ms
-    # Test Error: 2851418624.0
+    # Time per epoch: 172.86687755584717ms
+    # Test Error: 2649017856.0
     # --------------------------------------------------
     # State: 5L w/ dp
-    # Time per epoch: 200.09658479690552ms
-    # Test Error: 4558581248.0
+    # Time per epoch: 207.08342456817627ms
+    # Test Error: 3618239488.0
     # --------------------------------------------------
 
 
