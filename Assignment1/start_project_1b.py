@@ -5,10 +5,11 @@
 # import matplotlib
 # matplotlib.use('Agg')
 import math
-import tensorflow as tf
-import numpy as np
 import matplotlib.pylab as plt
+import numpy as np
+import os
 from sklearn.model_selection import train_test_split
+import tensorflow as tf
 import time
 
 TEST_SIZE = 0.3
@@ -35,7 +36,9 @@ class CVRegressor():
         self.features_dim = features_dim
         self.output_dim = output_dim
         self.drop_out = drop_out
-        self.keep_prob = keep_prob
+        if self.drop_out:
+            self._keep_prob = tf.placeholder(tf.float32)
+            self.keep_prob = keep_prob
         self.num_folds = num_folds
         self.num_hidden_layers = num_hidden_layers
         self.hidden_layer_dict = hidden_layer_dict
@@ -54,7 +57,8 @@ class CVRegressor():
         if hidden:
             U = tf.nn.relu(tf.matmul(X, W) + B)
             if self.drop_out:
-                U = tf.nn.dropout(U, self.keep_prob)
+                U = tf.nn.dropout(U, self._keep_prob)
+                return W, B, U
         else:
             U = tf.matmul(X, W) + B
 
@@ -123,7 +127,10 @@ class CVRegressor():
 
                     t = time.time()
                     for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
-                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
+                        if self.drop_out:
+                            self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end], self._keep_prob: self.keep_prob})
+                        else:
+                            self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
                     time_to_update += (time.time() - t)
 
                     if i % 100 == 0:
@@ -131,7 +138,10 @@ class CVRegressor():
                         print('----------------------')
 
                 #end for
-                _cv_err.append(self.loss.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
+                if self.drop_out:
+                    _cv_err.append(self.loss.eval(feed_dict={self.x: X_val, self.y_: Y_val, self._keep_prob: self.keep_prob}))
+                else:
+                    _cv_err.append(self.loss.eval(feed_dict={self.x: X_val, self.y_: Y_val}))
             #end for
             self.saver.save(sess, ".ckpt/1bmodel.ckpt")
         #end with
@@ -172,11 +182,20 @@ class CVRegressor():
 
                 t = time.time()
                 for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
-                    self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
+                    if self.drop_out:
+                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end], self._keep_prob: self.keep_prob})
+                    else:
+                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
+
                 time_to_update += (time.time() - t)
 
-                self.train_err.append(self.loss.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
-                self.test_err.append(self.error.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
+                if self.drop_out:
+                    self.train_err.append(self.loss.eval(feed_dict={self.x: X_train, self.y_: Y_train, self._keep_prob: self.keep_prob}))
+                    self.test_err.append(self.error.eval(feed_dict={self.x: X_test, self.y_: Y_test, self._keep_prob: 1.0}))
+                else:
+                    self.train_err.append(self.loss.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
+                    self.test_err.append(self.error.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
+
                 if i % 100 == 0:
                     print('iter %d: validation error %g'%(i, self.train_err[i]))
                     print('----------------------')
@@ -254,6 +273,10 @@ def best_fit(X, Y):
 #end def
 
 
+def correct_fit(X, Y):
+    return a, b
+#end def
+
 def main():
     # read data
     X_train, Y_train, X_test, Y_test = _read_data('./data/cal_housing.data')
@@ -323,54 +346,54 @@ def main():
     # plt.savefig('figures/1b/2b_time_taken_for_one_epoch_vs_learning_rate.png')
 
 
-    # # print("="*50)
-    # # print("="*25 + "Results" + "="*25 )
-    # # print("="*50)
-    # # for i in range(len(learning_rate_list)):
-    # #     print('Learning Rate: {}'.format(learning_rate_list[i]))
-    # #     print('CV error: {}'.format(CV_list[i]))
-    # #     print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-    # #     print('-'*50)
-    # # #end for
+    # print("="*50)
+    # print("="*25 + "Results" + "="*25 )
+    # print("="*50)
+    # for i in range(len(learning_rate_list)):
+    #     print('Learning Rate: {}'.format(learning_rate_list[i]))
+    #     print('CV error: {}'.format(CV_list[i]))
+    #     print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
+    #     print('-'*50)
+    # #end for
 
-    # # ==================================================
-    # # =========================Results=========================
-    # # ==================================================
-    # # Learning Rate: 1e-10
-    # # CV error: 31243259904.0
-    # # Time per epoch: 25.784738540649414ms
-    # # --------------------------------------------------
-    # # Learning Rate: 1e-09
-    # # CV error: 4593163264.0
-    # # Time per epoch: 25.553718757629394ms
-    # # --------------------------------------------------
-    # # Learning Rate: 5e-09
-    # # CV error: 4248844800.0
-    # # Time per epoch: 25.519759464263917ms
-    # # --------------------------------------------------
-    # # Learning Rate: 1e-07
-    # # CV error: 4062203904.0
-    # # Time per epoch: 26.97435426712036ms
-    # # --------------------------------------------------
-    # # Learning Rate: 5e-07
-    # # CV error: 4227072000.0
-    # # Time per epoch: 25.491313552856447ms
-    # # --------------------------------------------------
+    # ==================================================
+    # =========================Results=========================
+    # ==================================================
+    # Learning Rate: 1e-10
+    # CV error: 31243259904.0
+    # Time per epoch: 26.777660369873047ms
+    # --------------------------------------------------
+    # Learning Rate: 1e-09
+    # CV error: 4593163264.0
+    # Time per epoch: 27.363919258117676ms
+    # --------------------------------------------------
+    # Learning Rate: 5e-09
+    # CV error: 4248844800.0
+    # Time per epoch: 27.090182304382324ms
+    # --------------------------------------------------
+    # Learning Rate: 1e-07
+    # CV error: 4062203904.0
+    # Time per epoch: 27.278899002075196ms
+    # --------------------------------------------------
+    # Learning Rate: 5e-07
+    # CV error: 4227072000.0
+    # Time per epoch: 27.360304641723634ms
+    # --------------------------------------------------
 
     optimal_learning_rate = 10**(-7)
 
-    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-    #                         hidden_layer_dict={1: 30}, learning_rate=optimal_learning_rate)
-    # regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-    #                             small=False)
+    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+                            hidden_layer_dict={1: 30}, learning_rate=optimal_learning_rate)
+    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+                                small=False)
 
-    # plt.figure('{}: Test Error against Epochs'.format(optimal_learning_rate))
-    # plt.title('{}: Test Error against Epochs'.format(optimal_learning_rate))
-    # plt.grid(b=True)
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Test Error')
-    # plt.plot(range(1, 501), regressor.test_err)
-    # plt.savefig('figures/1b/2b_test_error_with_epochs.png')
+    plt.figure('{}: Test Error against Epochs'.format(optimal_learning_rate))
+    plt.title('{}: Test Error against Epochs'.format(optimal_learning_rate))
+    plt.grid(b=True)
+    plt.xlabel('Epochs')
+    plt.ylabel('Test Error')
+    plt.plot(range(1, 501), regressor.test_err)
+    plt.savefig('figures/1b/2b_test_error_with_epochs.png')
 
 
     # ############ Q3 3-layer Feedforward Network ############
@@ -440,111 +463,111 @@ def main():
 
     optimal_num_neurons = 100
 
-    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                            hidden_layer_dict={1: optimal_num_neurons}, learning_rate=optimal_learning_rate)
-    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=False)
+    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                         hidden_layer_dict={1: optimal_num_neurons}, learning_rate=optimal_learning_rate)
+    # regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+    #                             small=False)
 
-    plt.figure('{}: Test Error against Epochs'.format(optimal_num_neurons))
-    plt.title('{}: Test Error against Epochs'.format(optimal_num_neurons))
-    plt.grid(b=True)
-    plt.xlabel('Epochs')
-    plt.ylabel('Test Error')
-    plt.plot(range(1, 501), regressor.test_err)
-    plt.savefig('figures/1b/3bb_test_error_with_epochs.png')
+    # plt.figure('{}: Test Error against Epochs'.format(optimal_num_neurons))
+    # plt.title('{}: Test Error against Epochs'.format(optimal_num_neurons))
+    # plt.grid(b=True)
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Test Error')
+    # plt.plot(range(1, 501), regressor.test_err)
+    # plt.savefig('figures/1b/3bb_test_error_with_epochs.png')
 
 
-    ############ Q4 3-layer Feedforward Network ############
-    state_list = ['3L w/o dp', '3L w/ dp', '4L w/o dp', '4L w/ dp', '5L w/o dp', '5L w/ dp']
-    test_error_list = []
-    time_taken_one_epoch_list = []
+    # ############ Q4 3-layer Feedforward Network ############
+    # state_list = ['3L w/o dp', '3L w/ dp', '4L w/o dp', '4L w/ dp', '5L w/o dp', '5L w/ dp']
+    # test_error_list = []
+    # time_taken_one_epoch_list = []
 
-    #### 3-layer without dropout ####
-    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                            hidden_layer_dict={1: optimal_num_neurons},
-                            num_hidden_layers=1, learning_rate=10**(-9))
-    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=False)
-    test_error_list.append(regressor.test(X_test, Y_test))
-    time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
+    # #### 3-layer without dropout ####
+    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                         hidden_layer_dict={1: optimal_num_neurons},
+    #                         num_hidden_layers=1, learning_rate=10**(-9))
+    # regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+    #                             small=False)
+    # test_error_list.append(regressor.test(X_test, Y_test))
+    # time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
 
-    #### 3-layer with dropout ####
-    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                            hidden_layer_dict={1: optimal_num_neurons},
-                            num_hidden_layers=1, drop_out=True, keep_prob=0.9,
-                            learning_rate=10**(-9))
-    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=False)
-    test_error_list.append(regressor.test(X_test, Y_test))
-    time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
+    # #### 3-layer with dropout ####
+    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                         hidden_layer_dict={1: optimal_num_neurons},
+    #                         num_hidden_layers=1, drop_out=True, keep_prob=0.9,
+    #                         learning_rate=10**(-9))
+    # regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+    #                             small=False)
+    # test_error_list.append(regressor.test(X_test, Y_test))
+    # time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
 
-    #### 4-layer without dropout ####
-    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                            hidden_layer_dict={1: optimal_num_neurons, 2: 20},
-                            num_hidden_layers=2, learning_rate=10**(-9))
-    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=False)
-    test_error_list.append(regressor.test(X_test, Y_test))
-    time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
+    # #### 4-layer without dropout ####
+    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                         hidden_layer_dict={1: optimal_num_neurons, 2: 20},
+    #                         num_hidden_layers=2, learning_rate=10**(-9))
+    # regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+    #                             small=False)
+    # test_error_list.append(regressor.test(X_test, Y_test))
+    # time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
 
-    #### 4-layer with dropout ####
-    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                            hidden_layer_dict={1: optimal_num_neurons, 2: 20},
-                            num_hidden_layers=2, drop_out=True, keep_prob=0.9,
-                            learning_rate=10**(-9))
-    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=False)
-    test_error_list.append(regressor.test(X_test, Y_test))
-    time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
+    # #### 4-layer with dropout ####
+    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                         hidden_layer_dict={1: optimal_num_neurons, 2: 20},
+    #                         num_hidden_layers=2, drop_out=True, keep_prob=0.9,
+    #                         learning_rate=10**(-9))
+    # regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+    #                             small=False)
+    # test_error_list.append(regressor.test(X_test, Y_test))
+    # time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
 
-    #### 5-layer without dropout ####
-    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                            hidden_layer_dict={1: optimal_num_neurons, 2: 20, 3: 20},
-                            num_hidden_layers=3, learning_rate=10**(-9))
-    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=False)
-    test_error_list.append(regressor.test(X_test, Y_test))
-    time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
+    # #### 5-layer without dropout ####
+    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                         hidden_layer_dict={1: optimal_num_neurons, 2: 20, 3: 20},
+    #                         num_hidden_layers=3, learning_rate=10**(-9))
+    # regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+    #                             small=False)
+    # test_error_list.append(regressor.test(X_test, Y_test))
+    # time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
 
-    #### 5-layer with dropout ####
-    regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                            hidden_layer_dict={1: optimal_num_neurons, 2: 20, 3: 20},
-                            num_hidden_layers=3, drop_out=True, keep_prob=0.9,
-                            learning_rate=10**(-9))
-    regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
-                                small=False)
-    test_error_list.append(regressor.test(X_test, Y_test))
-    time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
+    # #### 5-layer with dropout ####
+    # regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                         hidden_layer_dict={1: optimal_num_neurons, 2: 20, 3: 20},
+    #                         num_hidden_layers=3, drop_out=True, keep_prob=0.9,
+    #                         learning_rate=10**(-9))
+    # regressor = regressor.train(trainX=X_train, trainY=Y_train, testX=X_test, testY=Y_test,
+    #                             small=False)
+    # test_error_list.append(regressor.test(X_test, Y_test))
+    # time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
 
-    for i in range(len(state_list)):
-        print("state list: {}, test_error: {}".format(state_list[i],test_error_list[i]))
+    # for i in range(len(state_list)):
+    #     print("state list: {}, test_error: {}".format(state_list[i],test_error_list[i]))
 
-    # Plot Time Taken for One Epoch
-    plt.figure("Time Taken for One Epoch againt state")
-    plt.title("Time Taken for One Epoch againt state")
-    plt.grid(b=True)
-    plt.ylabel('Time/ms')
-    plt.xticks(np.arange(6), state_list)
-    plt.plot(state_list, time_taken_one_epoch_list)
-    plt.savefig('figures/1b/44Time.png')
+    # # Plot Time Taken for One Epoch
+    # plt.figure("Time Taken for One Epoch againt state")
+    # plt.title("Time Taken for One Epoch againt state")
+    # plt.grid(b=True)
+    # plt.ylabel('Time/ms')
+    # plt.xticks(np.arange(6), state_list)
+    # plt.plot(state_list, time_taken_one_epoch_list)
+    # plt.savefig('figures/1b/44Time.png')
 
-    plt.figure('Test Error')
-    plt.title('Test Error')
-    plt.grid(b=True)
-    plt.ylabel('Test Error')
-    plt.xticks(np.arange(6), state_list)
-    plt.plot(state_list, test_error_list)
-    plt.savefig('figures/1b/44Test_error.png')
+    # plt.figure('Test Error')
+    # plt.title('Test Error')
+    # plt.grid(b=True)
+    # plt.ylabel('Test Error')
+    # plt.xticks(np.arange(6), state_list)
+    # plt.plot(state_list, test_error_list)
+    # plt.savefig('figures/1b/44Test_error.png')
 
-    print("="*50)
-    print("="*25 + "Results" + "="*25 )
-    print("="*50)
-    for i in range(len(state_list)):
-        print('State: {}'.format(state_list[i]))
-        print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-        print('Test Error: {}'.format(test_error_list[i]))
-        print('-'*50)
-    #end for
+    # print("="*50)
+    # print("="*25 + "Results" + "="*25 )
+    # print("="*50)
+    # for i in range(len(state_list)):
+    #     print('State: {}'.format(state_list[i]))
+    #     print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
+    #     print('Test Error: {}'.format(test_error_list[i]))
+    #     print('-'*50)
+    # #end for
     # ==================================================
     # =========================Results=========================
     # ==================================================
