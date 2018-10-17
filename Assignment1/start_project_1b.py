@@ -452,26 +452,25 @@ def main():
     # =========================Results=========================
     # ==================================================
     # Number of Neurons: 20
-    # CV error: 4066696448.0
-    # Time per epoch: 26.411721992492676ms
+    # CV error: 4086170368.0
+    # Time per epoch: 102.01765747070313ms
     # --------------------------------------------------
     # Number of Neurons: 40
-    # CV error: 3968453120.0
-    # Time per epoch: 27.138696956634522ms
+    # CV error: 4057242112.0
+    # Time per epoch: 98.3443314552307ms
     # --------------------------------------------------
     # Number of Neurons: 60
-    # CV error: 4019897088.0
-    # Time per epoch: 27.93471021652222ms
+    # CV error: 4011250432.0
+    # Time per epoch: 97.78651485443116ms
     # --------------------------------------------------
     # Number of Neurons: 80
-    # CV error: 4070825984.0
-    # Time per epoch: 27.435161781311038ms
+    # CV error: 4020797440.0
+    # Time per epoch: 100.36348514556884ms
     # --------------------------------------------------
     # Number of Neurons: 100
-    # CV error: 3924401408.0
-    # Time per epoch: 26.041232967376708ms
+    # CV error: 3934771712.0
+    # Time per epoch: 106.26908721923827ms
     # --------------------------------------------------
-
     optimal_num_neurons = 100
 
     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
