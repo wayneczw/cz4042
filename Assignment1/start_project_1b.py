@@ -211,7 +211,11 @@ class CVRegressor():
     def test(self, X_test, Y_test):
         with tf.Session() as sess:
             self.saver.restore(sess, ".ckpt/1bmodel.ckpt")
-            feed_dict = {self.x: X_test, self.y_: Y_test}
+            if self.drop_out:
+                feed_dict = {self.x: X_test, self.y_: Y_test, self._keep_prob: 1.0}
+            else:
+                feed_dict = {self.x: X_test, self.y_: Y_test}
+
             test_error = self.error.eval(feed_dict)
         #end with
 
@@ -223,7 +227,10 @@ class CVRegressor():
         with tf.Session() as sess:
             self.saver.restore(sess, ".ckpt/1bmodel.ckpt")
 
-            feed_dict = {self.x: X}
+            if self.drop_out:
+                feed_dict = {self.x: X, self._keep_prob: 1.0}
+            else:
+                feed_dict = {self.x: X}               
             prediction = self.U.eval(feed_dict)
         #end with
 
@@ -269,7 +276,7 @@ def best_fit(X, Y):
 
     print('best fit line:\ny = {:.2f} + {:.2f}x'.format(a, b))
 
-    return a, b
+    return a, b, 'y = {:.2f} + {:.2f}x'.format(a, b)
 #end def
 
 
@@ -300,61 +307,64 @@ def main():
     Y_predict, Y_true = regressor.predict(X_test[idx]), Y_test[idx]
     Y_predict = [l[0] for l in Y_predict]
     Y_true = [l[0] for l in Y_true]
-    a, b = best_fit(Y_true, Y_predict)
+    a, b, eqn = best_fit(Y_true, Y_predict)
     # plot points and fit line
     plt.figure('Predicted Value against True Value')
     plt.title('Predicted Value against True Value')
     plt.scatter(Y_true, Y_predict)
     yfit = [a + b * xi for xi in Y_true]
-    plt.plot(Y_true, yfit)
+    fit = Y_true
+    plt.plot(Y_true, yfit, label = 'Best fit line: {}'.format(eqn))
+    plt.plot(Y_true, Y_true, label = 'True value line: {}'.format('y = x'))
+    plt.legend()
     plt.grid(b=True)
     plt.xlabel('True Value')
     plt.ylabel('Predicted Value')
     plt.savefig('figures/1b/1b_Predicted_against_True.png')
 
-    ########### Q2 Optimal Learning Rate ############
-    learning_rate_list = [10**(-10), 10**(-9), 0.5 * 10**(-8), 10**(-7), 0.5 * 10**(-6)]
+    # ########### Q2 Optimal Learning Rate ############
+    # learning_rate_list = [10**(-10), 10**(-9), 0.5 * 10**(-8), 10**(-7), 0.5 * 10**(-6)]
 
-    CV_list = []
-    time_taken_one_epoch_list = []
+    # CV_list = []
+    # time_taken_one_epoch_list = []
 
-    for learning_rate in learning_rate_list:
-        regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
-                                hidden_layer_dict={1: 30}, learning_rate=learning_rate)
-        regressor = regressor.trainCV(trainX=X_train, trainY=Y_train, small=False)
-        CV_list.append(regressor.cv_err)
-        time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
-    #end for
+    # for learning_rate in learning_rate_list:
+    #     regressor = CVRegressor(features_dim=NUM_FEATURES, output_dim=1,
+    #                             hidden_layer_dict={1: 30}, learning_rate=learning_rate)
+    #     regressor = regressor.trainCV(trainX=X_train, trainY=Y_train, small=False)
+    #     CV_list.append(regressor.cv_err)
+    #     time_taken_one_epoch_list.append(regressor.time_taken_one_epoch)
+    # #end for
 
-    plt.figure('CV Error against Learning Rate')
-    plt.title('CV Error against Learning Rate')
-    plt.grid(b=True)
-    plt.xlabel('Learning Rate')
-    plt.ylabel('CV Error')
-    plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
-    plt.plot([str(l) for l in learning_rate_list], CV_list)
-    plt.savefig('figures/1b/2a_CV_error_against_learning_rate.png')
+    # plt.figure('CV Error against Learning Rate')
+    # plt.title('CV Error against Learning Rate')
+    # plt.grid(b=True)
+    # plt.xlabel('Learning Rate')
+    # plt.ylabel('CV Error')
+    # plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
+    # plt.plot([str(l) for l in learning_rate_list], CV_list)
+    # plt.savefig('figures/1b/2a_CV_error_against_learning_rate.png')
 
-    # Plot Time Taken for One Epoch
-    plt.figure("Time Taken for One Epoch against Learning Rate")
-    plt.title("Time Taken for One Epoch against Learning Rate")
-    plt.xlabel('Learning Rate')
-    plt.ylabel('Time/ms')
-    plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
-    plt.plot([str(l) for l in learning_rate_list], time_taken_one_epoch_list)
-    plt.grid(b=True)
-    plt.savefig('figures/1b/2b_time_taken_for_one_epoch_vs_learning_rate.png')
+    # # Plot Time Taken for One Epoch
+    # plt.figure("Time Taken for One Epoch against Learning Rate")
+    # plt.title("Time Taken for One Epoch against Learning Rate")
+    # plt.xlabel('Learning Rate')
+    # plt.ylabel('Time/ms')
+    # plt.xticks(np.arange(5), [str(l) for l in learning_rate_list])
+    # plt.plot([str(l) for l in learning_rate_list], time_taken_one_epoch_list)
+    # plt.grid(b=True)
+    # plt.savefig('figures/1b/2b_time_taken_for_one_epoch_vs_learning_rate.png')
 
 
-    print("="*50)
-    print("="*25 + "Results" + "="*25 )
-    print("="*50)
-    for i in range(len(learning_rate_list)):
-        print('Learning Rate: {}'.format(learning_rate_list[i]))
-        print('CV error: {}'.format(CV_list[i]))
-        print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
-        print('-'*50)
-    #end for
+    # print("="*50)
+    # print("="*25 + "Results" + "="*25 )
+    # print("="*50)
+    # for i in range(len(learning_rate_list)):
+    #     print('Learning Rate: {}'.format(learning_rate_list[i]))
+    #     print('CV error: {}'.format(CV_list[i]))
+    #     print('Time per epoch: {}ms'.format(time_taken_one_epoch_list[i]))
+    #     print('-'*50)
+    # #end for
 
     # # ==================================================
     # # =========================Results=========================
@@ -541,6 +551,13 @@ def main():
 
     # for i in range(len(state_list)):
     #     print("state list: {}, test_error: {}".format(state_list[i],test_error_list[i]))
+    # # state list: 3L w/o dp, test_error: 4523873280.0
+    # # state list: 3L w/ dp, test_error: 4526773248.0
+    # # state list: 4L w/o dp, test_error: 3021156864.0
+    # # state list: 4L w/ dp, test_error: 3602084864.0
+    # # state list: 5L w/o dp, test_error: 2649017856.0
+    # # state list: 5L w/ dp, test_error: 3052726528.0
+
 
     # # Plot Time Taken for One Epoch
     # plt.figure("Time Taken for One Epoch againt state")
@@ -568,32 +585,59 @@ def main():
     #     print('Test Error: {}'.format(test_error_list[i]))
     #     print('-'*50)
     # #end for
+    # # ==================================================
+    # # =========================Results=========================
+    # # ==================================================
+    # # State: 3L w/o dp
+    # # Time per epoch: 128.44493436813354ms
+    # # Test Error: 4523873280.0
+    # # --------------------------------------------------
+    # # State: 3L w/ dp
+    # # Time per epoch: 148.26585388183594ms
+    # # Test Error: 4634984448.0
+    # # --------------------------------------------------
+    # # State: 4L w/o dp
+    # # Time per epoch: 151.63497591018677ms
+    # # Test Error: 3021156864.0
+    # # --------------------------------------------------
+    # # State: 4L w/ dp
+    # # Time per epoch: 180.52647256851196ms
+    # # Test Error: 4204421376.0
+    # # --------------------------------------------------
+    # # State: 5L w/o dp
+    # # Time per epoch: 172.86687755584717ms
+    # # Test Error: 2649017856.0
+    # # --------------------------------------------------
+    # # State: 5L w/ dp
+    # # Time per epoch: 207.08342456817627ms
+    # # Test Error: 3618239488.0
+    # # --------------------------------------------------
     # ==================================================
     # =========================Results=========================
     # ==================================================
     # State: 3L w/o dp
-    # Time per epoch: 128.44493436813354ms
+    # Time per epoch: 137.84410953521729ms
     # Test Error: 4523873280.0
     # --------------------------------------------------
     # State: 3L w/ dp
-    # Time per epoch: 148.26585388183594ms
-    # Test Error: 4634984448.0
+    # Time per epoch: 171.21195077896118ms
+    # Test Error: 4526773248.0
     # --------------------------------------------------
     # State: 4L w/o dp
-    # Time per epoch: 151.63497591018677ms
+    # Time per epoch: 162.18966579437256ms
     # Test Error: 3021156864.0
     # --------------------------------------------------
     # State: 4L w/ dp
-    # Time per epoch: 180.52647256851196ms
-    # Test Error: 4204421376.0
+    # Time per epoch: 206.2958059310913ms
+    # Test Error: 3602084864.0
     # --------------------------------------------------
     # State: 5L w/o dp
-    # Time per epoch: 172.86687755584717ms
+    # Time per epoch: 183.60487985610962ms
     # Test Error: 2649017856.0
     # --------------------------------------------------
     # State: 5L w/ dp
-    # Time per epoch: 207.08342456817627ms
-    # Test Error: 3618239488.0
+    # Time per epoch: 239.46327114105225ms
+    # Test Error: 3052726528.0
     # --------------------------------------------------
 
 
