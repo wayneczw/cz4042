@@ -58,7 +58,6 @@ class CVRegressor():
             U = tf.nn.relu(tf.matmul(X, W) + B)
             if self.drop_out:
                 U = tf.nn.dropout(U, self._keep_prob)
-                return W, B, U
         else:
             U = tf.matmul(X, W) + B
 
