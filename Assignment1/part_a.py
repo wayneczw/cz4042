@@ -35,6 +35,7 @@ class Classifier():
         batch_size=32, learning_rate=0.01,
         l2_beta=10**(-6), epochs=1000,
         early_stop=True, patience=20, min_delta=0.001,
+        momentum=None,
         **kwargs
     ):
 
@@ -51,6 +52,8 @@ class Classifier():
         self.early_stop = early_stop
         self.patience = patience
         self.min_delta = min_delta
+        if momentum:
+            self.momentum = momentum
         self._build_model()
     #end def
 
@@ -94,8 +97,7 @@ class Classifier():
         self.loss = tf.reduce_mean(self.cross_entropy + self.l2_beta*self.regularization)
 
         # Create the gradient descent optimizer with the given learning rate.
-        optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
-        self.train_op = optimizer.minimize(self.loss)
+        self.train_op = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.loss)
     #end def
 
     def train(self, X_train, Y_train, X_test, Y_test, X_val, Y_val, **kwargs):

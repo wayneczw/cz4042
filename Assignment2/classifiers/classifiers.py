@@ -5,6 +5,10 @@ import tensorflow as tf
 import numpy as np
 import time
 
+seed = 10
+tf.set_random_seed(seed)
+
+
 class CNNClassifer():
     def __init__(
         self,
@@ -13,6 +17,7 @@ class CNNClassifer():
         batch_size=128, learning_rate=0.001,
         l2_beta=0.001, epochs=1000,
         early_stop=False, patience=20, min_delta=0.001,
+        optimizer='GD', momentum=None,
         **kwargs
     ):
 
@@ -32,6 +37,9 @@ class CNNClassifer():
         self.early_stop = early_stop
         self.patience = patience
         self.min_delta = min_delta
+        self.optimizer = 'GD'
+        if momentum:
+            self.momentum = momentum
         self._build_model()
     #end def
 
@@ -96,8 +104,13 @@ class CNNClassifer():
         self.accuracy = tf.reduce_mean(self.correct_prediction)
 
         self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_, logits=self.y_conv))
-        optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
-        self.train_op = optimizer.minimize(self.cross_entropy)
+        
+        # diff choices of optimizer
+        if self.optimizer == 'GD': self.train_op = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.cross_entropy)
+        elif self.optimizer == 'momentum': self.train_op = tf.train.MomentumOptimizer(self.learning_rate, self.momentum).minimize(self.cross_entropy)
+        elif self.optimizer == 'RMSProp': self.train_op = tf.train.RMSPropOptimizer(self.learning_rate).minimize(self.cross_entropy)
+        elif self.optimizer == 'Adam': self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.cross_entropy)
+        else: self.train_op = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.cross_entropy)          
     #end def
 
 
@@ -124,14 +137,24 @@ class CNNClassifer():
 
                 t = time.time()
                 for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
-                    self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
+                    if self.drop_out:
+                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end], self._keep_prob: self.keep_prob})
+                    else:
+                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
                 time_to_update += (time.time() - t)
 
-                self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
-                self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
+                if self.drop_out:
+                    self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train, self._keep_prob: self.keep_prob}))
+                    self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test, self._keep_prob: 1.0}))
+                else:
+                    self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
+                    self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
                 
                 if self.early_stop:
-                    _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
+                    if self.drop_out:
+                        _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val, self._keep_prob: self.keep_prob})
+                    else: 
+                        _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
                     if (tmp_best_val_err - _val_err) < self.min_delta:
                         _patience -= 1
                         if _patience == 0:
@@ -144,7 +167,7 @@ class CNNClassifer():
                     #end if
                 #end if
 
-                if i % 50 == 0:
+                if i % 100 == 0:
                     print('iter: %d, train error  : %g'%(i, self.train_err[i]))
                     print('iter: %d, test accuracy  : %g'%(i, self.test_acc[i]))
                     print('-'*50)
@@ -157,6 +180,17 @@ class CNNClassifer():
         self.time_taken_one_epoch = (time_to_update/_epochs) * 1000
         return self
     #end def
+
+
+    def get_feature_maps(self, X):
+        with tf.Session() as sess:
+            self.saver.restore(sess, ".ckpt/1amodel.ckpt")
+            if self.drop_out:
+                c1, p1, c2, p2 = sess.run([self.h_conv1, self.h_pool1, self.h_conv2, self.h_pool2], {self.x: X.reshape(-1, self.input_width*self.input_height*self.num_channels), self._keep_prob: 1.0})
+            else:
+                c1, p1, c2, p2 = sess.run([self.h_conv1, self.h_pool1, self.h_conv2, self.h_pool2], {self.x: X.reshape(-1, self.input_width*self.input_height*self.num_channels)})
+
+        return c1, p1, c2, p2
 #end class
 
 

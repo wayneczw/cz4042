@@ -72,39 +72,218 @@ def load_data(train_file, test_file):
 
 
 def main():
+    error_against_epoch = [0, 1000, 0, 2]
+    accuracy_against_epoch = [0, 1000, 0, 1]
 
     trainX, trainY, valX, valY, testX, testY = load_data('data/data_batch_1', 'data/test_batch_trim')
-    # print(trainX.shape)
-    trainX = trainX[:100]
-    trainY = trainY[:100]
+    trainX = trainX[:200]
+    trainY = trainY[:200]
     valX = valX[:10]
-    valY = valY[:100]
+    valY = valY[:10]
     testX = testX[:10]
     testY = testY[:10]
 
-    t = time.time()
+    ################ Q1
     C1_dict = dict(window_width=9, window_height=9, output_maps=50, padding='VALID', strides=1)
     C2_dict = dict(window_width=5, window_height=5, output_maps=60, padding='VALID', strides=1)
     S1_dict = dict(window_width=2, window_height=2, padding='VALID', strides=2)
     S2_dict = dict(window_width=2, window_height=2, padding='VALID', strides=2)
     F1_dict = dict(size=300)
     hidden_layer_dict = dict(C1=C1_dict, C2=C2_dict, S1=S1_dict, S2=S2_dict, F1=F1_dict)
-    cnn = CNNClassifer(hidden_layer_dict=hidden_layer_dict).train(X_train=trainX, Y_train=trainY,
-                                                                X_test=testX, Y_test=testY,
-                                                                X_val=valX, Y_val=valY,
-                                                                early_stop=True)
-    print((time.time()-t)*1000)
 
-    ind = np.random.randint(low=0, high=100)
+    init_dict = dict(input_width=IMG_SIZE, input_height=IMG_SIZE, num_channels=NUM_CHANNELS, output_dim=NUM_CLASSES,
+                hidden_layer_dict=hidden_layer_dict, num_feature_maps=50,
+                batch_size=128, learning_rate=learning_rate, epochs=1000,
+                early_stop=True, patience=20, min_delta=0.001)
+    cnn = CNNClassifer(**init_dict).train(X_train=trainX, Y_train=trainY,
+                                        X_test=testX, Y_test=testY,
+                                        X_val=valX, Y_val=valY)
+    train_err, test_acc, time_taken_one_epoch, early_stop_epoch = cnn.train_err, cnn.test_acc, cnn.time_taken_one_epoch, cnn.early_stop_epoch
+
+    # Plot Training Errors
+    plt.figure("Train Error against Epoch")
+    plt.title("Train Error against Epoch")
+    plt.plot(range(len(train_err)), train_err)
+    plt.xlabel('Epochs')
+    plt.ylabel('Train Error')
+    plt.grid(b=True)
+    plt.savefig('figures/a/1a_train_error_vs_epoch.png')
+
+    # Plot Test Accuracy
+    plt.figure("Early Stopping Test Accuracy against Epoch")
+    plt.title("Early Stopping Test Accuracy against Epoch")
+    plt.plot(range(len(test_acc)), test_acc)
+    plt.xlabel('Epochs')
+    plt.ylabel('Test Accuracy')
+    plt.grid(b=True)
+    plt.savefig('figures/a/1a_test_accuracy_vs_epoch.png')
+
+    np.random.seed(seed)
+
+    ind = np.random.randint(low=0, high=10)
     X = trainX[ind,:]
+    path_dict = dict(test='figures/a/1b_1_test.png', c1='figures/a/1b_1_c1.png',
+                    p1='figures/a/1b_1_p1.png', c2='figures/a/1b_1_c2.png',
+                    p2='figures/a/1b_1_p2.png')
+    plot_feature_map(X, cnn, path_dict)
     
+    ind = np.random.randint(low=0, high=10)
+    X = trainX[ind,:]
+    path_dict = dict(test='figures/a/1b_2_test.png', c1='figures/a/1b_2_c1.png',
+                    p1='figures/a/1b_2_p1.png', c2='figures/a/1b_2_c2.png',
+                    p2='figures/a/1b_2_p2.png')
+    plot_feature_map(X, cnn, path_dict)
+
+
+    ################ Q2
+
+    ################ Q3
+    C1_dict = dict(window_width=9, window_height=9, output_maps=50, padding='VALID', strides=1)
+    C2_dict = dict(window_width=5, window_height=5, output_maps=60, padding='VALID', strides=1)
+    S1_dict = dict(window_width=2, window_height=2, padding='VALID', strides=2)
+    S2_dict = dict(window_width=2, window_height=2, padding='VALID', strides=2)
+    F1_dict = dict(size=300)
+    hidden_layer_dict = dict(C1=C1_dict, C2=C2_dict, S1=S1_dict, S2=S2_dict, F1=F1_dict)
+
+    train_err_dict = dict()
+    test_acc_dict = dict()
+    time_taken_one_epoch_dict = dict()
+    early_stop_epoch_dict = dict()
+
+    optimizers = [dict(optimizer='momentum', momentum=0.1),
+                dict(optimizer='RMSProp'),
+                dict(optimizer='Adam'),
+                dict(drop_out=True, keep_prob=0.9)]
+    #### momentum = 0.1
+    for optimizer in optimizers:
+        print('='*50)
+        print(optimizer.values())
+        init_dict = dict(input_width=IMG_SIZE, input_height=IMG_SIZE, num_channels=NUM_CHANNELS, output_dim=NUM_CLASSES, 
+            hidden_layer_dict=hidden_layer_dict, num_feature_maps=50,
+            batch_size=128, learning_rate=learning_rate, epochs=1000,
+            early_stop=True, patience=20, min_delta=0.001, **optimizer)
+        cnn = CNNClassifer(**init_dict).train(X_train=trainX, Y_train=trainY,
+                                            X_test=testX, Y_test=testY,
+                                            X_val=valX, Y_val=valY)
+        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = cnn.train_err, cnn.test_acc, cnn.time_taken_one_epoch, cnn.early_stop_epoch
+        try:
+            train_err_dict[optimizer['optimizer']] = train_err
+            test_acc_dict[optimizer['optimizer']] = test_acc
+            time_taken_one_epoch_dict[optimizer['optimizer']] = time_taken_one_epoch
+            early_stop_epoch_dict[optimizer['optimizer']] = early_stop_epoch
+        except KeyError:
+            train_err_dict['Drop Out 0.9'] = train_err
+            test_acc_dict['Drop Out 0.9'] = test_acc
+            time_taken_one_epoch_dict['Drop Out 0.9'] = time_taken_one_epoch
+            early_stop_epoch_dict['Drop Out 0.9'] = early_stop_epoch
+        #end try
+    #end for
+
+    # Plot Training Errors
+    plt.figure("Train Error against Epoch")
+    plt.title("Train Error against Epoch")
+    error_against_epoch[1] = max([len(l) for l in train_err_dict.values()])
+    plt.axis(error_against_epoch)
+    for key, val in train_err_dict.items():
+        plt.plot(range(len(val)), val, label = 'optimizer = {}'.format(key))
+        plt.xlabel('Epochs')
+        plt.ylabel('Train Error')
+        plt.legend()
+        plt.grid(b=True)
+    #end for
+    plt.savefig('figures/a/3_train_error_vs_epoch.png')
+
+    # Plot Test Accuracy
+    plt.figure("Test Accuracy against Epoch")
+    plt.title("Test Accuracy against Epoch")
+    accuracy_against_epoch[1] = max([len(l) for l in test_acc_dict.values()])
+    plt.axis(accuracy_against_epoch)
+    for key, val in test_acc_dict.items():
+        plt.plot(range(len(val)), val, label = 'optimizer = {}'.format(key))
+        plt.xlabel('Epochs')
+        plt.ylabel('Test Accuracy')
+        plt.legend()
+        plt.grid(b=True)
+    #end for
+    plt.savefig('figures/a/3_test_accuracy_vs_epoch.png')
+    #end for
+
+    # Plot Time Taken for One Epoch
+    optimizer_list = test_acc_dict.keys()
+    time_taken_one_epoch_list = [time_taken_one_epoch_dict[optimizer] for optimizer in optimizer_list]
+    plt.figure("Time Taken for One Epoch")
+    plt.title("Time Taken for One Epoch")
+    plt.xticks(np.arange(len(optimizer_list)), optimizer_list)
+    plt.plot(optimizer_list, time_taken_one_epoch_list)
+    plt.xlabel('Optimizer')
+    plt.ylabel('Time per Epoch/ms')
+    plt.grid(b=True)
+    plt.savefig('figures/a/3_time_taken_for_one_epoch.png')
+
+    early_stop_epoch_list = [early_stop_epoch_dict[optimizer] for optimizer in optimizer_list]
+    total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
+    # Plot Total Time Taken
+    plt.figure("Early Stopping Total Time Taken")
+    plt.title("Early Stopping Total Time Taken")
+    plt.plot(optimizer_list, total_time_taken_list)
+    plt.xlabel('Optimizer')
+    plt.ylabel('Total Time/ms')
+    plt.grid(b=True)
+    plt.savefig('figures/a/3_total_time_taken.png')
+
+
+
+#end def
+
+def plot_feature_map(X, cnn, path_dict):
+    # original test pattern
     plt.figure()
     plt.gray()
     X_show = X.reshape(NUM_CHANNELS, IMG_SIZE, IMG_SIZE).transpose(1, 2, 0)
     plt.axis('off')
     plt.imshow(X_show)
-    plt.savefig('./p1b_2.png')
+    plt.savefig(path_dict['test'])
 
+    # feed X into cnn
+    c1, p1, c2, p2 = cnn.get_feature_maps(X)
+
+    # plot c1
+    plt.figure('C1')
+    plt.title('C1')
+    plt.gray()
+    plt.subplot(3,1,1), plt.axis('off'), plt.imshow(c1[0,:,:,0])
+    plt.subplot(3,1,2), plt.axis('off'), plt.imshow(c1[0,:,:,1])
+    plt.subplot(3,1,3), plt.axis('off'), plt.imshow(c1[0,:,:,2])
+    plt.savefig(path_dict['c1'])
+
+    # plot p1
+    plt.figure('P1')
+    plt.title('P1')
+    plt.gray()
+    plt.subplot(3,1,1), plt.axis('off'), plt.imshow(p1[0,:,:,0])
+    plt.subplot(3,1,2), plt.axis('off'), plt.imshow(p1[0,:,:,1])
+    plt.subplot(3,1,3), plt.axis('off'), plt.imshow(p1[0,:,:,2])
+    plt.savefig(path_dict['p1'])
+
+    # plot c2
+    plt.figure('C2')
+    plt.title('C2')
+    plt.gray()
+    plt.subplot(3,1,1), plt.axis('off'), plt.imshow(c2[0,:,:,0])
+    plt.subplot(3,1,2), plt.axis('off'), plt.imshow(c2[0,:,:,1])
+    plt.subplot(3,1,3), plt.axis('off'), plt.imshow(c2[0,:,:,2])
+    plt.savefig(path_dict['c2'])
+
+    # plot p2
+    plt.figure('P2')
+    plt.title('P2')
+    plt.gray()
+    plt.subplot(3,1,1), plt.axis('off'), plt.imshow(p2[0,:,:,0])
+    plt.subplot(3,1,2), plt.axis('off'), plt.imshow(p2[0,:,:,1])
+    plt.subplot(3,1,3), plt.axis('off'), plt.imshow(p2[0,:,:,2])
+    plt.savefig(path_dict['p2'])
+#end def
+   
 
 if __name__ == '__main__':
   main()
