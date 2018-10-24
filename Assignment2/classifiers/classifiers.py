@@ -144,7 +144,7 @@ class CNNClassifer():
                     #end if
                 #end if
 
-                if i % 5 == 0:
+                if i % 50 == 0:
                     print('iter: %d, train error  : %g'%(i, self.train_err[i]))
                     print('iter: %d, test accuracy  : %g'%(i, self.test_acc[i]))
                     print('-'*50)

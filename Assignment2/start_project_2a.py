@@ -4,12 +4,14 @@
 
 import math
 import tensorflow as tf
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import pylab as plt
 import pickle
 from sklearn.model_selection import train_test_split
 from classifiers import CNNClassifer
-
+import time
 
 NUM_CLASSES = 10
 IMG_SIZE = 32
@@ -72,6 +74,7 @@ def load_data(train_file, test_file):
 def main():
 
     trainX, trainY, valX, valY, testX, testY = load_data('data/data_batch_1', 'data/test_batch_trim')
+    # print(trainX.shape)
     trainX = trainX[:1000]
     trainY = trainY[:1000]
     valX = valX[:100]
@@ -79,6 +82,7 @@ def main():
     testX = testX[:100]
     testY = testY[:100]
 
+    t = time.time()
     C1_dict = dict(window_width=9, window_height=9, output_maps=50, padding='VALID', strides=1)
     C2_dict = dict(window_width=5, window_height=5, output_maps=60, padding='VALID', strides=1)
     S1_dict = dict(window_width=2, window_height=2, padding='VALID', strides=2)
@@ -87,8 +91,9 @@ def main():
     hidden_layer_dict = dict(C1=C1_dict, C2=C2_dict, S1=S1_dict, S2=S2_dict, F1=F1_dict)
     cnn = CNNClassifer(hidden_layer_dict=hidden_layer_dict).train(X_train=trainX, Y_train=trainY,
                                                                 X_test=testX, Y_test=testY,
-                                                                X_val=valX, Y_val=valY)
-    print(cnn.test_acc)
+                                                                X_val=valX, Y_val=valY,
+                                                                early_stop=True)
+    print((time.time()-t)*1000)
 
     # ind = np.random.randint(low=0, high=100)
     # X = trainX[ind,:]
