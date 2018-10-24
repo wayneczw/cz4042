@@ -75,12 +75,12 @@ def main():
 
     trainX, trainY, valX, valY, testX, testY = load_data('data/data_batch_1', 'data/test_batch_trim')
     # print(trainX.shape)
-    trainX = trainX[:1000]
-    trainY = trainY[:1000]
-    valX = valX[:100]
+    trainX = trainX[:100]
+    trainY = trainY[:100]
+    valX = valX[:10]
     valY = valY[:100]
-    testX = testX[:100]
-    testY = testY[:100]
+    testX = testX[:10]
+    testY = testY[:10]
 
     t = time.time()
     C1_dict = dict(window_width=9, window_height=9, output_maps=50, padding='VALID', strides=1)
@@ -95,15 +95,15 @@ def main():
                                                                 early_stop=True)
     print((time.time()-t)*1000)
 
-    # ind = np.random.randint(low=0, high=100)
-    # X = trainX[ind,:]
+    ind = np.random.randint(low=0, high=100)
+    X = trainX[ind,:]
     
-    # plt.figure()
-    # plt.gray()
-    # X_show = X.reshape(NUM_CHANNELS, IMG_SIZE, IMG_SIZE).transpose(1, 2, 0)
-    # plt.axis('off')
-    # plt.imshow(X_show)
-    # plt.savefig('./p1b_2.png')
+    plt.figure()
+    plt.gray()
+    X_show = X.reshape(NUM_CHANNELS, IMG_SIZE, IMG_SIZE).transpose(1, 2, 0)
+    plt.axis('off')
+    plt.imshow(X_show)
+    plt.savefig('./p1b_2.png')
 
 
 if __name__ == '__main__':
