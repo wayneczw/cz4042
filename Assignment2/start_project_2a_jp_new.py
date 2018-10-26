@@ -377,12 +377,12 @@ def main():
 
     trainX, trainY, valX, valY, testX, testY = read_data('data/data_batch_1', 'data/test_batch_trim')
 
-    trainX = trainX[:200]
-    trainY = trainY[:200]
-    valX = valX[:10]
-    valY = valY[:10]
-    testX = testX[:10]
-    testY = testY[:10]
+    # trainX = trainX[:200]
+    # trainY = trainY[:200]
+    # valX = valX[:10]
+    # valY = valY[:10]
+    # testX = testX[:10]
+    # testY = testY[:10]
 
     # =====================Q1 =====================
     model_save_path = 'models/a/1_GD'
