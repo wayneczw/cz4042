@@ -377,12 +377,12 @@ def main():
 
     trainX, trainY, valX, valY, testX, testY = read_data('data/data_batch_1', 'data/test_batch_trim')
 
-    # trainX = trainX[:200]
-    # trainY = trainY[:200]
-    # valX = valX[:10]
-    # valY = valY[:10]
-    # testX = testX[:10]
-    # testY = testY[:10]
+    trainX = trainX[:100]
+    trainY = trainY[:100]
+    valX = valX[:10]
+    valY = valY[:10]
+    testX = testX[:10]
+    testY = testY[:10]
 
     # =====================Q1 =====================
     model_save_path = 'models/a/1_GD'
@@ -462,11 +462,11 @@ def main():
 
     # # =====================Q3 optimal feature map=====================
     optimizers = ['momentum','RMSProp','Adam','Drop_Out_0.5', 'Drop_Out 0.7', 'Drop_Out_0.9']
-    # C1_map = C1
-    # C2_map = C2
+    C1_map = C1
+    C2_map = C2
     # optimizers = ['Drop_Out_0.5', 'Drop_Out 0.7', 'Drop_Out_0.9']
-    C1_map = 50
-    C2_map = 60 
+    # C1_map = 50
+    # C2_map = 60 
     for optimizer in optimizers:
         print('='*50)
         print(optimizer)
@@ -518,7 +518,7 @@ def main():
     #end for
 
     # Plot Time Taken for One Epoch
-    optimizer_list = test_acc_dict.keys()
+    optimizer_list = list(test_acc_dict.keys())
     time_taken_one_epoch_list = [time_taken_one_epoch_dict[optimizer] for optimizer in optimizer_list]
     plt.figure("Time Taken for One Epoch")
     plt.title("Time Taken for One Epoch")
@@ -532,8 +532,8 @@ def main():
     early_stop_epoch_list = [early_stop_epoch_dict[optimizer] for optimizer in optimizer_list]
     total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
     # Plot Total Time Taken
-    plt.figure("Early Stopping Total Time Taken")
-    plt.title("Early Stopping Total Time Taken")
+    plt.figure("Total Time Taken")
+    plt.title("Total Time Taken")
     plt.plot(optimizer_list, total_time_taken_list)
     plt.xlabel('Optimizer')
     plt.ylabel('Total Time/ms')
@@ -546,17 +546,39 @@ def main():
 
     for key, val in test_acc_dict.items():
         model_list.append(key)
-        test_acc_list.append(val)
-        print("model: %s test_acc: %f" %(key,val))
+        test_acc_list.append(val[-1])
+        print("model: %s test_acc: %f" %(key,val[-1]))
 
     # Plot Test Accuracy
     plt.figure("Test Accuracy against models")
     plt.title("Test Accuracy against models")
     plt.grid(b=True)
     plt.ylabel('Test Accuracy')
-    plt.xticks(np.arange(6), state_list)
+    plt.xticks(np.arange(6), model_list)
     plt.plot(model_list, test_acc_list)
-    plt.savefig('figures/a/4_model_comparison.png')
+    plt.savefig('figures/a/4_test_accuracy.png')
+
+    # Plot Time Taken for One Epoch
+    time_taken_one_epoch_list = [time_taken_one_epoch_dict[model] for model in model_list]
+    plt.figure("Time Taken for One Epoch")
+    plt.title("Time Taken for One Epoch")
+    plt.xticks(np.arange(len(model_list)), model_list)
+    plt.plot(model_list, time_taken_one_epoch_list)
+    plt.xlabel('Model')
+    plt.ylabel('Time per Epoch/ms')
+    plt.grid(b=True)
+    plt.savefig('figures/a/4_time_taken_for_one_epoch.png')
+
+    early_stop_epoch_list = [early_stop_epoch_dict[optimizer] for optimizer in model_list]
+    total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
+    # Plot Total Time Taken
+    plt.figure("Total Time Taken")
+    plt.title("Total Time Taken")
+    plt.plot(model_list, total_time_taken_list)
+    plt.xlabel('Model')
+    plt.ylabel('Total Time/ms')
+    plt.grid(b=True)
+    plt.savefig('figures/a/4_total_time_taken.png')
 
 # end def
 
