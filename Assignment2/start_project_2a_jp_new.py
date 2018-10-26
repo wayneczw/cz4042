@@ -34,11 +34,12 @@ tf.set_random_seed(seed)
 class CNNClassifer():
     def __init__(
         self, save_path,
-        input_width = IMG_SIZE, input_height = IMG_SIZE, num_channels = NUM_CHANNELS, output_dim = NUM_CLASSES, drop_out=False,
+        input_width = IMG_SIZE, input_height = IMG_SIZE, num_channels = NUM_CHANNELS,
+        output_dim = NUM_CLASSES, drop_out=False,
         keep_prob=0.9, hidden_layer_dict=None,
-        batch_size=128, learning_rate= 0.001, epochs=1000,
-        early_stop= True, patience=20, min_delta=0.001,
-        optimizer='GD',momentum=0.1,
+        batch_size=128, learning_rate= 0.001, epochs=2000,
+        early_stop= True, patience=20, min_delta=0.0005,
+        optimizer='GD', momentum=0.1,
         **kwargs
     ):
         self.save_path = save_path
@@ -305,7 +306,7 @@ def plot_feature_map(X, cnn, path_dict):
 #end def
 
 
-def arg_dict(model_save_path, C1_map=50, C2_map=60,optimizer='GD'):
+def arg_dict(model_save_path, C1_map=50, C2_map=60, optimizer='GD', drop_out=False, keep_prob=0.9):
     C1_dict = dict(window_width=9, window_height=9, output_maps=C1_map, padding='VALID', strides=1)
     C2_dict = dict(window_width=5, window_height=5, output_maps=C2_map, padding='VALID', strides=1)
     S1_dict = dict(window_width=2, window_height=2, padding='VALID', strides=2)
@@ -317,7 +318,8 @@ def arg_dict(model_save_path, C1_map=50, C2_map=60,optimizer='GD'):
         input_width=IMG_SIZE, input_height=IMG_SIZE, num_channels=NUM_CHANNELS, output_dim=NUM_CLASSES,
         hidden_layer_dict=hidden_layer_dict,
         batch_size=128, learning_rate=learning_rate, epochs=1000,
-        early_stop=True, patience=20, min_delta=0.001)
+        early_stop=True, patience=20, min_delta=0.001,
+        drop_out=drop_out, keep_prob=keep_prob)
     return init_dict
 #end def
 
@@ -337,19 +339,18 @@ def grid_search(trainX, trainY,
             if C2_map <= 0: continue
             key = (C1_map, C2_map)
             model_save_path = 'models/a/2_C1_' + str(C1_map) + '_C2_' + str(C2_map)
-            init_dict = arg_dict(model_save_path, C1_map, C2_map,optimizer)
+            init_dict = arg_dict(model_save_path, C1_map, C2_map, optimizer)
             cnn = CNNClassifer(**init_dict).train(X_train=trainX, Y_train=trainY,
                                                 X_test=testX, Y_test=testY,
                                                 X_val=valX, Y_val=valY)
             train_err, test_acc, time_taken_one_epoch, early_stop_epoch = cnn.train_err, cnn.test_acc, cnn.time_taken_one_epoch, cnn.early_stop_epoch
 
-            gs_train_err_dict[key] = train_err[-1]
-            gs_test_acc_dict[key] = test_acc[-1]
+            gs_train_err_dict[key] = train_err
+            gs_test_acc_dict[key] = test_acc
             gs_time_taken_one_epoch_dict[key] = time_taken_one_epoch
             gs_early_stop_epoch_dict[key] = early_stop_epoch
 
-    gs_test_acc_dict = OrderedDict(sorted(gs_test_acc_dict.items(), key=lambda t: t[1], reverse=True))
-    print(gs_test_acc_dict)
+    gs_test_acc_dict = OrderedDict(sorted(gs_test_acc_dict.items(), key=lambda t: t[1][-1], reverse=True))
     opt_C1_C2 = list(gs_test_acc_dict.items())[0]
     optimal_C1 = opt_C1_C2[0][0]
     optimal_C2 = opt_C1_C2[0][1]
@@ -358,7 +359,7 @@ def grid_search(trainX, trainY,
     optimal_time_taken_one_epoch = gs_time_taken_one_epoch_dict[opt_C1_C2[0]]
     optimal_early_stop_epoch = gs_early_stop_epoch_dict[opt_C1_C2[0]]
 
-    print('C1: %d\nC2: %d\ntest_acc: %f' % (optimal_C1,optimal_C2,optimal_test_acc))
+    print('C1: %d\nC2: %d\ntest_acc: %f' % (optimal_C1, optimal_C2, optimal_test_acc[-1]))
 
     optimal_dict = dict(C1=optimal_C1, C2=optimal_C2, test_acc=optimal_test_acc, train_err=optimal_train_err, time=optimal_time_taken_one_epoch, es_epoch=optimal_early_stop_epoch)
     return optimal_dict
@@ -376,12 +377,12 @@ def main():
 
     trainX, trainY, valX, valY, testX, testY = read_data('data/data_batch_1', 'data/test_batch_trim')
 
-    # trainX = trainX[:200]
-    # trainY = trainY[:200]
-    # valX = valX[:10]
-    # valY = valY[:10]
-    # testX = testX[:10]
-    # testY = testY[:10]
+    trainX = trainX[:200]
+    trainY = trainY[:200]
+    valX = valX[:10]
+    valY = valY[:10]
+    testX = testX[:10]
+    testY = testY[:10]
 
     # =====================Q1 =====================
     model_save_path = 'models/a/1_GD'
@@ -448,124 +449,114 @@ def main():
                                 testX, testY,
                                 valX, valY,
                                 C1_range, C2_range)
+    
+    C1 = optimal_dict['C1']
+    C2 = optimal_dict['C2']
+    optimal_C = 'Optimal_' + str(C1) + '_' + str(C2)
+    train_err_dict[optimal_C] = optimal_dict['train_err']
+    test_acc_dict[optimal_C] = optimal_dict['test_acc']
+    time_taken_one_epoch_dict[optimal_C] = optimal_dict['time']
+    early_stop_epoch_dict[optimal_C] = optimal_dict['es_epoch']
 
-    # C1 = optimal_dict['C1']
-    # C1_range = [C1-10,C1+10,5]
-    # C2 = optimal_dict['C2']
-    # C2_range = [C1-10,C1+10,5]
-    # optimal_dict = grid_search(trainX, trainY,
-    #                             testX, testY,
-    #                             valX, valY,
-    #                             C1_range, C2_range) 
-
-    # C1 = optimal_dict['C1']
-    # C1_range = [C1-5,C1+5,2]
-    # C2 = optimal_dict['C2']
-    # C2_range = [C1-5,C1+5,2]
-    # optimal_dict = grid_search(trainX, trainY,
-    #                             testX, testY,
-    #                             valX, valY,
-    #                             C1_range, C2_range)
-
-    # C1 = optimal_dict['C1']
-    # C1_range = [C1-2,C1+2,1]
-    # C2 = optimal_dict['C2']
-    # C2_range = [C1-2,C1+2,1]
-    # optimal_dict = grid_search(trainX, trainY,
-    #                             testX, testY,
-    #                             valX, valY,
-    print("Optimal C1: {}\n Optimal C2: {}".format(optimal_dict['C1'], optimal_dict['C2']))
+    print("Optimal C1: {}\nOptimal C2: {}".format(C1, C2))
 
     # # =====================Q3 optimal feature map=====================
-    # optimizers = ['momentum','RMSProp','Adam','Drop Out']
+    optimizers = ['momentum','RMSProp','Adam','Drop_Out_0.5', 'Drop_Out 0.7', 'Drop_Out_0.9']
+    # C1_map = C1
+    # C2_map = C2
+    # optimizers = ['Drop_Out_0.5', 'Drop_Out 0.7', 'Drop_Out_0.9']
+    C1_map = 50
+    C2_map = 60 
+    for optimizer in optimizers:
+        print('='*50)
+        print(optimizer)
+        model_save_path = 'models/a/3_' + str(optimizer)
+        if 'Drop_Out' in optimizer:
+            _optimizer = 'Drop Out'
+            keep_prob = float(optimizer[-3:])
+            init_dict = arg_dict(model_save_path, C1_map, C2_map, optimizer, keep_prob=keep_prob)
+           
+        init_dict = arg_dict(model_save_path, C1_map, C2_map, optimizer)
+        cnn = CNNClassifer(**init_dict).train(X_train=trainX, Y_train=trainY,
+                                            X_test=testX, Y_test=testY,
+                                            X_val=valX, Y_val=valY)
+        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = cnn.train_err, cnn.test_acc, cnn.time_taken_one_epoch, cnn.early_stop_epoch
 
-    # for optimizer in optimizers:
-    #     print('='*50)
-    #     print(optimizer.values())
-    #     model_save_path = 'models/a/3_' + str(optimizer)
-    #     C1_map = 50
-    #     C2_map = 60
-    #     init_dict = arg_dict(model_save_path, C1_map, C2_map,optimizer)
-    #     cnn = CNNClassifer(**init_dict).train(X_train=trainX, Y_train=trainY,
-    #                                         X_test=testX, Y_test=testY,
-    #                                         X_val=valX, Y_val=valY)
-    #     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = cnn.train_err, cnn.test_acc, cnn.time_taken_one_epoch, cnn.early_stop_epoch
+        train_err_dict[optimizer] = train_err
+        test_acc_dict[optimizer] = test_acc
+        time_taken_one_epoch_dict[optimizer] = time_taken_one_epoch
+        early_stop_epoch_dict[optimizer] = early_stop_epoch
+    #end for
 
-    #     train_err_dict[optimizer] = train_err
-    #     test_acc_dict[optimizer] = test_acc
-    #     time_taken_one_epoch_dict[optimizer] = time_taken_one_epoch
-    #     early_stop_epoch_dict[optimizer] = early_stop_epoch
-    # #end for
+    # Plot Training Errors
+    plt.figure("Train Error against Epoch")
+    plt.title("Train Error against Epoch")
+    error_against_epoch[1] = max([len(l) for l in train_err_dict.values()])
+    plt.axis(error_against_epoch)
+    for key, val in train_err_dict.items():
+        plt.plot(range(len(val)), val, label = 'optimizer = {}'.format(key))
+        plt.xlabel('Epochs')
+        plt.ylabel('Train Error')
+        plt.legend()
+        plt.grid(b=True)
+    #end for
+    plt.savefig('figures/a/3_train_error_vs_epoch.png')
 
-    # # Plot Training Errors
-    # plt.figure("Train Error against Epoch")
-    # plt.title("Train Error against Epoch")
-    # error_against_epoch[1] = max([len(l) for l in train_err_dict.values()])
-    # plt.axis(error_against_epoch)
-    # for key, val in train_err_dict.items():
-    #     plt.plot(range(len(val)), val, label = 'optimizer = {}'.format(key))
-    #     plt.xlabel('Epochs')
-    #     plt.ylabel('Train Error')
-    #     plt.legend()
-    #     plt.grid(b=True)
-    # #end for
-    # plt.savefig('figures/a/3_train_error_vs_epoch.png')
+    # Plot Test Accuracy
+    plt.figure("Test Accuracy against Epoch")
+    plt.title("Test Accuracy against Epoch")
+    accuracy_against_epoch[1] = max([len(l) for l in test_acc_dict.values()])
+    plt.axis(accuracy_against_epoch)
+    for key, val in test_acc_dict.items():
+        plt.plot(range(len(val)), val, label = 'optimizer = {}'.format(key))
+        plt.xlabel('Epochs')
+        plt.ylabel('Test Accuracy')
+        plt.legend()
+        plt.grid(b=True)
+    #end for
+    plt.savefig('figures/a/3_test_accuracy_vs_epoch.png')
+    #end for
 
-    # # Plot Test Accuracy
-    # plt.figure("Test Accuracy against Epoch")
-    # plt.title("Test Accuracy against Epoch")
-    # accuracy_against_epoch[1] = max([len(l) for l in test_acc_dict.values()])
-    # plt.axis(accuracy_against_epoch)
-    # for key, val in test_acc_dict.items():
-    #     plt.plot(range(len(val)), val, label = 'optimizer = {}'.format(key))
-    #     plt.xlabel('Epochs')
-    #     plt.ylabel('Test Accuracy')
-    #     plt.legend()
-    #     plt.grid(b=True)
-    # #end for
-    # plt.savefig('figures/a/3_test_accuracy_vs_epoch.png')
-    # #end for
+    # Plot Time Taken for One Epoch
+    optimizer_list = test_acc_dict.keys()
+    time_taken_one_epoch_list = [time_taken_one_epoch_dict[optimizer] for optimizer in optimizer_list]
+    plt.figure("Time Taken for One Epoch")
+    plt.title("Time Taken for One Epoch")
+    plt.xticks(np.arange(len(optimizer_list)), optimizer_list)
+    plt.plot(optimizer_list, time_taken_one_epoch_list)
+    plt.xlabel('Optimizer')
+    plt.ylabel('Time per Epoch/ms')
+    plt.grid(b=True)
+    plt.savefig('figures/a/3_time_taken_for_one_epoch.png')
 
-    # # Plot Time Taken for One Epoch
-    # optimizer_list = test_acc_dict.keys()
-    # time_taken_one_epoch_list = [time_taken_one_epoch_dict[optimizer] for optimizer in optimizer_list]
-    # plt.figure("Time Taken for One Epoch")
-    # plt.title("Time Taken for One Epoch")
-    # plt.xticks(np.arange(len(optimizer_list)), optimizer_list)
-    # plt.plot(optimizer_list, time_taken_one_epoch_list)
-    # plt.xlabel('Optimizer')
-    # plt.ylabel('Time per Epoch/ms')
-    # plt.grid(b=True)
-    # plt.savefig('figures/a/3_time_taken_for_one_epoch.png')
+    early_stop_epoch_list = [early_stop_epoch_dict[optimizer] for optimizer in optimizer_list]
+    total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
+    # Plot Total Time Taken
+    plt.figure("Early Stopping Total Time Taken")
+    plt.title("Early Stopping Total Time Taken")
+    plt.plot(optimizer_list, total_time_taken_list)
+    plt.xlabel('Optimizer')
+    plt.ylabel('Total Time/ms')
+    plt.grid(b=True)
+    plt.savefig('figures/a/3_total_time_taken.png')
 
-    # early_stop_epoch_list = [early_stop_epoch_dict[optimizer] for optimizer in optimizer_list]
-    # total_time_taken_list = [x*y for x,y in zip(early_stop_epoch_list,time_taken_one_epoch_list)]
-    # # Plot Total Time Taken
-    # plt.figure("Early Stopping Total Time Taken")
-    # plt.title("Early Stopping Total Time Taken")
-    # plt.plot(optimizer_list, total_time_taken_list)
-    # plt.xlabel('Optimizer')
-    # plt.ylabel('Total Time/ms')
-    # plt.grid(b=True)
-    # plt.savefig('figures/a/3_total_time_taken.png')
+    # =====================Q4 comparison of model accuracy=====================
+    test_acc_list = []
+    model_list = []
 
-    # # =====================Q4 comparison of model accuracy=====================
-    # test_acc_list = []
-    # model_list = []
+    for key, val in test_acc_dict.items():
+        model_list.append(key)
+        test_acc_list.append(val)
+        print("model: %s test_acc: %f" %(key,val))
 
-    # for key, val in test_acc_dict.items():
-    #     model_list.append(key)
-    #     test_acc_list.append(val)
-    #     print("model: %s test_acc: %f" %(key,val))
-
-    # # Plot Test Accuracy
-    # plt.figure("Test Accuracy against models")
-    # plt.title("Test Accuracy against models")
-    # plt.grid(b=True)
-    # plt.ylabel('Test Accuracy')
-    # plt.xticks(np.arange(6), state_list)
-    # plt.plot(model_list, test_acc_list)
-    # plt.savefig('figures/a/4_model_comparison.png')
+    # Plot Test Accuracy
+    plt.figure("Test Accuracy against models")
+    plt.title("Test Accuracy against models")
+    plt.grid(b=True)
+    plt.ylabel('Test Accuracy')
+    plt.xticks(np.arange(6), state_list)
+    plt.plot(model_list, test_acc_list)
+    plt.savefig('figures/a/4_model_comparison.png')
 
 # end def
 
