@@ -522,7 +522,7 @@ def main():
     time_taken_one_epoch_list = [time_taken_one_epoch_dict[optimizer] for optimizer in optimizer_list]
     plt.figure("Time Taken for One Epoch")
     plt.title("Time Taken for One Epoch")
-    plt.xticks(np.arange(len(optimizer_list)), optimizer_list)
+    plt.xticks(np.arange(len(optimizer_list)), optimizer_list, rotate=90)
     plt.plot(optimizer_list, time_taken_one_epoch_list)
     plt.xlabel('Optimizer')
     plt.ylabel('Time per Epoch/ms')
@@ -535,6 +535,7 @@ def main():
     plt.figure("Total Time Taken")
     plt.title("Total Time Taken")
     plt.plot(optimizer_list, total_time_taken_list)
+    plt.xticks(rotate=90)
     plt.xlabel('Optimizer')
     plt.ylabel('Total Time/ms')
     plt.grid(b=True)
@@ -554,7 +555,7 @@ def main():
     plt.title("Test Accuracy against models")
     plt.grid(b=True)
     plt.ylabel('Test Accuracy')
-    plt.xticks(np.arange(6), model_list)
+    plt.xticks(np.arange(6), model_list, rotate=90)
     plt.plot(model_list, test_acc_list)
     plt.savefig('figures/a/4_test_accuracy.png')
 
