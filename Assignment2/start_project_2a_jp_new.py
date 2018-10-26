@@ -406,6 +406,7 @@ def main():
     plt.xlabel('Epochs')
     plt.ylabel('Train Error')
     plt.grid(b=True)
+    plt.tight_layout()
     plt.savefig('figures/a/1a_train_error_vs_epoch.png')
 
     # Plot Test Accuracy
@@ -415,6 +416,7 @@ def main():
     plt.xlabel('Epochs')
     plt.ylabel('Test Accuracy')
     plt.grid(b=True)
+    plt.tight_layout()
     plt.savefig('figures/a/1a_test_accuracy_vs_epoch.png')
 
     np.random.seed(seed)
@@ -500,6 +502,7 @@ def main():
         plt.legend()
         plt.grid(b=True)
     #end for
+    plt.tight_layout()
     plt.savefig('figures/a/3_train_error_vs_epoch.png')
 
     # Plot Test Accuracy
@@ -514,6 +517,7 @@ def main():
         plt.legend()
         plt.grid(b=True)
     #end for
+    plt.tight_layout()
     plt.savefig('figures/a/3_test_accuracy_vs_epoch.png')
     #end for
 
@@ -522,11 +526,12 @@ def main():
     time_taken_one_epoch_list = [time_taken_one_epoch_dict[optimizer] for optimizer in optimizer_list]
     plt.figure("Time Taken for One Epoch")
     plt.title("Time Taken for One Epoch")
-    plt.xticks(np.arange(len(optimizer_list)), optimizer_list, rotate=90)
+    plt.xticks(np.arange(len(optimizer_list)), optimizer_list, rotation=90)
     plt.plot(optimizer_list, time_taken_one_epoch_list)
     plt.xlabel('Optimizer')
     plt.ylabel('Time per Epoch/ms')
     plt.grid(b=True)
+    plt.tight_layout()
     plt.savefig('figures/a/3_time_taken_for_one_epoch.png')
 
     early_stop_epoch_list = [early_stop_epoch_dict[optimizer] for optimizer in optimizer_list]
@@ -535,10 +540,11 @@ def main():
     plt.figure("Total Time Taken")
     plt.title("Total Time Taken")
     plt.plot(optimizer_list, total_time_taken_list)
-    plt.xticks(rotate=90)
+    plt.xticks(rotation=90)
     plt.xlabel('Optimizer')
     plt.ylabel('Total Time/ms')
     plt.grid(b=True)
+    plt.tight_layout()
     plt.savefig('figures/a/3_total_time_taken.png')
 
     # =====================Q4 comparison of model accuracy=====================
@@ -555,8 +561,9 @@ def main():
     plt.title("Test Accuracy against models")
     plt.grid(b=True)
     plt.ylabel('Test Accuracy')
-    plt.xticks(np.arange(6), model_list, rotate=90)
+    plt.xticks(np.arange(6), model_list, rotation=90)
     plt.plot(model_list, test_acc_list)
+    plt.tight_layout()
     plt.savefig('figures/a/4_test_accuracy.png')
 
     # Plot Time Taken for One Epoch
@@ -568,6 +575,7 @@ def main():
     plt.xlabel('Model')
     plt.ylabel('Time per Epoch/ms')
     plt.grid(b=True)
+    plt.tight_layout()
     plt.savefig('figures/a/4_time_taken_for_one_epoch.png')
 
     early_stop_epoch_list = [early_stop_epoch_dict[optimizer] for optimizer in model_list]
@@ -579,6 +587,7 @@ def main():
     plt.xlabel('Model')
     plt.ylabel('Total Time/ms')
     plt.grid(b=True)
+    plt.tight_layout()
     plt.savefig('figures/a/4_total_time_taken.png')
 
 # end def
