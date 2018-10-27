@@ -591,6 +591,7 @@ def main():
     plt.savefig('figures/a/4_total_time_taken.png')
 
     for key in test_acc_dict.keys():
+        print(key)
         print('Time per epoch: {}ms'.format(time_taken_one_epoch_dict[key]))
         print('Number of Epochs: {}'.format(early_stop_epoch_dict[key]))
         print('Convergence Test Accuracy: {}'.format(test_acc_dict[key][-1]))
