@@ -46,13 +46,13 @@ def read_data_chars():
   
   x_train, y_train, x_test, y_test = [], [], [], []
 
-  with open('train_medium.csv', encoding='utf-8') as filex:
+  with open('data/train_medium.csv', encoding='utf-8') as filex:
     reader = csv.reader(filex)
     for row in reader:
       x_train.append(row[1])
       y_train.append(int(row[0]))
 
-  with open('test_medium.csv', encoding='utf-8') as filex:
+  with open('data/test_medium.csv', encoding='utf-8') as filex:
     reader = csv.reader(filex)
     for row in reader:
       x_test.append(row[1])
@@ -76,6 +76,8 @@ def read_data_chars():
 def main():
   
   x_train, y_train, x_test, y_test = read_data_chars()
+  x_train = x_train[:100]
+  y_train = y_train[:100]
 
   print(len(x_train))
   print(len(x_test))
