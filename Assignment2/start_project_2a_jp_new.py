@@ -40,7 +40,7 @@ class CNNClassifer():
         batch_size=128, learning_rate= 0.001, epochs=2000,
         early_stop= True, patience=20, min_delta=0.0005,
         optimizer='GD', momentum=0.1,
-        min_epoch = 200,
+        min_epoch=200,
         **kwargs
     ):
         self.save_path = save_path
@@ -179,9 +179,9 @@ class CNNClassifer():
                         _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
                     if (tmp_best_val_err - _val_err) < self.min_delta:
                         _patience -= 1
-                        if _patience == 0:
-                            if _epochs <= self.min_epoch:
-                                continue
+                        if _epochs <= self.min_epoch:
+                            pass
+                        elif _patience <= 0:
                             print('Early stopping at {}th iteration'.format(i))
                             print('-'*50)
                             break
