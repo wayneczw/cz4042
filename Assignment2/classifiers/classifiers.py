@@ -37,7 +37,7 @@ class CNNClassifer():
         self.early_stop = early_stop
         self.patience = patience
         self.min_delta = min_delta
-        self.optimizer = 'GD'
+        self.optimizer = optimizer
         if momentum:
             self.momentum = momentum
         self._build_model()
@@ -235,7 +235,9 @@ class CNNCharClassifer():
     def _build_layer(self, x, cfilters, ckernel_size, cpadding,
                     pwindow, pstrides, ppadding, **kwargs):
         #Conv
-        conv = tf.layers.conv2d(x, filters=cfilters,
+        conv = tf.layers.conv2d(
+                            x,
+                            filters=cfilters,
                             kernel_size=ckernel_size,
                             padding=cpadding,
                             use_bias=True,
@@ -264,24 +266,26 @@ class CNNCharClassifer():
             self.x_embed = tf.contrib.layers.embed_sequence(self.x_, vocab_size=self.vocab_size, embed_dim=self.embed_dim)
 
         # Conv 1 and pool 1
-        input_dict1 = dict(cfilters=self.hidden_layer_dict['C1']['filters'],
-                            ckernel_size=self.hidden_layer_dict['C1']['kernel_size'],
-                            cpadding=self.hidden_layer_dict['C1']['padding'],
-                            pwindow=self.hidden_layer_dict['S1']['window'],
-                            pstrides=self.hidden_layer_dict['S1']['strides'],
-                            ppadding=self.hidden_layer_dict['S1']['padding'])
+        input_dict1 = dict(
+                        cfilters=self.hidden_layer_dict['C1']['filters'],
+                        ckernel_size=self.hidden_layer_dict['C1']['kernel_size'],
+                        cpadding=self.hidden_layer_dict['C1']['padding'],
+                        pwindow=self.hidden_layer_dict['S1']['window'],
+                        pstrides=self.hidden_layer_dict['S1']['strides'],
+                        ppadding=self.hidden_layer_dict['S1']['padding'])
         if self.embed:
             self.h_conv1, self.h_pool1 = self._build_layer(self.x_embed, **input_dict1)
         else:
             self.h_conv1, self.h_pool1 = self._build_layer(self.x_, **input_dict1)
 
         # Conv 2 and pool 2
-        input_dict2 = dict(cfilters=self.hidden_layer_dict['C2']['filters'],
-                            ckernel_size=self.hidden_layer_dict['C2']['kernel_size'],
-                            cpadding=self.hidden_layer_dict['C2']['padding'],
-                            pwindow=self.hidden_layer_dict['S2']['window'],
-                            pstrides=self.hidden_layer_dict['S2']['strides'],
-                            ppadding=self.hidden_layer_dict['S2']['padding'])
+        input_dict2 = dict(
+                        cfilters=self.hidden_layer_dict['C2']['filters'],
+                        ckernel_size=self.hidden_layer_dict['C2']['kernel_size'],
+                        cpadding=self.hidden_layer_dict['C2']['padding'],
+                        pwindow=self.hidden_layer_dict['S2']['window'],
+                        pstrides=self.hidden_layer_dict['S2']['strides'],
+                        ppadding=self.hidden_layer_dict['S2']['padding'])
         self.h_conv2, self.h_pool2 = self._build_layer(self.h_pool1, **input_dict2)
 
         self.h_pool2 = tf.squeeze(tf.reduce_max(self.h_conv2, 1), squeeze_dims=[1])
