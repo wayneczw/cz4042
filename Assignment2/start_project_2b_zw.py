@@ -3,6 +3,8 @@ import pandas
 import tensorflow as tf
 import csv
 from sklearn.model_selection import train_test_split
+import os
+import time
 
 MAX_DOCUMENT_LENGTH = 100
 N_FILTERS = 10
@@ -11,26 +13,29 @@ POOLING_WINDOW = 4
 POOLING_STRIDE = 2
 MAX_LABEL = 15
 
-no_epochs = 100
-lr = 0.01
+learning_rate = 0.01
 
 tf.logging.set_verbosity(tf.logging.ERROR)
 seed = 10
 tf.set_random_seed(seed)
 
+if not os.path.exists('models'):
+    os.makedirs('models')
+if not os.path.exists(os.path.join('models', 'b')):
+    os.makedirs(os.path.join('models', 'b'))
 
 class CNNClassifer():
     def __init__(
-        self,
+        self, save_path,
         input_dim=100, output_dim=15, drop_out=False,
         drop_out_rate=0.5, hidden_layer_dict=None,
         batch_size=128, learning_rate=0.01,
         epochs=1000,
-        early_stop=False, patience=20, min_delta=0.001,
-        choice='char',
+        early_stop=False, patience=20, min_delta=0.001, min_epoch=200,
+        choice='char', n_words=None, embedding_size=None,
         **kwargs
     ):
-
+        self.save_path = save_path
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.drop_out = drop_out
@@ -43,8 +48,13 @@ class CNNClassifer():
         self.early_stop = early_stop
         self.patience = patience
         self.min_delta = min_delta
-        if choice == 'char': self._build_char_model()
-        else: self._build_word_model()
+        self.min_epoch = min_epoch
+        if choice == 'char':
+            self._build_char_model()
+        else:
+            self.n_words = n_words
+            self.embedding_size = embedding_size
+            self._build_word_model()
     #end def
 
 
@@ -121,9 +131,11 @@ class CNNClassifer():
         self.x = tf.placeholder(tf.int64, [None, self.input_dim])
         self.y_ = tf.placeholder(tf.int64)
         self.x_ = tf.contrib.layers.embed_sequence(
-                                                x,
-                                                vocab_size=n_words,
-                                                embed_dim=EMBEDDING_SIZE)
+                                                self.x,
+                                                vocab_size=self.n_words,
+                                                embed_dim=self.embedding_size)
+        self.x_ = tf.reshape(self.x_, [-1, self.input_dim, self.embedding_size, 1])
+
         # Conv 1 and pool 1
         input_dict1 = dict(
                         cfilters=self.hidden_layer_dict['C1']['filters'],
@@ -180,27 +192,20 @@ class CNNClassifer():
 
                 t = time.time()
                 for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
-                    if self.drop_out:
-                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end], self._keep_prob: self.keep_prob})
-                    else:
-                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
+                    self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
                 time_to_update += (time.time() - t)
 
-                if self.drop_out:
-                    self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train, self._keep_prob: self.keep_prob}))
-                    self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test, self._keep_prob: 1.0}))
-                else:
-                    self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
-                    self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
+
+                self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
+                self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
                 
                 if self.early_stop:
-                    if self.drop_out:
-                        _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val, self._keep_prob: self.keep_prob})
-                    else: 
-                        _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
+                    _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
                     if (tmp_best_val_err - _val_err) < self.min_delta:
                         _patience -= 1
-                        if _patience == 0:
+                        if _epochs <= self.min_epoch:
+                            pass
+                        elif _patience <= 0:
                             print('Early stopping at {}th iteration'.format(i))
                             print('-'*50)
                             break
@@ -217,7 +222,7 @@ class CNNClassifer():
 
             #end for
             self.early_stop_epoch = _epochs
-            self.saver.save(sess, ".ckpt/1amodel.ckpt")
+            self.saver.save(sess, self.save_path)
         #end with
 
         self.time_taken_one_epoch = (time_to_update/_epochs) * 1000
@@ -229,8 +234,8 @@ class CNNClassifer():
 def read_data(choice='char'):
     if choice == 'char': row_num = 1
     else: row_num = 2
-
-    with open('train_medium.csv', encoding='utf-8') as filex:
+    x_train, y_train, x_test, y_test = [], [], [], []
+    with open('data/train_medium.csv', encoding='utf-8') as filex:
         reader = csv.reader(filex)
         for row in reader:
             x_train.append(row[row_num])
@@ -238,7 +243,7 @@ def read_data(choice='char'):
         #end for
     #end with
 
-    with open('test_medium.csv', encoding='utf-8') as filex:
+    with open('data/test_medium.csv', encoding='utf-8') as filex:
         reader = csv.reader(filex)
         for row in reader:
             x_test.append(row[row_num])
@@ -274,35 +279,44 @@ def read_data(choice='char'):
         x_val = np.array(list(vocab_processor.transform(x_val)))
         x_test = np.array(list(vocab_processor.transform(x_test)))
 
-        no_words = len(vocab_processor.vocabulary_)
-        print('Total words: %d' % no_words)
+        n_words = len(vocab_processor.vocabulary_)
+        print('Total words: %d' % n_words)
 
-        return x_train, y_train, x_val, y_val, x_test, y_test, no_words
+        return x_train, y_train, x_val, y_val, x_test, y_test, n_words
     #end if
 #end def
 
 
-def arg_dict(model_save_path, C1_map=50, C2_map=60, optimizer='GD', drop_out=False, keep_prob=0.9):
-            input_dict2 = dict(
-                        cfilters=self.hidden_layer_dict['C2']['filters'],
-                        ckernel_size=self.hidden_layer_dict['C2']['kernel_size'],
-                        cpadding=self.hidden_layer_dict['C2']['padding'],
-                        pwindow=self.hidden_layer_dict['S2']['window'],
-                        pstrides=self.hidden_layer_dict['S2']['strides'],
-                        ppadding=self.hidden_layer_dict['S2']['padding'])
+def arg_dict(model_save_path, C1_filters=10, C2_filters=10,
+            C1_kernal_size=[20, 256], C2_kernal_size=[20, 1],
+            S1_window=4, S2_window=4,
+            S1_strides=2, S2_strides=2,
+            drop_out=False, drop_out_rate=0.1,
+            n_words=None, embedding_size=None, choice='char'):
 
-    C1_dict = dict(filters=9, kernel_size=9, padding='VALID')
-    C2_dict = dict(filters=9, kernel_size=9, padding='VALID')
-    S1_dict = dict(window=2, strides=2, padding='VALID')
-    S2_dict = dict(window=2, strides=2, padding='VALID')
+    C1_dict = dict(filters=C1_filters, kernel_size=C1_kernal_size, padding='VALID')
+    C2_dict = dict(filters=C2_filters, kernel_size=C2_kernal_size, padding='VALID')
+    S1_dict = dict(window=S1_window, strides=S1_strides, padding='SAME')
+    S2_dict = dict(window=S2_window, strides=S2_strides, padding='SAME')
     hidden_layer_dict = dict(C1=C1_dict, C2=C2_dict, S1=S1_dict, S2=S2_dict)
 
-    init_dict = dict(save_path=model_save_path,optimizer=optimizer,
-        input_width=IMG_SIZE, input_height=IMG_SIZE, num_channels=NUM_CHANNELS, output_dim=NUM_CLASSES,
-        hidden_layer_dict=hidden_layer_dict,
-        batch_size=128, learning_rate=learning_rate, epochs=1000,
-        early_stop=True, patience=20, min_delta=0.001,
-        drop_out=drop_out, keep_prob=keep_prob)
+    init_dict = dict(
+                save_path=model_save_path,
+                input_dim=MAX_DOCUMENT_LENGTH,
+                output_dim=MAX_LABEL,
+                drop_out=drop_out,
+                drop_out_rate=drop_out_rate,
+                hidden_layer_dict=hidden_layer_dict,
+                batch_size=128,
+                learning_rate=learning_rate,
+                epochs=2000,
+                early_stop=True,
+                patience=20,
+                min_delta = 0.0005,
+                min_epoch=30,
+                n_words=n_words,
+                embedding_size=embedding_size,
+                choice=choice)
     return init_dict
 #end def
 
@@ -311,15 +325,62 @@ def main():
   
     x_train, y_train, x_val, y_val, x_test, y_test = read_data(choice='char')
 
-    # =========================== Q1
+    x_train = x_train[:100]
+    y_train = y_train[:100]
+    x_test = x_test[:10]
+    y_test = y_test[:10]
+    x_val = x_val[:10]
+    y_val = y_val[:10]
 
-    char_cnn = CNNClassifer().train(
+    x_train_word, y_train_word, x_val_word, y_val_word, x_test_word, y_test_word, n_words = read_data(choice='word')
+
+    x_train_word = x_train_word[:100]
+    y_train_word = y_train_word[:100]
+    x_test_word = x_test_word[:10]
+    y_test_word = y_test_word[:10]
+    x_val_word = x_val_word[:10]
+    y_val_word = y_val_word[:10]
+    # =========================== Q1
+    init_dict = arg_dict(
+                    model_save_path='models/b/1_char_cnn',
+                    C1_filters=10, C2_filters=10,
+                    C1_kernal_size=[20, 256], C2_kernal_size=[20, 1],
+                    S1_window=4, S2_window=4,
+                    S1_strides=2, S2_strides=2,
+                    drop_out=False, drop_out_rate=0.1,
+                    choice='char')
+
+    char_cnn = CNNClassifer(**init_dict).train(
                                 X_train=x_train,
                                 Y_train=y_train,
                                 X_test=x_test,
                                 Y_test=y_test,
                                 X_val=x_val,
                                 Y_val=y_val)
+
+    train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_cnn.train_err, char_cnn.test_acc, char_cnn.time_taken_one_epoch, char_cnn.early_stop_epoch
+
+    # =========================== Q2
+    init_dict = arg_dict(
+                    model_save_path='models/b/2_word_cnn',
+                    C1_filters=10, C2_filters=10,
+                    C1_kernal_size=[20, 20], C2_kernal_size=[20, 1],
+                    S1_window=4, S2_window=4,
+                    S1_strides=2, S2_strides=2,
+                    drop_out=False, drop_out_rate=0.1,
+                    n_words=n_words, embedding_size=20,
+                    choice='word')
+
+    char_cnn = CNNClassifer(**init_dict).train(
+                                X_train=x_train_word,
+                                Y_train=y_train_word,
+                                X_test=x_test_word,
+                                Y_test=y_test_word,
+                                X_val=x_val_word,
+                                Y_val=y_val_word)
+
+    train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_cnn.train_err, char_cnn.test_acc, char_cnn.time_taken_one_epoch, char_cnn.early_stop_epoch
+   
 
 if __name__ == '__main__':
   main()
