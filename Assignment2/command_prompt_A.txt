@@ -1,0 +1,150 @@
+﻿C1: 75
+C2: 70
+test_acc: 0.518500
+Optimal C1: 75
+Optimal C2: 70
+==================================================
+momentum
+2018-10-28 05:20:45.656176: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+490] Adding visible gpu devices: 0
+2018-10-28 05:20:45.656176: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+71] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-28 05:20:45.671776: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+77]      0
+2018-10-28 05:20:45.671776: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+90] 0:   N
+2018-10-28 05:20:45.671776: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
+h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+00:02:00.0, compute capability: 5.2)
+Early stopping at 657th iteration
+--------------------------------------------------
+==================================================
+RMSProp
+2018-10-28 05:45:14.692576: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+490] Adding visible gpu devices: 0
+2018-10-28 05:45:14.692576: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+71] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-28 05:45:14.692576: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+77]      0
+2018-10-28 05:45:14.692576: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+90] 0:   N
+2018-10-28 05:45:14.708176: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
+h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+00:02:00.0, compute capability: 5.2)
+Early stopping at 200th iteration
+--------------------------------------------------
+==================================================
+Adam
+2018-10-28 05:52:43.878976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+490] Adding visible gpu devices: 0
+2018-10-28 05:52:43.878976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+71] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-28 05:52:43.878976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+77]      0
+2018-10-28 05:52:43.878976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+90] 0:   N
+2018-10-28 05:52:43.894576: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
+h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+00:02:00.0, compute capability: 5.2)
+Early stopping at 200th iteration
+--------------------------------------------------
+==================================================
+Drop_Out_0.5
+2018-10-28 06:00:18.306976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+490] Adding visible gpu devices: 0
+2018-10-28 06:00:18.306976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+71] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-28 06:00:18.306976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+77]      0
+2018-10-28 06:00:18.306976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+90] 0:   N
+2018-10-28 06:00:18.322576: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
+h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+00:02:00.0, compute capability: 5.2)
+Early stopping at 690th iteration
+--------------------------------------------------
+==================================================
+Drop_Out 0.7
+2018-10-28 06:26:17.776576: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+490] Adding visible gpu devices: 0
+2018-10-28 06:26:17.792176: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+71] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-28 06:26:17.792176: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+77]      0
+2018-10-28 06:26:17.792176: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+90] 0:   N
+2018-10-28 06:26:17.792176: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
+h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+00:02:00.0, compute capability: 5.2)
+Early stopping at 690th iteration
+--------------------------------------------------
+==================================================
+Drop_Out_0.9
+2018-10-28 06:51:37.544176: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+490] Adding visible gpu devices: 0
+2018-10-28 06:51:37.544176: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+71] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-28 06:51:37.544176: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+77]      0
+2018-10-28 06:51:37.559776: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+90] 0:   N
+2018-10-28 06:51:37.559776: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
+h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+00:02:00.0, compute capability: 5.2)
+Early stopping at 690th iteration
+--------------------------------------------------
+model: GD_50_60 test_acc: 0.510000
+model: Optimal_75_70 test_acc: 0.518500
+model: momentum test_acc: 0.500000
+model: RMSProp test_acc: 0.458500
+model: Adam test_acc: 0.478500
+model: Drop_Out_0.5 test_acc: 0.517500
+model: Drop_Out 0.7 test_acc: 0.517500
+model: Drop_Out_0.9 test_acc: 0.519000
+GD_50_60
+Time per epoch: 982.314476302254ms
+Number of Epochs: 739
+Convergence Test Accuracy: 0.5099999904632568
+--------------------------------------------------
+Optimal_75_70
+Time per epoch: 1466.1516622247984ms
+Number of Epochs: 691
+Convergence Test Accuracy: 0.5184999704360962
+--------------------------------------------------
+momentum
+Time per epoch: 1439.8705220150005ms
+Number of Epochs: 658
+Convergence Test Accuracy: 0.5
+--------------------------------------------------
+RMSProp
+Time per epoch: 1430.0776121035144ms
+Number of Epochs: 201
+Convergence Test Accuracy: 0.4584999978542328
+--------------------------------------------------
+Adam
+Time per epoch: 1457.9403103880622ms
+Number of Epochs: 201
+Convergence Test Accuracy: 0.47850000858306885
+--------------------------------------------------
+Drop_Out_0.5
+Time per epoch: 1462.6298230222267ms
+Number of Epochs: 691
+Convergence Test Accuracy: 0.5174999833106995
+--------------------------------------------------
+Drop_Out 0.7
+Time per epoch: 1409.0795941359743ms
+Number of Epochs: 691
+Convergence Test Accuracy: 0.5174999833106995
+--------------------------------------------------
+Drop_Out_0.9
+Time per epoch: 1416.823162528782ms
+Number of Epochs: 691
+Convergence Test Accuracy: 0.5189999938011169
+--------------------------------------------------
+

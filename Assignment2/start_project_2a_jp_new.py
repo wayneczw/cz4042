@@ -465,6 +465,11 @@ def main():
     early_stop_epoch_dict[optimal_C] = optimal_dict['es_epoch']
 
     print("Optimal C1: {}\nOptimal C2: {}".format(C1, C2))
+	# ==================================================
+	# test_acc: 0.518500
+	# Optimal C1: 75
+	# Optimal C2: 70
+	# ==================================================
 
     # =====================Q3 optimal feature map=====================
     optimizers = ['momentum','RMSProp','Adam','Drop_Out_0.5', 'Drop_Out 0.7', 'Drop_Out_0.9']
@@ -598,6 +603,57 @@ def main():
         print('Number of Epochs: {}'.format(early_stop_epoch_dict[key]))
         print('Convergence Test Accuracy: {}'.format(test_acc_dict[key][-1]))
         print('-'*50)
+	
+	# --------------------------------------------------
+	# model: GD_50_60 test_acc: 0.510000
+	# model: Optimal_75_70 test_acc: 0.518500
+	# model: momentum test_acc: 0.500000
+	# model: RMSProp test_acc: 0.458500
+	# model: Adam test_acc: 0.478500
+	# model: Drop_Out_0.5 test_acc: 0.517500
+	# model: Drop_Out 0.7 test_acc: 0.517500
+	# model: Drop_Out_0.9 test_acc: 0.519000
+	# GD_50_60
+	# Time per epoch: 982.314476302254ms
+	# Number of Epochs: 739
+	# Convergence Test Accuracy: 0.5099999904632568
+	# --------------------------------------------------
+	# Optimal_75_70
+	# Time per epoch: 1466.1516622247984ms
+	# Number of Epochs: 691
+	# Convergence Test Accuracy: 0.5184999704360962
+	# --------------------------------------------------
+	# momentum
+	# Time per epoch: 1439.8705220150005ms
+	# Number of Epochs: 658
+	# Convergence Test Accuracy: 0.5
+	# --------------------------------------------------
+	# RMSProp
+	# Time per epoch: 1430.0776121035144ms
+	# Number of Epochs: 201
+	# Convergence Test Accuracy: 0.4584999978542328
+	# --------------------------------------------------
+	# Adam
+	# Time per epoch: 1457.9403103880622ms
+	# Number of Epochs: 201
+	# Convergence Test Accuracy: 0.47850000858306885
+	# --------------------------------------------------
+	# Drop_Out_0.5
+	# Time per epoch: 1462.6298230222267ms
+	# Number of Epochs: 691
+	# Convergence Test Accuracy: 0.5174999833106995
+	# --------------------------------------------------
+	# Drop_Out 0.7
+	# Time per epoch: 1409.0795941359743ms
+	# Number of Epochs: 691
+	# Convergence Test Accuracy: 0.5174999833106995
+	# --------------------------------------------------
+	# Drop_Out_0.9
+	# Time per epoch: 1416.823162528782ms
+	# Number of Epochs: 691
+	# Convergence Test Accuracy: 0.5189999938011169
+	# --------------------------------------------------
+	
 # end def
 
 if __name__ == '__main__': main()
