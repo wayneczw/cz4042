@@ -515,7 +515,7 @@ def arg_cnn_dict(model_save_path, C1_filters=10, C2_filters=10,
                 early_stop=True,
                 patience=20,
                 min_delta = 0.0005,
-                min_epoch=20,
+                min_epoch=200,
                 n_words=n_words,
                 embedding_size=embedding_size,
                 choice=choice)
@@ -542,7 +542,7 @@ def arg_rnn_dict(model_save_path, n_hidden_list,
                 early_stop=True,
                 patience=20,
                 min_delta = 0.0005,
-                min_epoch=20,
+                min_epoch=200,
                 n_words=n_words,
                 embedding_size=embedding_size,
                 choice=choice,
@@ -653,6 +653,7 @@ def main():
     print()
     print('='*100)
     print('Q4 Word RNN')
+    print('='*100)
 
     tf.reset_default_graph()
     init_dict = arg_rnn_dict(
@@ -706,6 +707,8 @@ def main():
                                     Y_val=y_val)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_cnn.train_err, char_cnn.test_acc, char_cnn.time_taken_one_epoch, char_cnn.early_stop_epoch
 
+        print()
+
         # word CNN with dropout
         tf.reset_default_graph()
         print('Word CNN')
@@ -728,6 +731,8 @@ def main():
                                     Y_val=y_val_word)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_cnn.train_err, word_cnn.test_acc, word_cnn.time_taken_one_epoch, word_cnn.early_stop_epoch
 
+        print()
+
         # char RNN with dropout
         tf.reset_default_graph()
         print('Char RNN')
@@ -746,6 +751,8 @@ def main():
                                     X_val=x_val,
                                     Y_val=y_val)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
+
+        print()
 
         # word RNN with dropout
         tf.reset_default_graph()
@@ -799,6 +806,8 @@ def main():
                                     Y_val=y_val)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
 
+        print()
+
         tf.reset_default_graph()
         print('Word RNN')
         init_dict = arg_rnn_dict(
@@ -842,7 +851,9 @@ def main():
                                 X_val=x_val,
                                 Y_val=y_val)
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
-
+    
+    print()
+    
     tf.reset_default_graph()
     print('Word RNN')
     init_dict = arg_rnn_dict(
@@ -884,6 +895,8 @@ def main():
                                 X_val=x_val,
                                 Y_val=y_val)
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
+
+    print()
 
     tf.reset_default_graph()
     print('Word RNN')
