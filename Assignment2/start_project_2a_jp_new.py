@@ -507,10 +507,6 @@ def main():
         time_taken_one_epoch_dict[optimizer] = time_taken_one_epoch
         early_stop_epoch_dict[optimizer] = early_stop_epoch
     #end for
-    for key, val in test_acc_dict.items():
-        model_list.append(key)
-        test_acc_list.append(val[-1])
-        print("model: %s test_acc: %f" %(key,val[-1]))
 
     # Plot Training Errors
     plt.figure("Train Error against Epoch")
