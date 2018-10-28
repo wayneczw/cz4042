@@ -1,9 +1,12 @@
-import numpy as np
-import pandas
-import tensorflow as tf
 import csv
-from sklearn.model_selection import train_test_split
+import matplotlib
+matplotlib.use('Agg')
+import numpy as np
 import os
+import pandas
+import pylab as plt
+from sklearn.model_selection import train_test_split
+import tensorflow as tf
 import time
 
 MAX_DOCUMENT_LENGTH = 100
