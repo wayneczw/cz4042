@@ -168,10 +168,16 @@ class CNNClassifer():
         self.h_pool2 = tf.squeeze(tf.reduce_max(self.h_pool2, 1), squeeze_dims=[1])
         self.y_conv = tf.layers.dense(self.h_pool2, self.output_dim, activation=None)
 
-        self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=tf.one_hot(self.y_, self.output_dim), logits=self.y_conv))
+        self.cross_entropy = tf.reduce_mean(
+                                tf.nn.softmax_cross_entropy_with_logits_v2(
+                                                        labels=tf.one_hot(self.y_, self.output_dim),
+                                                        logits=self.y_conv))
 
         # accuracy
-        self.correct_prediction = tf.cast(tf.equal(tf.argmax(self.y_conv, 1), tf.argmax(tf.one_hot(self.y_, self.output_dim), 1)), tf.float32)
+        self.correct_prediction = tf.cast(
+                                    tf.equal(
+                                        tf.argmax(self.y_conv, 1),
+                                        tf.argmax(tf.one_hot(self.y_, self.output_dim), 1)), tf.float32)
         self.accuracy = tf.reduce_mean(self.correct_prediction)
         
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.cross_entropy)
@@ -324,10 +330,16 @@ class RNNClassifer():
                                 rate=self.drop_out_rate,
                                 seed=seed)
 
-        self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=tf.one_hot(self.y_, self.output_dim), logits=self.y))
+        self.cross_entropy = tf.reduce_mean(
+                                tf.nn.softmax_cross_entropy_with_logits_v2(
+                                                        labels=tf.one_hot(self.y_, self.output_dim),
+                                                        logits=self.y))
 
         # accuracy
-        self.correct_prediction = tf.cast(tf.equal(tf.argmax(self.y, 1), tf.argmax(tf.one_hot(self.y_, self.output_dim), 1)), tf.float32)
+        self.correct_prediction = tf.cast(
+                                    tf.equal(
+                                        tf.argmax(self.y, 1),
+                                        tf.argmax(tf.one_hot(self.y_, self.output_dim), 1)), tf.float32)
         self.accuracy = tf.reduce_mean(self.correct_prediction)
         
         if self.gradient_clipped:
@@ -435,6 +447,7 @@ class RNNClassifer():
         return self
     #end def
 #end class
+
 
 def read_data(choice='char'):
     if choice == 'char': row_num = 1
@@ -877,6 +890,8 @@ def main():
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
 
     # =========================== Q6 c
+    print()
+    print()
     print('='*100)
     print('Q6c. Char/Word RNN w/ Gradient Clipped at Threshold 2.0')
     print('='*100)
@@ -920,6 +935,8 @@ def main():
                                 X_val=x_val_word,
                                 Y_val=y_val_word)
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
+#end def
+
 
 if __name__ == '__main__':
   main()
