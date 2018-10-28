@@ -33,13 +33,13 @@ def data_read_words():
   
   x_train, y_train, x_test, y_test = [], [], [], []
   
-  with open('train_medium.csv', encoding='utf-8') as filex:
+  with open('data/train_medium.csv', encoding='utf-8') as filex:
     reader = csv.reader(filex)
     for row in reader:
       x_train.append(row[2])
       y_train.append(int(row[0]))
 
-  with open("test_medium.csv", encoding='utf-8') as filex:
+  with open("data/test_medium.csv", encoding='utf-8') as filex:
     reader = csv.reader(filex)
     for row in reader:
       x_test.append(row[2])
@@ -70,6 +70,8 @@ def main():
   global n_words
 
   x_train, y_train, x_test, y_test, n_words = data_read_words()
+  x_train = x_train[:100]
+  y_train = y_train[:100]
 
   # Create the model
   x = tf.placeholder(tf.int64, [None, MAX_DOCUMENT_LENGTH])
