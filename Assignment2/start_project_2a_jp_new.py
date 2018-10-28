@@ -483,7 +483,7 @@ def main():
         if 'Dropout' in optimizer:
             _optimizer = 'Drop Out'
             keep_prob = float(optimizer[-3:])
-            init_dict = arg_dict(model_save_path, C1_map, C2_map, optimizer, drop_out=True, keep_prob=keep_prob)
+            init_dict = arg_dict(model_save_path, C1_map, C2_map, optimizer=_optimizer, drop_out=True, keep_prob=keep_prob)
         else:
             init_dict = arg_dict(model_save_path, C1_map, C2_map, optimizer)
         cnn = CNNClassifer(**init_dict).train(X_train=trainX, Y_train=trainY,
