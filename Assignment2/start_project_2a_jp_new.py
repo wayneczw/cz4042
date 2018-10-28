@@ -162,7 +162,10 @@ class CNNClassifer():
 
                 t = time.time()
                 for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
-                    self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
+                    if self.drop_out:
+                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end], self._keep_prob: self.keep_prob})
+                    else:
+                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
                 time_to_update += (time.time() - t)
 
                 if self.drop_out:
@@ -381,13 +384,6 @@ def main():
 
     trainX, trainY, valX, valY, testX, testY = read_data('data/data_batch_1', 'data/test_batch_trim')
 
-    # trainX = trainX[:100]
-    # trainY = trainY[:100]
-    # valX = valX[:10]
-    # valY = valY[:10]
-    # testX = testX[:10]
-    # testY = testY[:10]
-
     # =====================Q1 =====================
     model_save_path = 'models/a/1_GD'
     C1_map = 50
@@ -487,6 +483,7 @@ def main():
     early_stop_epoch_dict['Optimal_75_70 test_acc'] = early_stop_epoch
 
     # =====================Q3 optimal feature map=====================
+    
     optimizers = ['momentum','RMSProp','Adam','Dropout_0.5', 'Dropout_0.7', 'Dropout_0.9']
     C1_map = C1
     C2_map = C2
@@ -496,14 +493,13 @@ def main():
         print(optimizer)
         model_save_path = 'models/a/3_' + str(optimizer)
         if 'Dropout' in optimizer:
-            _optimizer = 'Drop Out'
             keep_prob = float(optimizer[-3:])
-            init_dict = arg_dict(model_save_path, C1_map, C2_map, optimizer=_optimizer, drop_out=True, keep_prob=keep_prob)
+            init_dict = arg_dict(model_save_path, C1_map, C2_map, optimizer='Drop Out', drop_out=True, keep_prob=keep_prob)
         else:
             init_dict = arg_dict(model_save_path, C1_map, C2_map, optimizer)
         cnn = CNNClassifer(**init_dict).train(X_train=trainX, Y_train=trainY,
-                                            X_test=testX, Y_test=testY,
-                                            X_val=valX, Y_val=valY)
+                                        X_test=testX, Y_test=testY,
+                                        X_val=valX, Y_val=valY)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = cnn.train_err, cnn.test_acc, cnn.time_taken_one_epoch, cnn.early_stop_epoch
 
         train_err_dict[optimizer] = train_err
@@ -511,6 +507,10 @@ def main():
         time_taken_one_epoch_dict[optimizer] = time_taken_one_epoch
         early_stop_epoch_dict[optimizer] = early_stop_epoch
     #end for
+    for key, val in test_acc_dict.items():
+        model_list.append(key)
+        test_acc_list.append(val[-1])
+        print("model: %s test_acc: %f" %(key,val[-1]))
 
     # Plot Training Errors
     plt.figure("Train Error against Epoch")
