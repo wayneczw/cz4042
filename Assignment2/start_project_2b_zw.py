@@ -602,6 +602,7 @@ def main():
     print()
     print('='*100)
     print('Q2 Word CNN')
+    print('='*100)
 
     tf.reset_default_graph()
     init_dict = arg_cnn_dict(
