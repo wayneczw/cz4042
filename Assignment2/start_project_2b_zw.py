@@ -818,14 +818,14 @@ def main():
                         choice='word', n_words=n_words, embedding_size=20,
                         rnn_choice=rnn_choice)
 
-        char_rnn = RNNClassifer(**init_dict).train(
+        word_rnn = RNNClassifer(**init_dict).train(
                                     X_train=x_train_word,
                                     Y_train=y_train_word,
                                     X_test=x_test_word,
                                     Y_test=y_test_word,
                                     X_val=x_val_word,
                                     Y_val=y_val_word)
-        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
+        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
     #end for
 
     # =========================== Q6 b
