@@ -440,6 +440,7 @@ def main():
     plot_feature_map(X, cnn, path_dict)
 
     # =====================Q2 optimal feature map=====================
+    '''
     C1_range = [40,71,10]
     C2_range = [40,71,10]
     optimal_dict = grid_search(trainX, trainY,
@@ -470,6 +471,20 @@ def main():
     # Optimal C1: 75
     # Optimal C2: 70
     # ==================================================
+    '''
+	# to delete
+    C1 = 75
+    C2 = 70
+    model_save_path = 'models/a/2_C1_' + str(C1) + '_C2_' + str(C2)
+    init_dict = arg_dict(model_save_path, C1, C2,optimizer)
+    cnn = CNNClassifer(**init_dict).train(X_train=trainX, Y_train=trainY,
+                                        X_test=testX, Y_test=testY,
+                                        X_val=valX, Y_val=valY)
+    train_err, test_acc, time_taken_one_epoch, early_stop_epoch = cnn.train_err, cnn.test_acc, cnn.time_taken_one_epoch, cnn.early_stop_epoch
+    train_err_dict['Optimal_75_70 test_acc'] = train_err
+    test_acc_dict['Optimal_75_70 test_acc'] = test_acc
+    time_taken_one_epoch_dict['Optimal_75_70 test_acc'] = time_taken_one_epoch
+    early_stop_epoch_dict['Optimal_75_70 test_acc'] = early_stop_epoch
 
     # =====================Q3 optimal feature map=====================
     optimizers = ['momentum','RMSProp','Adam','Dropout_0.5', 'Dropout_0.7', 'Dropout_0.9']
