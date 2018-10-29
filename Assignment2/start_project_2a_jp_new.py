@@ -579,7 +579,7 @@ def main():
     plt.title("Test Accuracy against models")
     plt.grid(b=True)
     plt.ylabel('Test Accuracy')
-    plt.xticks(np.arange(6), model_list, rotation=90)
+    plt.xticks(np.arange(len(model_list)), model_list, rotation=90)
     plt.plot(model_list, test_acc_list)
     plt.tight_layout()
     plt.savefig('figures/a/4_test_accuracy.png')
@@ -601,6 +601,7 @@ def main():
     # Plot Total Time Taken
     plt.figure("Total Time Taken")
     plt.title("Total Time Taken")
+    plt.xticks(np.arange(len(model_list)), model_list)
     plt.plot(model_list, total_time_taken_list)
     plt.xlabel('Model')
     plt.ylabel('Total Time/ms')
