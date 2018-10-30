@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use('Agg')
 import numpy as np
 import os
-import pandas
+import pandas as pd
 import pylab as plt
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
@@ -26,6 +26,9 @@ if not os.path.exists('models'):
     os.makedirs('models')
 if not os.path.exists(os.path.join('models', 'b')):
     os.makedirs(os.path.join('models', 'b'))
+if not os.path.exists(os.path.join('csv_results')):
+    os.makedirs(os.path.join('csv_results'))
+
 
 class CNNClassifer():
     def __init__(
@@ -475,12 +478,12 @@ def read_data(choice='char'):
                                                     test_size=0.2,
                                                     random_state=seed)
 
-    x_train = pandas.Series(x_train)
-    y_train = pandas.Series(y_train)
-    x_val = pandas.Series(x_val)
-    y_val = pandas.Series(y_val)
-    x_test = pandas.Series(x_test)
-    y_test = pandas.Series(y_test)
+    x_train = pd.Series(x_train)
+    y_train = pd.Series(y_train)
+    x_val = pd.Series(x_val)
+    y_val = pd.Series(y_val)
+    x_test = pd.Series(x_test)
+    y_test = pd.Series(y_test)
     y_train = y_train.values
     y_val = y_val.values
     y_test = y_test.values   
@@ -588,6 +591,8 @@ def main():
     x_val_word = x_val_word[:10]
     y_val_word = y_val_word[:10]
 
+    result_dict_list = list()
+
     # =========================== Q1
     print('='*100)
     print('Q1 Char CNN')
@@ -612,6 +617,9 @@ def main():
                                 Y_val=y_val)
 
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_cnn.train_err, char_cnn.test_acc, char_cnn.time_taken_one_epoch, char_cnn.early_stop_epoch
+
+    _result_dict = dict(name='q1_char_cnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
 
     # =========================== Q2
     print()
@@ -640,6 +648,9 @@ def main():
                                 Y_val=y_val_word)
 
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_cnn.train_err, word_cnn.test_acc, word_cnn.time_taken_one_epoch, word_cnn.early_stop_epoch
+
+    _result_dict = dict(name='q2_word_cnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
    
     # =========================== Q3
     print()
@@ -665,6 +676,9 @@ def main():
                                 Y_val=y_val)
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
 
+    _result_dict = dict(name='q3_char_rnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
+
     # =========================== Q4
     print()
     print()
@@ -688,6 +702,9 @@ def main():
                                 X_val=x_val_word,
                                 Y_val=y_val_word)
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
+
+    _result_dict = dict(name='q4_word_rnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
 
     # =========================== Q5
     print()
@@ -724,6 +741,9 @@ def main():
                                     Y_val=y_val)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_cnn.train_err, char_cnn.test_acc, char_cnn.time_taken_one_epoch, char_cnn.early_stop_epoch
 
+        _result_dict = dict(name='q5_char_cnn_'+str(rate), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        result_dict_list.append(_result_dict)
+
         print()
 
         # word CNN with dropout
@@ -748,6 +768,9 @@ def main():
                                     Y_val=y_val_word)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_cnn.train_err, word_cnn.test_acc, word_cnn.time_taken_one_epoch, word_cnn.early_stop_epoch
 
+        _result_dict = dict(name='q5_word_cnn_'+str(rate), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        result_dict_list.append(_result_dict)
+
         print()
 
         # char RNN with dropout
@@ -769,6 +792,9 @@ def main():
                                     Y_val=y_val)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
 
+        _result_dict = dict(name='q5_char_rnn_'+str(rate), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        result_dict_list.append(_result_dict)
+
         print()
 
         # word RNN with dropout
@@ -789,6 +815,8 @@ def main():
                                     X_val=x_val_word,
                                     Y_val=y_val_word)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
+        _result_dict = dict(name='q5_word_rnn_'+str(rate), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        result_dict_list.append(_result_dict)
     #end for
 
     # =========================== Q6 a
@@ -823,6 +851,9 @@ def main():
                                     Y_val=y_val)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
 
+        _result_dict = dict(name='q6a_char_rnn_'+rnn_choice, train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        result_dict_list.append(_result_dict)
+
         print()
 
         tf.reset_default_graph()
@@ -842,6 +873,9 @@ def main():
                                     X_val=x_val_word,
                                     Y_val=y_val_word)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
+
+        _result_dict = dict(name='q6a_char_rnn_'+rnn_choice, train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        result_dict_list.append(_result_dict)
     #end for
 
     # =========================== Q6 b
@@ -868,7 +902,9 @@ def main():
                                 X_val=x_val,
                                 Y_val=y_val)
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
-    
+    _result_dict = dict(name='q6b_char_rnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
+
     print()
     
     tf.reset_default_graph()
@@ -888,6 +924,9 @@ def main():
                                 X_val=x_val_word,
                                 Y_val=y_val_word)
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
+
+    _result_dict = dict(name='q6b_word_rnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
 
     # =========================== Q6 c
     print()
@@ -915,6 +954,9 @@ def main():
                                 Y_val=y_val)
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
 
+    _result_dict = dict(name='q6c_char_rnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
+
     print()
 
     tf.reset_default_graph()
@@ -935,6 +977,15 @@ def main():
                                 X_val=x_val_word,
                                 Y_val=y_val_word)
     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
+    _result_dict = dict(name='q6c_word_rnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
+
+    df = pd.DataFrame.from_dict(result_dict_list)
+    df.to_csv('./csv_results/q2.csv')
+
+    _df = pd.read_csv('./csv_results/q2.csv')
+    print(_df)
+
 #end def
 
 
