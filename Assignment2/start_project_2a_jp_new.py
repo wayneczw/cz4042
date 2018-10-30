@@ -351,7 +351,8 @@ def grid_search(trainX, trainY,
                                                 X_test=testX, Y_test=testY,
                                                 X_val=valX, Y_val=valY)
             train_err, test_acc, time_taken_one_epoch, early_stop_epoch = cnn.train_err, cnn.test_acc, cnn.time_taken_one_epoch, cnn.early_stop_epoch
-
+            print("C1: {0:d}    C2: {1:d}    Test Accuracy: {2:.4f}".format(C1_map, C2_map,test_acc[-1]))
+            print('='*50)
             gs_train_err_dict[key] = train_err
             gs_test_acc_dict[key] = test_acc
             gs_time_taken_one_epoch_dict[key] = time_taken_one_epoch
@@ -359,6 +360,7 @@ def grid_search(trainX, trainY,
 
     gs_test_acc_dict = OrderedDict(sorted(gs_test_acc_dict.items(), key=lambda t: t[1][-1], reverse=True))
     opt_C1_C2 = list(gs_test_acc_dict.items())[0]
+	
     optimal_C1 = opt_C1_C2[0][0]
     optimal_C2 = opt_C1_C2[0][1]
     optimal_test_acc = opt_C1_C2[1]
@@ -424,8 +426,8 @@ def main():
     ind = np.random.randint(low=0, high=len(testX))
     X = trainX[ind,:]
     path_dict = dict(test='figures/a/1b_1_test.png', c1='figures/a/1b_1_c1.png',
-                    p1='figures/a/1b_1_p1.png', c2='figures/a/1b_1_c2.png',
-                    p2='figures/a/1b_1_p2.png')
+                    # p1='figures/a/1b_1_p1.png', c2='figures/a/1b_1_c2.png',
+                    # p2='figures/a/1b_1_p2.png')
     plot_feature_map(X, cnn, path_dict)
 
     ind = np.random.randint(low=0, high=10)
@@ -436,7 +438,7 @@ def main():
     plot_feature_map(X, cnn, path_dict)
 
     # =====================Q2 optimal feature map=====================
-    '''
+    
     C1_range = [40,71,10]
     C2_range = [40,71,10]
     optimal_dict = grid_search(trainX, trainY,
@@ -460,28 +462,16 @@ def main():
     test_acc_dict[optimal_C] = optimal_dict['test_acc']
     time_taken_one_epoch_dict[optimal_C] = optimal_dict['time']
     early_stop_epoch_dict[optimal_C] = optimal_dict['es_epoch']
+	
 
     print("Optimal C1: {}\nOptimal C2: {}".format(C1, C2))
+	
     # ==================================================
-    # test_acc: 0.518500
-    # Optimal C1: 75
-    # Optimal C2: 70
+    # test_acc: 0.5120
+    # Optimal C1: 60
+    # Optimal C2: 60
     # ==================================================
-    '''
-	# to delete
-    C1 = 75
-    C2 = 70
-    model_save_path = 'models/a/2_C1_' + str(C1) + '_C2_' + str(C2)
-    init_dict = arg_dict(model_save_path, C1, C2,optimizer)
-    cnn = CNNClassifer(**init_dict).train(X_train=trainX, Y_train=trainY,
-                                        X_test=testX, Y_test=testY,
-                                        X_val=valX, Y_val=valY)
-    train_err, test_acc, time_taken_one_epoch, early_stop_epoch = cnn.train_err, cnn.test_acc, cnn.time_taken_one_epoch, cnn.early_stop_epoch
-    train_err_dict['Optimal_75_70 test_acc'] = train_err
-    test_acc_dict['Optimal_75_70 test_acc'] = test_acc
-    time_taken_one_epoch_dict['Optimal_75_70 test_acc'] = time_taken_one_epoch
-    early_stop_epoch_dict['Optimal_75_70 test_acc'] = early_stop_epoch
-
+    
     # =====================Q3 optimal feature map=====================
     
     optimizers = ['momentum','RMSProp','Adam','Dropout_0.5', 'Dropout_0.7', 'Dropout_0.9']
@@ -615,7 +605,61 @@ def main():
         print('Number of Epochs: {}'.format(early_stop_epoch_dict[key]))
         print('Convergence Test Accuracy: {}'.format(test_acc_dict[key][-1]))
         print('-'*50)
-    
+	
+	# --------------------------------------------------
+	# model: GD_50_60 test_acc: 0.510500
+	# model: Optimal_60_60 test_acc test_acc: 0.516000
+	# model: momentum test_acc: 0.495000
+	# model: RMSProp test_acc: 0.422500
+	# model: Adam test_acc: 0.475000
+	# model: Dropout_0.5 test_acc: 0.423000
+	# model: Dropout_0.7 test_acc: 0.439000
+	# model: Dropout_0.9 test_acc: 0.500000
+	# GD_50_60
+	# Time per epoch: 984.319887883931ms
+	# Number of Epochs: 739
+	# Convergence Test Accuracy: 0.5105000138282776
+	# --------------------------------------------------
+	# Optimal_60_60 test_acc
+	# Time per epoch: 1066.54181886913ms
+	# Number of Epochs: 739
+	# Convergence Test Accuracy: 0.515999972820282
+	# --------------------------------------------------
+	# momentum
+	# Time per epoch: 1029.020267161163ms
+	# Number of Epochs: 592
+	# Convergence Test Accuracy: 0.4950000047683716
+	# --------------------------------------------------
+	# RMSProp
+	# Time per epoch: 1078.4955119612205ms
+	# Number of Epochs: 201
+	# Convergence Test Accuracy: 0.42250001430511475
+	# --------------------------------------------------
+	# Adam
+	# Time per epoch: 1087.4985011655892ms
+	# Number of Epochs: 201
+	# Convergence Test Accuracy: 0.4749999940395355
+	# --------------------------------------------------
+	# Dropout_0.5
+	# Time per epoch: 1489.2535057796795ms
+	# Number of Epochs: 314
+	# Convergence Test Accuracy: 0.4230000078678131
+	# --------------------------------------------------
+	# Dropout_0.7
+	# Time per epoch: 1486.0388368464596ms
+	# Number of Epochs: 309
+	# Convergence Test Accuracy: 0.4390000104904175
+	# --------------------------------------------------
+	# Dropout_0.9
+	# Time per epoch: 1473.141430105482ms
+	# Number of Epochs: 560
+	# Convergence Test Accuracy: 0.5
+	# --------------------------------------------------
+
+		
+	
+    '''
+	old versions
     # --------------------------------------------------
 	# model: GD_50_60 test_acc: 0.509000
 	# model: Optimal_75_70 test_acc test_acc: 0.518500
@@ -664,7 +708,8 @@ def main():
 	# Time per epoch: 1987.9034627782237ms
 	# Number of Epochs: 404
 	# Convergence Test Accuracy: 0.48399999737739563
-	# --------------------------------------------------    
+	# -------------------------------------------------- 
+	'''	
 # end def
 
 if __name__ == '__main__': main()

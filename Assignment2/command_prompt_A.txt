@@ -1,4 +1,56 @@
-﻿C:\Users\ze0001po\Desktop\CZ4042\cz4042\Assignment2>python start_project_2a_jp_n
+﻿2018-10-30 14:05:11.331398: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+71] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-30 14:05:11.346998: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+77]      0
+2018-10-30 14:05:11.346998: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+90] 0:   N
+2018-10-30 14:05:11.346998: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
+h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+00:02:00.0, compute capability: 5.2)
+Early stopping at 690th iteration
+--------------------------------------------------
+C1: 65    C2: 55    Test Accuracy: 0.4930
+==================================================
+2018-10-30 14:26:33.058598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+490] Adding visible gpu devices: 0
+2018-10-30 14:26:33.058598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+71] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-30 14:26:33.074198: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+77]      0
+2018-10-30 14:26:33.074198: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+90] 0:   N
+2018-10-30 14:26:33.074198: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
+h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+00:02:00.0, compute capability: 5.2)
+Early stopping at 563th iteration
+--------------------------------------------------
+C1: 65    C2: 60    Test Accuracy: 0.4865
+==================================================
+2018-10-30 14:44:14.622998: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+490] Adding visible gpu devices: 0
+2018-10-30 14:44:14.638598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+71] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-30 14:44:14.638598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+77]      0
+2018-10-30 14:44:14.638598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+90] 0:   N
+2018-10-30 14:44:14.638598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
+h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+00:02:00.0, compute capability: 5.2)
+Early stopping at 690th iteration
+--------------------------------------------------
+C1: 65    C2: 65    Test Accuracy: 0.5025
+==================================================
+C1: 60
+C2: 60
+test_acc: 0.512000
+Optimal C1: 60
+Optimal C2: 60
+
+C:\Users\ze0001po\Desktop\CZ4042\cz4042\Assignment2>python start_project_2a_jp_n
 ew.py
 (10000, 3072) (10000, 10)
 (2000, 3072) (2000, 10)
@@ -12,234 +64,209 @@ into the labels input on backprop by default.
 
 See `tf.nn.softmax_cross_entropy_with_logits_v2`.
 
-2018-10-28 15:22:33.947622: I tensorflow/core/platform/cpu_feature_guard.cc:141]
+2018-10-30 17:20:38.793382: I tensorflow/core/platform/cpu_feature_guard.cc:141]
  Your CPU supports instructions that this TensorFlow binary was not compiled to
 use: AVX2
-2018-10-28 15:22:34.192622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 17:20:39.089782: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 411] Found device 0 with properties:
 name: Quadro M2000 major: 5 minor: 2 memoryClockRate(GHz): 1.1625
 pciBusID: 0000:02:00.0
 totalMemory: 4.00GiB freeMemory: 3.88GiB
-2018-10-28 15:22:34.199622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 17:20:39.105382: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 490] Adding visible gpu devices: 0
-2018-10-28 15:25:19.681222: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 17:23:44.651782: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 71] Device interconnect StreamExecutor with strength 1 edge matrix:
-2018-10-28 15:25:19.681222: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 17:23:44.667382: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 77]      0
-2018-10-28 15:25:19.681222: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 17:23:44.667382: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 90] 0:   N
-2018-10-28 15:25:19.681222: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 17:23:44.682982: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
-h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+h 3605 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
 00:02:00.0, compute capability: 5.2)
-2018-10-28 15:25:24.579622: W tensorflow/core/common_runtime/bfc_allocator.cc:21
+2018-10-30 17:23:49.628182: W tensorflow/core/common_runtime/bfc_allocator.cc:21
 5] Allocator (GPU_0_bfc) ran out of memory trying to allocate 3.24GiB. The calle
 r indicates that this is not a failure, but may mean that there could be perform
 ance gains if more memory were available.
-2018-10-28 15:25:24.595222: W tensorflow/core/common_runtime/bfc_allocator.cc:21
+2018-10-30 17:23:49.643782: W tensorflow/core/common_runtime/bfc_allocator.cc:21
 5] Allocator (GPU_0_bfc) ran out of memory trying to allocate 1.72GiB. The calle
 r indicates that this is not a failure, but may mean that there could be perform
 ance gains if more memory were available.
-2018-10-28 15:25:25.250422: W tensorflow/core/common_runtime/bfc_allocator.cc:21
+2018-10-30 17:23:50.298982: W tensorflow/core/common_runtime/bfc_allocator.cc:21
 5] Allocator (GPU_0_bfc) ran out of memory trying to allocate 3.58GiB. The calle
 r indicates that this is not a failure, but may mean that there could be perform
 ance gains if more memory were available.
 Early stopping at 738th iteration
 --------------------------------------------------
-2018-10-28 15:44:03.427222: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 17:42:07.322182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 490] Adding visible gpu devices: 0
-2018-10-28 15:44:03.427222: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 17:42:07.322182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 71] Device interconnect StreamExecutor with strength 1 edge matrix:
-2018-10-28 15:44:03.442822: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 17:42:07.337782: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 77]      0
-2018-10-28 15:44:03.442822: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 17:42:07.337782: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 90] 0:   N
-2018-10-28 15:44:03.442822: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 17:42:07.337782: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
-h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+h 3605 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
 00:02:00.0, compute capability: 5.2)
-2018-10-28 15:44:04.207222: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
-490] Adding visible gpu devices: 0
-2018-10-28 15:44:04.207222: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
-71] Device interconnect StreamExecutor with strength 1 edge matrix:
-2018-10-28 15:44:04.222822: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
-77]      0
-2018-10-28 15:44:04.222822: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
-90] 0:   N
-2018-10-28 15:44:04.222822: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
-103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
-h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
-00:02:00.0, compute capability: 5.2)
-C:\Users\Administrator\AppData\Local\Programs\Python\Python36\lib\site-packages\
-matplotlib\figure.py:98: MatplotlibDeprecationWarning:
-Adding an axes using the same arguments as a previous axes currently reuses the
-earlier instance.  In a future version, a new instance will always be created an
-d returned.  Meanwhile, this warning can be suppressed, and the future behavior
-ensured, by passing a unique label to each axes instance.
-  "Adding an axes using the same arguments as a previous axes "
-2018-10-28 15:44:04.550422: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
-490] Adding visible gpu devices: 0
-2018-10-28 15:44:04.550422: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
-71] Device interconnect StreamExecutor with strength 1 edge matrix:
-2018-10-28 15:44:04.566022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
-77]      0
-2018-10-28 15:44:04.566022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
-90] 0:   N
-2018-10-28 15:44:04.566022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
-103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
-h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
-00:02:00.0, compute capability: 5.2)
+2018-10-30 17:42:09.162982: W tensorflow/core/common_runtime/bfc_allocator.cc:21
+5] Allocator (GPU_0_bfc) ran out of memory trying to allocate 3.89GiB. The calle
+r indicates that this is not a failure, but may mean that there could be perform
+ance gains if more memory were available.
+2018-10-30 17:42:09.178582: W tensorflow/core/common_runtime/bfc_allocator.cc:21
+5] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.04GiB. The calle
+r indicates that this is not a failure, but may mean that there could be perform
+ance gains if more memory were available.
+2018-10-30 17:42:09.989782: W tensorflow/core/common_runtime/bfc_allocator.cc:21
+5] Allocator (GPU_0_bfc) ran out of memory trying to allocate 3.91GiB. The calle
+r indicates that this is not a failure, but may mean that there could be perform
+ance gains if more memory were available.
 Early stopping at 738th iteration
 --------------------------------------------------
 ==================================================
 momentum
-2018-10-28 16:02:18.016822: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:02:06.915382: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 490] Adding visible gpu devices: 0
-2018-10-28 16:02:18.016822: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:02:06.915382: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 71] Device interconnect StreamExecutor with strength 1 edge matrix:
-2018-10-28 16:02:18.016822: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:02:06.930982: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 77]      0
-2018-10-28 16:02:18.032422: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:02:06.930982: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 90] 0:   N
-2018-10-28 16:02:18.032422: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:02:06.930982: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
-h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+h 3605 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
 00:02:00.0, compute capability: 5.2)
-2018-10-28 16:02:20.372422: W tensorflow/core/common_runtime/bfc_allocator.cc:21
-5] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.53GiB. The calle
-r indicates that this is not a failure, but may mean that there could be perform
-ance gains if more memory were available.
-2018-10-28 16:02:21.495622: W tensorflow/core/common_runtime/bfc_allocator.cc:21
-5] Allocator (GPU_0_bfc) ran out of memory trying to allocate 3.58GiB. The calle
-r indicates that this is not a failure, but may mean that there could be perform
-ance gains if more memory were available.
-Early stopping at 657th iteration
+Early stopping at 591th iteration
 --------------------------------------------------
 ==================================================
 RMSProp
-2018-10-28 16:26:12.873622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:17:40.216582: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 490] Adding visible gpu devices: 0
-2018-10-28 16:26:12.873622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:17:40.216582: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 71] Device interconnect StreamExecutor with strength 1 edge matrix:
-2018-10-28 16:26:12.873622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:17:40.232182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 77]      0
-2018-10-28 16:26:12.873622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:17:40.232182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 90] 0:   N
-2018-10-28 16:26:12.873622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:17:40.247782: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
-h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+h 3605 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
 00:02:00.0, compute capability: 5.2)
 Early stopping at 200th iteration
 --------------------------------------------------
 ==================================================
 Adam
-2018-10-28 16:33:42.606022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:23:08.768182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 490] Adding visible gpu devices: 0
-2018-10-28 16:33:42.606022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:23:08.768182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 71] Device interconnect StreamExecutor with strength 1 edge matrix:
-2018-10-28 16:33:42.606022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:23:08.768182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 77]      0
-2018-10-28 16:33:42.606022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:23:08.783782: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 90] 0:   N
-2018-10-28 16:33:42.621622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:23:08.783782: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
-h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+h 3605 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
 00:02:00.0, compute capability: 5.2)
 Early stopping at 200th iteration
 --------------------------------------------------
 ==================================================
 Dropout_0.5
-2018-10-28 16:41:20.294422: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:28:39.628582: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 490] Adding visible gpu devices: 0
-2018-10-28 16:41:20.294422: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:28:39.628582: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 71] Device interconnect StreamExecutor with strength 1 edge matrix:
-2018-10-28 16:41:20.310022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:28:39.644182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 77]      0
-2018-10-28 16:41:20.310022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:28:39.644182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 90] 0:   N
-2018-10-28 16:41:20.310022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:28:39.644182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
-h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+h 3605 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
 00:02:00.0, compute capability: 5.2)
-Early stopping at 690th iteration
+Early stopping at 313th iteration
 --------------------------------------------------
 ==================================================
 Dropout_0.7
-2018-10-28 17:06:37.722022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:41:27.772582: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 490] Adding visible gpu devices: 0
-2018-10-28 17:06:37.722022: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:41:27.772582: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 71] Device interconnect StreamExecutor with strength 1 edge matrix:
-2018-10-28 17:06:37.737622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:41:27.772582: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 77]      0
-2018-10-28 17:06:37.737622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:41:27.772582: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 90] 0:   N
-2018-10-28 17:06:37.737622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:41:27.788182: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
-h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+h 3605 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
 00:02:00.0, compute capability: 5.2)
-Early stopping at 690th iteration
+Early stopping at 308th iteration
 --------------------------------------------------
 ==================================================
 Dropout_0.9
-2018-10-28 17:32:04.743622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:54:03.639382: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 490] Adding visible gpu devices: 0
-2018-10-28 17:32:04.743622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:54:03.654982: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 71] Device interconnect StreamExecutor with strength 1 edge matrix:
-2018-10-28 17:32:04.743622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:54:03.654982: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 77]      0
-2018-10-28 17:32:04.743622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
+2018-10-30 18:54:03.654982: I tensorflow/core/common_runtime/gpu/gpu_device.cc:9
 90] 0:   N
-2018-10-28 17:32:04.743622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
+2018-10-30 18:54:03.654982: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1
 103] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 wit
-h 3610 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
+h 3605 MB memory) -> physical GPU (device: 0, name: Quadro M2000, pci bus id: 00
 00:02:00.0, compute capability: 5.2)
-Early stopping at 690th iteration
+Early stopping at 559th iteration
 --------------------------------------------------
-model: GD_50_60 test_acc: 0.509000
-model: Optimal_75_70 test_acc: 0.507000
-model: momentum test_acc: 0.496500
-model: RMSProp test_acc: 0.440000
-model: Adam test_acc: 0.467000
-model: Dropout_0.5 test_acc: 0.517500
-model: Dropout_0.7 test_acc: 0.517500
-model: Dropout_0.9 test_acc: 0.518000
+model: GD_50_60 test_acc: 0.510500
+model: Optimal_60_60 test_acc test_acc: 0.516000
+model: momentum test_acc: 0.495000
+model: RMSProp test_acc: 0.422500
+model: Adam test_acc: 0.475000
+model: Dropout_0.5 test_acc: 0.423000
+model: Dropout_0.7 test_acc: 0.439000
+model: Dropout_0.9 test_acc: 0.500000
 GD_50_60
-Time per epoch: 1011.6146133458985ms
+Time per epoch: 984.319887883931ms
 Number of Epochs: 739
-Convergence Test Accuracy: 0.5090000033378601
+Convergence Test Accuracy: 0.5105000138282776
 --------------------------------------------------
-Optimal_75_70
-Time per epoch: 976.1293715165981ms
+Optimal_60_60 test_acc
+Time per epoch: 1066.54181886913ms
 Number of Epochs: 739
-Convergence Test Accuracy: 0.5070000290870667
+Convergence Test Accuracy: 0.515999972820282
 --------------------------------------------------
 momentum
-Time per epoch: 1383.0893586834152ms
-Number of Epochs: 658
-Convergence Test Accuracy: 0.4964999854564667
+Time per epoch: 1029.020267161163ms
+Number of Epochs: 592
+Convergence Test Accuracy: 0.4950000047683716
 --------------------------------------------------
 RMSProp
-Time per epoch: 1443.0388004625613ms
+Time per epoch: 1078.4955119612205ms
 Number of Epochs: 201
-Convergence Test Accuracy: 0.4399999976158142
+Convergence Test Accuracy: 0.42250001430511475
 --------------------------------------------------
 Adam
-Time per epoch: 1480.6806009207198ms
+Time per epoch: 1087.4985011655892ms
 Number of Epochs: 201
-Convergence Test Accuracy: 0.46700000762939453
+Convergence Test Accuracy: 0.4749999940395355
 --------------------------------------------------
 Dropout_0.5
-Time per epoch: 1406.3027457114413ms
-Number of Epochs: 691
-Convergence Test Accuracy: 0.5174999833106995
+Time per epoch: 1489.2535057796795ms
+Number of Epochs: 314
+Convergence Test Accuracy: 0.4230000078678131
 --------------------------------------------------
 Dropout_0.7
-Time per epoch: 1420.345000351217ms
-Number of Epochs: 691
-Convergence Test Accuracy: 0.5174999833106995
+Time per epoch: 1486.0388368464596ms
+Number of Epochs: 309
+Convergence Test Accuracy: 0.4390000104904175
 --------------------------------------------------
 Dropout_0.9
-Time per epoch: 1465.158330376345ms
-Number of Epochs: 691
-Convergence Test Accuracy: 0.5180000066757202
+Time per epoch: 1473.141430105482ms
+Number of Epochs: 560
+Convergence Test Accuracy: 0.5
 --------------------------------------------------
+
+C:\Users\ze0001po\Desktop\CZ4042\cz4042\Assignment2>
