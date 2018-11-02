@@ -614,111 +614,69 @@ def main():
         print('Number of Epochs: {}'.format(early_stop_epoch_dict[key]))
         print('Convergence Test Accuracy: {}'.format(test_acc_dict[key][-1]))
         print('-'*50)
-
+		
 	# --------------------------------------------------
-	# model: GD_50_60 test_acc: 0.510500
-	# model: Optimal_60_60 test_acc test_acc: 0.516000
-	# model: momentum test_acc: 0.495000
-	# model: RMSProp test_acc: 0.422500
-	# model: Adam test_acc: 0.475000
-	# model: Dropout_0.5 test_acc: 0.423000
-	# model: Dropout_0.7 test_acc: 0.439000
-	# model: Dropout_0.9 test_acc: 0.500000
+	# model: GD_50_60 test_acc: 0.507500
+	# model: Optimal_60_60 test_acc: 0.493000
+	# model: momentum test_acc: 0.497000
+	# model: RMSProp test_acc: 0.451500
+	# model: Adam test_acc: 0.476000
+	# model: Dropout_0.1 test_acc: 0.102000
+	# model: Dropout_0.3 test_acc: 0.290000
+	# model: Dropout_0.5 test_acc: 0.374500
+	# model: Dropout_0.7 test_acc: 0.384000
+	# model: Dropout_0.9 test_acc: 0.437000
 	# GD_50_60
-	# Time per epoch: 984.319887883931ms
+	# Time per epoch: 933.2135323742568ms
 	# Number of Epochs: 739
-	# Convergence Test Accuracy: 0.5105000138282776
+	# Convergence Test Accuracy: 0.5074999928474426
 	# --------------------------------------------------
-	# Optimal_60_60 test_acc
-	# Time per epoch: 1066.54181886913ms
-	# Number of Epochs: 739
-	# Convergence Test Accuracy: 0.515999972820282
-	# --------------------------------------------------
-	# momentum
-	# Time per epoch: 1029.020267161163ms
+	# Optimal_60_60
+	# Time per epoch: 1061.5378441037358ms
 	# Number of Epochs: 592
-	# Convergence Test Accuracy: 0.4950000047683716
-	# --------------------------------------------------
-	# RMSProp
-	# Time per epoch: 1078.4955119612205ms
-	# Number of Epochs: 201
-	# Convergence Test Accuracy: 0.42250001430511475
-	# --------------------------------------------------
-	# Adam
-	# Time per epoch: 1087.4985011655892ms
-	# Number of Epochs: 201
-	# Convergence Test Accuracy: 0.4749999940395355
-	# --------------------------------------------------
-	# Dropout_0.5
-	# Time per epoch: 1489.2535057796795ms
-	# Number of Epochs: 314
-	# Convergence Test Accuracy: 0.4230000078678131
-	# --------------------------------------------------
-	# Dropout_0.7
-	# Time per epoch: 1486.0388368464596ms
-	# Number of Epochs: 309
-	# Convergence Test Accuracy: 0.4390000104904175
-	# --------------------------------------------------
-	# Dropout_0.9
-	# Time per epoch: 1473.141430105482ms
-	# Number of Epochs: 560
-	# Convergence Test Accuracy: 0.5
-	# --------------------------------------------------
-
-
-
-    '''
-	old versions
-    # --------------------------------------------------
-	# model: GD_50_60 test_acc: 0.509000
-	# model: Optimal_75_70 test_acc test_acc: 0.518500
-	# model: momentum test_acc: 0.496500
-	# model: RMSProp test_acc: 0.462000
-	# model: Adam test_acc: 0.478000
-	# model: Dropout_0.5 test_acc: 0.445500
-	# model: Dropout_0.7 test_acc: 0.508000
-	# model: Dropout_0.9 test_acc: 0.484000
-	# GD_50_60
-	# Time per epoch: 992.2394975112481ms
-	# Number of Epochs: 739
-	# Convergence Test Accuracy: 0.5090000033378601
-	# --------------------------------------------------
-	# Optimal_75_70 test_acc
-	# Time per epoch: 1429.4182357153222ms
-	# Number of Epochs: 691
-	# Convergence Test Accuracy: 0.5184999704360962
+	# Convergence Test Accuracy: 0.49300000071525574
 	# --------------------------------------------------
 	# momentum
-	# Time per epoch: 1359.2340359209518ms
-	# Number of Epochs: 658
-	# Convergence Test Accuracy: 0.4964999854564667
+	# Time per epoch: 1057.8750057800396ms
+	# Number of Epochs: 592
+	# Convergence Test Accuracy: 0.4970000088214874
 	# --------------------------------------------------
 	# RMSProp
-	# Time per epoch: 1415.7462760583678ms
-	# Number of Epochs: 201
-	# Convergence Test Accuracy: 0.4620000123977661
+	# Time per epoch: 1105.0838578131893ms
+	# Number of Epochs: 31
+	# Convergence Test Accuracy: 0.4514999985694885
 	# --------------------------------------------------
 	# Adam
-	# Time per epoch: 1444.900488972071ms
-	# Number of Epochs: 201
-	# Convergence Test Accuracy: 0.4779999852180481
+	# Time per epoch: 1095.0193328242149ms
+	# Number of Epochs: 31
+	# Convergence Test Accuracy: 0.47600001096725464
+	# --------------------------------------------------
+	# Dropout_0.1
+	# Time per epoch: 1181.9127082824707ms
+	# Number of Epochs: 55
+	# Convergence Test Accuracy: 0.10199999809265137
+	# --------------------------------------------------
+	# Dropout_0.3
+	# Time per epoch: 1202.074761145583ms
+	# Number of Epochs: 428
+	# Convergence Test Accuracy: 0.28999999165534973
 	# --------------------------------------------------
 	# Dropout_0.5
-	# Time per epoch: 1973.8154680955977ms
-	# Number of Epochs: 336
-	# Convergence Test Accuracy: 0.445499986410141
+	# Time per epoch: 1173.5698960044167ms
+	# Number of Epochs: 319
+	# Convergence Test Accuracy: 0.37450000643730164
 	# --------------------------------------------------
 	# Dropout_0.7
-	# Time per epoch: 1934.315444573824ms
-	# Number of Epochs: 466
-	# Convergence Test Accuracy: 0.5080000162124634
+	# Time per epoch: 1187.7728538853783ms
+	# Number of Epochs: 280
+	# Convergence Test Accuracy: 0.3840000033378601
 	# --------------------------------------------------
 	# Dropout_0.9
-	# Time per epoch: 1987.9034627782237ms
-	# Number of Epochs: 404
-	# Convergence Test Accuracy: 0.48399999737739563
+	# Time per epoch: 1202.7561105694856ms
+	# Number of Epochs: 401
+	# Convergence Test Accuracy: 0.43700000643730164
 	# --------------------------------------------------
-	'''
+	
 # end def
 
 if __name__ == '__main__': main()
