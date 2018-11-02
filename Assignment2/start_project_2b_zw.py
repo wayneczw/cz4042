@@ -287,31 +287,45 @@ class RNNClassifer():
 
 
     def _build_layer(self, x, n_hidden_list, rnn_choice='GRU', **kwargs):
+        # if rnn_choice == 'GRU':
+        #     cells = tf.nn.rnn_cell.GRUCell(n_hidden_list[0])
+        #     cells = tf.nn.rnn_cell.DropoutWrapper(cells, output_keep_prob = 1 - self.drop_out_rate)
+        #     if len(n_hidden_list) > 1:
+        #         cell2 = tf.nn.rnn_cell.GRUCell(n_hidden_list[1])
+        #         cell2 = tf.nn.rnn_cell.DropoutWrapper(cell2, output_keep_prob = 1 - self.drop_out_rate)
+        #         cells = tf.nn.rnn_cell.MultiRNNCell([cells, cell2])
+        #     outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
+        # elif rnn_choice == 'BASIC':
+        #     cells = tf.nn.rnn_cell.BasicRNNCell(n_hidden_list[0])
+        #     cells = tf.nn.rnn_cell.DropoutWrapper(cells, output_keep_prob = 1 - self.drop_out_rate)
+        #     if len(n_hidden_list) > 1:
+        #         cell2 = tf.nn.rnn_cell.BasicRNNCell(n_hidden_list[1])
+        #         cell2 = tf.nn.rnn_cell.DropoutWrapper(cell2, output_keep_prob = 1 - self.drop_out_rate)
+        #         cells = tf.nn.rnn_cell.MultiRNNCell([cells, cell2])
+        #     outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
+        # elif rnn_choice == 'LSTM':
+        #     cells = tf.nn.rnn_cell.BasicLSTMCell(n_hidden_list[0])
+        #     cells = tf.nn.rnn_cell.DropoutWrapper(cells, output_keep_prob = 1 - self.drop_out_rate)
+        #     if len(n_hidden_list) > 1:
+        #         cell2 = tf.nn.rnn_cell.BasicLSTMCell(n_hidden_list[1])
+        #         cell2 = tf.nn.rnn_cell.DropoutWrapper(cell2, output_keep_prob = 1 - self.drop_out_rate)
+        #         cells = tf.nn.rnn_cell.MultiRNNCell([cells, cell2])
+        #     outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
+        #     states = states.h
+
         if rnn_choice == 'GRU':
-            cells = tf.nn.rnn_cell.GRUCell(n_hidden_list[0])
-            cells = tf.nn.rnn_cell.DropoutWrapper(cells, output_keep_prob = 1 - self.drop_out_rate)
-            if len(n_hidden_list) > 1:
-                cell2 = tf.nn.rnn_cell.GRUCell(n_hidden_list[1])
-                cell2 = tf.nn.rnn_cell.DropoutWrapper(cell2, output_keep_prob = 1 - self.drop_out_rate)
-                cells = tf.nn.rnn_cell.MultiRNNCell([cells, cell2])
+            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.GRUCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+            cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
         elif rnn_choice == 'BASIC':
-            cells = tf.nn.rnn_cell.BasicRNNCell(n_hidden_list[0])
-            cells = tf.nn.rnn_cell.DropoutWrapper(cells, output_keep_prob = 1 - self.drop_out_rate)
-            if len(n_hidden_list) > 1:
-                cell2 = tf.nn.rnn_cell.BasicRNNCell(n_hidden_list[1])
-                cell2 = tf.nn.rnn_cell.DropoutWrapper(cell2, output_keep_prob = 1 - self.drop_out_rate)
-                cells = tf.nn.rnn_cell.MultiRNNCell([cells, cell2])
+            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.BasicRNNCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+            cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
         elif rnn_choice == 'LSTM':
-            cells = tf.nn.rnn_cell.BasicLSTMCell(n_hidden_list[0])
-            cells = tf.nn.rnn_cell.DropoutWrapper(cells, output_keep_prob = 1 - self.drop_out_rate)
-            if len(n_hidden_list) > 1:
-                cell2 = tf.nn.rnn_cell.BasicLSTMCell(n_hidden_list[1])
-                cell2 = tf.nn.rnn_cell.DropoutWrapper(cell2, output_keep_prob = 1 - self.drop_out_rate)
-                cells = tf.nn.rnn_cell.MultiRNNCell([cells, cell2])
+            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.BasicLSTMCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+            cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
-            states = states.h
+            states = states[-1].h
 
         return states if not isinstance(states, tuple) else states[-1]
     #end def
@@ -545,7 +559,7 @@ def arg_cnn_dict(model_save_path, C1_filters=10, C2_filters=10,
                 epochs=2000,
                 early_stop=True,
                 patience=20,
-                min_delta = 0.0005,
+                min_delta = 0.0001,
                 n_words=n_words,
                 embedding_size=embedding_size,
                 choice=choice)
@@ -571,7 +585,7 @@ def arg_rnn_dict(model_save_path, n_hidden_list,
                 epochs=2000,
                 early_stop=True,
                 patience=20,
-                min_delta = 0.0005,
+                min_delta = 0.0001,
                 n_words=n_words,
                 embedding_size=embedding_size,
                 choice=choice,
@@ -585,21 +599,21 @@ def main():
   
     x_train, y_train, x_val, y_val, x_test, y_test = read_data(choice='char')
 
-    # x_train = x_train[:100]
-    # y_train = y_train[:100]
-    # x_test = x_test[:10]
-    # y_test = y_test[:10]
-    # x_val = x_val[:10]
-    # y_val = y_val[:10]
+    x_train = x_train[:100]
+    y_train = y_train[:100]
+    x_test = x_test[:10]
+    y_test = y_test[:10]
+    x_val = x_val[:10]
+    y_val = y_val[:10]
 
     x_train_word, y_train_word, x_val_word, y_val_word, x_test_word, y_test_word, n_words = read_data(choice='word')
 
-    # x_train_word = x_train_word[:100]
-    # y_train_word = y_train_word[:100]
-    # x_test_word = x_test_word[:10]
-    # y_test_word = y_test_word[:10]
-    # x_val_word = x_val_word[:10]
-    # y_val_word = y_val_word[:10]
+    x_train_word = x_train_word[:100]
+    y_train_word = y_train_word[:100]
+    x_test_word = x_test_word[:10]
+    y_test_word = y_test_word[:10]
+    x_val_word = x_val_word[:10]
+    y_val_word = y_val_word[:10]
 
     result_dict_list = list()
 
@@ -884,7 +898,7 @@ def main():
                                     Y_val=y_val_word)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
 
-        _result_dict = dict(name='q6a_char_rnn_'+rnn_choice, train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        _result_dict = dict(name='q6a_word_rnn_'+rnn_choice, train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
         result_dict_list.append(_result_dict)
     #end for
 
