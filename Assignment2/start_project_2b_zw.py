@@ -318,11 +318,11 @@ class RNNClassifer():
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
         elif rnn_choice == 'BASIC':
-            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.BasicRNNCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.RNNCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
         elif rnn_choice == 'LSTM':
-            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.BasicLSTMCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.LSTMCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
             states = states[-1].h
