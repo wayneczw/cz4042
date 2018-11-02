@@ -37,7 +37,7 @@ class CNNClassifer():
         drop_out_rate=0.5, hidden_layer_dict=None,
         batch_size=128, learning_rate=0.01,
         epochs=1000,
-        early_stop=False, patience=20, min_delta=0.001, min_epoch=200,
+        early_stop=False, patience=20, min_delta=0.001,
         choice='char', n_words=None, embedding_size=None,
         **kwargs
     ):
@@ -54,7 +54,6 @@ class CNNClassifer():
         self.early_stop = early_stop
         self.patience = patience
         self.min_delta = min_delta
-        self.min_epoch = min_epoch
         if choice == 'char':
             self._build_char_model()
         else:
@@ -83,12 +82,12 @@ class CNNClassifer():
                             padding=cpadding,
                             activation=tf.nn.relu)
 
-        # dropout
-        if self.drop_out:
-            conv = tf.layers.dropout(
-                                conv,
-                                rate=self.drop_out_rate,
-                                seed=seed)
+        # # dropout
+        # if self.drop_out:
+        #     conv = tf.layers.dropout(
+        #                         conv,
+        #                         rate=self.drop_out_rate,
+        #                         seed=seed)
         
         # Pool
         pool = tf.layers.max_pooling2d(
@@ -97,6 +96,12 @@ class CNNClassifer():
                             strides=pstrides,
                             padding=ppadding)
 
+        # dropout
+        if self.drop_out:
+            pool = tf.layers.dropout(
+                                pool,
+                                rate=self.drop_out_rate,
+                                seed=seed)
         return conv, pool
     #end def
 
@@ -221,9 +226,7 @@ class CNNClassifer():
                     _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
                     if (tmp_best_val_err - _val_err) < self.min_delta:
                         _patience -= 1
-                        if _epochs <= self.min_epoch:
-                            pass
-                        elif _patience <= 0:
+                        if _patience <= 0:
                             print('Early stopping at {}th iteration. Test Acc {}'.format(i, self.test_acc[-1]))
                             break
                     else:
@@ -254,7 +257,7 @@ class RNNClassifer():
         drop_out_rate=0, n_hidden_list=None,
         batch_size=128, learning_rate=0.01,
         epochs=1000,
-        early_stop=False, patience=20, min_delta=0.001, min_epoch=200,
+        early_stop=False, patience=20, min_delta=0.001,
         choice='char', n_words=None, embedding_size=None,
         rnn_choice='GRU',
         gradient_clipped=False,
@@ -272,7 +275,6 @@ class RNNClassifer():
         self.early_stop = early_stop
         self.patience = patience
         self.min_delta = min_delta
-        self.min_epoch = min_epoch
         self.rnn_choice = rnn_choice
         self.gradient_clipped = gradient_clipped
         if choice == 'char':
@@ -325,13 +327,19 @@ class RNNClassifer():
                         rnn_choice=self.rnn_choice)
         self.encoding = self._build_layer(self.x_, **input_dict1)
 
-        self.y = tf.layers.dense(self.encoding, self.output_dim, activation=None)
-        
         if self.drop_out:
-            self.y = tf.layers.dropout(
-                                self.y,
+            self.encoding = tf.layers.dropout(
+                                self.encoding,
                                 rate=self.drop_out_rate,
                                 seed=seed)
+
+        self.y = tf.layers.dense(self.encoding, self.output_dim, activation=None)
+        
+        # if self.drop_out:
+        #     self.y = tf.layers.dropout(
+        #                         self.y,
+        #                         rate=self.drop_out_rate,
+        #                         seed=seed)
 
         self.cross_entropy = tf.reduce_mean(
                                 tf.nn.softmax_cross_entropy_with_logits_v2(
@@ -369,13 +377,19 @@ class RNNClassifer():
                         rnn_choice=self.rnn_choice)
         self.encoding = self._build_layer(self.x_, **input_dict1)
 
-        self.y = tf.layers.dense(self.encoding, self.output_dim, activation=None)
-
         if self.drop_out:
-            self.y = tf.layers.dropout(
-                                self.y,
+            self.encoding = tf.layers.dropout(
+                                self.encoding,
                                 rate=self.drop_out_rate,
                                 seed=seed)
+
+        self.y = tf.layers.dense(self.encoding, self.output_dim, activation=None)
+
+        # if self.drop_out:
+        #     self.y = tf.layers.dropout(
+        #                         self.y,
+        #                         rate=self.drop_out_rate,
+        #                         seed=seed)
 
         self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=tf.one_hot(self.y_, self.output_dim), logits=self.y))
 
@@ -426,9 +440,7 @@ class RNNClassifer():
                     _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
                     if (tmp_best_val_err - _val_err) < self.min_delta:
                         _patience -= 1
-                        if _epochs <= self.min_epoch:
-                            pass
-                        elif _patience <= 0:
+                        if _patience <= 0:
                             print('Early stopping at {}th iteration. Test Acc {}'.format(i, self.test_acc[-1]))
                             break
                     else:
@@ -534,7 +546,6 @@ def arg_cnn_dict(model_save_path, C1_filters=10, C2_filters=10,
                 early_stop=True,
                 patience=20,
                 min_delta = 0.0005,
-                min_epoch=200,
                 n_words=n_words,
                 embedding_size=embedding_size,
                 choice=choice)
@@ -561,7 +572,6 @@ def arg_rnn_dict(model_save_path, n_hidden_list,
                 early_stop=True,
                 patience=20,
                 min_delta = 0.0005,
-                min_epoch=200,
                 n_words=n_words,
                 embedding_size=embedding_size,
                 choice=choice,
@@ -575,21 +585,21 @@ def main():
   
     x_train, y_train, x_val, y_val, x_test, y_test = read_data(choice='char')
 
-    # x_train = x_train[:100]
-    # y_train = y_train[:100]
-    # x_test = x_test[:10]
-    # y_test = y_test[:10]
-    # x_val = x_val[:10]
-    # y_val = y_val[:10]
+    x_train = x_train[:100]
+    y_train = y_train[:100]
+    x_test = x_test[:10]
+    y_test = y_test[:10]
+    x_val = x_val[:10]
+    y_val = y_val[:10]
 
     x_train_word, y_train_word, x_val_word, y_val_word, x_test_word, y_test_word, n_words = read_data(choice='word')
 
-    # x_train_word = x_train_word[:100]
-    # y_train_word = y_train_word[:100]
-    # x_test_word = x_test_word[:10]
-    # y_test_word = y_test_word[:10]
-    # x_val_word = x_val_word[:10]
-    # y_val_word = y_val_word[:10]
+    x_train_word = x_train_word[:100]
+    y_train_word = y_train_word[:100]
+    x_test_word = x_test_word[:10]
+    y_test_word = y_test_word[:10]
+    x_val_word = x_val_word[:10]
+    y_val_word = y_val_word[:10]
 
     result_dict_list = list()
 
@@ -710,10 +720,10 @@ def main():
     print()
     print()
     print('='*100)
-    print('Q5 Char/Word CNN/RNN on Dropout Rate - 0.1, 0.3, 0.5')
+    print('Q5 Char/Word CNN/RNN on Dropout Rate - 0.1, 0.3, 0.5, 0.7, 0.9')
     print('='*100)
 
-    drop_out_rates = [0.1, 0.3, 0.5]
+    drop_out_rates = [0.1, 0.3, 0.5, 0.7, 0.9]
 
     for rate in drop_out_rates:
         print('-'*40)
@@ -981,9 +991,9 @@ def main():
     result_dict_list.append(_result_dict)
 
     df = pd.DataFrame.from_dict(result_dict_list)
-    df.to_csv('./csv_results/q2.csv')
+    df.to_csv('./csv_results/q2222.csv')
 
-    _df = pd.read_csv('./csv_results/q2.csv')
+    _df = pd.read_csv('./csv_results/q2222.csv')
     print(_df)
 
 #end def
