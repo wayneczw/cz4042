@@ -318,7 +318,7 @@ class RNNClassifer():
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
         elif rnn_choice == 'BASIC':
-            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.RNNCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.BasicRNNCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
         elif rnn_choice == 'LSTM':
@@ -599,21 +599,21 @@ def main():
   
     x_train, y_train, x_val, y_val, x_test, y_test = read_data(choice='char')
 
-    # x_train = x_train[:100]
-    # y_train = y_train[:100]
-    # x_test = x_test[:10]
-    # y_test = y_test[:10]
-    # x_val = x_val[:10]
-    # y_val = y_val[:10]
+    x_train = x_train[:100]
+    y_train = y_train[:100]
+    x_test = x_test[:10]
+    y_test = y_test[:10]
+    x_val = x_val[:10]
+    y_val = y_val[:10]
 
     x_train_word, y_train_word, x_val_word, y_val_word, x_test_word, y_test_word, n_words = read_data(choice='word')
 
-    # x_train_word = x_train_word[:100]
-    # y_train_word = y_train_word[:100]
-    # x_test_word = x_test_word[:10]
-    # y_test_word = y_test_word[:10]
-    # x_val_word = x_val_word[:10]
-    # y_val_word = y_val_word[:10]
+    x_train_word = x_train_word[:100]
+    y_train_word = y_train_word[:100]
+    x_test_word = x_test_word[:10]
+    y_test_word = y_test_word[:10]
+    x_val_word = x_val_word[:10]
+    y_val_word = y_val_word[:10]
 
     result_dict_list = list()
 
