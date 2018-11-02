@@ -75,11 +75,11 @@ class CNNClassifer():
 
         conv = tf.nn.relu(tf.nn.conv2d(x, W, [1, cstrides, cstrides, 1], padding=cpadding) + b)  # strides = [1, stride, stride, 1]
 
-        if self.drop_out:
-            conv = tf.nn.dropout(conv, self._keep_prob)
-
         #Pool
         pool = tf.nn.max_pool(conv, ksize=[1, pwindow_width, pwindow_height, 1], strides= [1, pstrides, pstrides, 1], padding=ppadding, name='pool')
+
+        if self.drop_out:
+            pool = tf.nn.dropout(pool, self._keep_prob)
 
         return W, conv, pool
     #end def
@@ -114,8 +114,7 @@ class CNNClassifer():
         self.bf = tf.Variable(tf.zeros([self.hidden_layer_dict['F1']['size']]), name='biases')
         self.hf = tf.nn.relu(tf.matmul(h_pool2_flat, self.Wf) + self.bf)
 
-        # Dropout - controls the complexity of the model, prevents co-adaptation of
-        # features.
+        # Dropout - controls the complexity of the model, prevents co-adaptation of features.
         if self.drop_out:
             self.hf = tf.nn.dropout(self.hf, self._keep_prob)
 
