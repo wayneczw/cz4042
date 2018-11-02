@@ -40,7 +40,6 @@ class CNNClassifer():
         batch_size=128, learning_rate= 0.001, epochs=2000,
         early_stop= True, patience=20, min_delta=0.0005,
         optimizer='GD', momentum=0.1,
-        min_epoch=200,
         **kwargs
     ):
         self.save_path = save_path
@@ -63,7 +62,6 @@ class CNNClassifer():
         self.min_delta = min_delta
         self.optimizer = optimizer
         self.momentum = momentum
-        self.min_epoch = min_epoch
         self._build_model()
 
     #end def
@@ -182,9 +180,7 @@ class CNNClassifer():
                         _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
                     if (tmp_best_val_err - _val_err) < self.min_delta:
                         _patience -= 1
-                        if _epochs <= self.min_epoch:
-                            pass
-                        elif _patience <= 0:
+                        if _patience <= 0:
                             print('Early stopping at {}th iteration'.format(i))
                             print('-'*50)
                             break
@@ -326,7 +322,7 @@ def arg_dict(model_save_path, C1_map=50, C2_map=60, optimizer='GD', drop_out=Fal
         hidden_layer_dict=hidden_layer_dict,
         batch_size=128, learning_rate=learning_rate, epochs=2000,
         early_stop=True, patience=20, min_delta=0.0005,
-        min_epoch = 200, drop_out=drop_out, keep_prob=keep_prob)
+        drop_out=drop_out, keep_prob=keep_prob)
     return init_dict
 #end def
 
@@ -360,7 +356,7 @@ def grid_search(trainX, trainY,
 
     gs_test_acc_dict = OrderedDict(sorted(gs_test_acc_dict.items(), key=lambda t: t[1][-1], reverse=True))
     opt_C1_C2 = list(gs_test_acc_dict.items())[0]
-	
+
     optimal_C1 = opt_C1_C2[0][0]
     optimal_C2 = opt_C1_C2[0][1]
     optimal_test_acc = opt_C1_C2[1]
@@ -426,8 +422,8 @@ def main():
     ind = np.random.randint(low=0, high=len(testX))
     X = trainX[ind,:]
     path_dict = dict(test='figures/a/1b_1_test.png', c1='figures/a/1b_1_c1.png',
-                    # p1='figures/a/1b_1_p1.png', c2='figures/a/1b_1_c2.png',
-                    # p2='figures/a/1b_1_p2.png')
+                    p1='figures/a/1b_1_p1.png', c2='figures/a/1b_1_c2.png',
+                    p2='figures/a/1b_1_p2.png')
     plot_feature_map(X, cnn, path_dict)
 
     ind = np.random.randint(low=0, high=10)
@@ -438,43 +434,57 @@ def main():
     plot_feature_map(X, cnn, path_dict)
 
     # =====================Q2 optimal feature map=====================
-    
-    C1_range = [40,71,10]
-    C2_range = [40,71,10]
-    optimal_dict = grid_search(trainX, trainY,
-                                testX, testY,
-                                valX, valY,
-                                C1_range, C2_range)
 
-    C1 = optimal_dict['C1']
-    C1_range = [C1-10,C1+10,5]
-    C2 = optimal_dict['C2']
-    C2_range = [C1-10,C1+10,5]
-    optimal_dict = grid_search(trainX, trainY,
-                                testX, testY,
-                                valX, valY,
-                                C1_range, C2_range)
+    # C1_range = [40,71,10]
+    # C2_range = [40,71,10]
+    # optimal_dict = grid_search(trainX, trainY,
+    #                             testX, testY,
+    #                             valX, valY,
+    #                             C1_range, C2_range)
+    #
+    # C1 = optimal_dict['C1']
+    # C1_range = [C1-10,C1+10,5]
+    # C2 = optimal_dict['C2']
+    # C2_range = [C1-10,C1+10,5]
+    # optimal_dict = grid_search(trainX, trainY,
+    #                             testX, testY,
+    #                             valX, valY,
+    #                             C1_range, C2_range)
+    #
+    # C1 = optimal_dict['C1']
+    # C2 = optimal_dict['C2']
+    # optimal_C = 'Optimal_' + str(C1) + '_' + str(C2)
+    # train_err_dict[optimal_C] = optimal_dict['train_err']
+    # test_acc_dict[optimal_C] = optimal_dict['test_acc']
+    # time_taken_one_epoch_dict[optimal_C] = optimal_dict['time']
+    # early_stop_epoch_dict[optimal_C] = optimal_dict['es_epoch']
+    # print("Optimal C1: {}\nOptimal C2: {}".format(C1, C2))
 
-    C1 = optimal_dict['C1']
-    C2 = optimal_dict['C2']
-    optimal_C = 'Optimal_' + str(C1) + '_' + str(C2)
-    train_err_dict[optimal_C] = optimal_dict['train_err']
-    test_acc_dict[optimal_C] = optimal_dict['test_acc']
-    time_taken_one_epoch_dict[optimal_C] = optimal_dict['time']
-    early_stop_epoch_dict[optimal_C] = optimal_dict['es_epoch']
-	
+    #TO DELETE
+    C1_map = C1 = 60
+    C2_map = C2 = 60
+    optimizer = 'GD'
+    model_save_path = 'models/a/2_C1_' + str(C1_map) + '_C2_' + str(C2_map)
+    init_dict = arg_dict(model_save_path, C1_map, C2_map, optimizer)
+    cnn = CNNClassifer(**init_dict).train(X_train=trainX, Y_train=trainY,
+                                        X_test=testX, Y_test=testY,
+                                        X_val=valX, Y_val=valY)
+    train_err, test_acc, time_taken_one_epoch, early_stop_epoch = cnn.train_err, cnn.test_acc, cnn.time_taken_one_epoch, cnn.early_stop_epoch
 
-    print("Optimal C1: {}\nOptimal C2: {}".format(C1, C2))
-	
+    train_err_dict['Optimal_60_60'] = train_err
+    test_acc_dict['Optimal_60_60'] = test_acc
+    time_taken_one_epoch_dict['Optimal_60_60'] = time_taken_one_epoch
+    early_stop_epoch_dict['Optimal_60_60'] = early_stop_epoch
+
     # ==================================================
     # test_acc: 0.5120
     # Optimal C1: 60
     # Optimal C2: 60
     # ==================================================
-    
+
     # =====================Q3 optimal feature map=====================
-    
-    optimizers = ['momentum','RMSProp','Adam','Dropout_0.5', 'Dropout_0.7', 'Dropout_0.9']
+
+    optimizers = ['momentum','RMSProp','Adam','Dropout_0.1', 'Dropout_0.3','Dropout_0.5', 'Dropout_0.7', 'Dropout_0.9']
     C1_map = C1
     C2_map = C2
 
@@ -605,7 +615,7 @@ def main():
         print('Number of Epochs: {}'.format(early_stop_epoch_dict[key]))
         print('Convergence Test Accuracy: {}'.format(test_acc_dict[key][-1]))
         print('-'*50)
-	
+
 	# --------------------------------------------------
 	# model: GD_50_60 test_acc: 0.510500
 	# model: Optimal_60_60 test_acc test_acc: 0.516000
@@ -656,8 +666,8 @@ def main():
 	# Convergence Test Accuracy: 0.5
 	# --------------------------------------------------
 
-		
-	
+
+
     '''
 	old versions
     # --------------------------------------------------
@@ -708,8 +718,8 @@ def main():
 	# Time per epoch: 1987.9034627782237ms
 	# Number of Epochs: 404
 	# Convergence Test Accuracy: 0.48399999737739563
-	# -------------------------------------------------- 
-	'''	
+	# --------------------------------------------------
+	'''
 # end def
 
 if __name__ == '__main__': main()
