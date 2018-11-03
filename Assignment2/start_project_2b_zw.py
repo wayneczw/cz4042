@@ -513,7 +513,7 @@ def arg_cnn_dict(model_save_path, C1_filters=10, C2_filters=10,
             C1_kernal_size=[20, 256], C2_kernal_size=[20, 1],
             S1_window=4, S2_window=4,
             S1_strides=2, S2_strides=2,
-            drop_out=False, drop_out_rate=0.1,
+            drop_out=False, keep_prob=0.9,
             n_words=None, embedding_size=None, choice='char'):
 
     C1_dict = dict(filters=C1_filters, kernel_size=C1_kernal_size, padding='VALID')
@@ -527,7 +527,7 @@ def arg_cnn_dict(model_save_path, C1_filters=10, C2_filters=10,
                 input_dim=MAX_DOCUMENT_LENGTH,
                 output_dim=MAX_LABEL,
                 drop_out=drop_out,
-                drop_out_rate=drop_out_rate,
+                keep_prob=keep_prob,
                 hidden_layer_dict=hidden_layer_dict,
                 batch_size=128,
                 learning_rate=learning_rate,
@@ -543,7 +543,7 @@ def arg_cnn_dict(model_save_path, C1_filters=10, C2_filters=10,
 
 
 def arg_rnn_dict(model_save_path, n_hidden_list,
-            drop_out=False, drop_out_rate=0,
+            drop_out=False, keep_prob=0.9,
             n_words=None, embedding_size=None, choice='char', rnn_choice='GRU',
             gradient_clipped=False):
 
@@ -553,7 +553,7 @@ def arg_rnn_dict(model_save_path, n_hidden_list,
                 input_dim=MAX_DOCUMENT_LENGTH,
                 output_dim=MAX_LABEL,
                 drop_out=drop_out,
-                drop_out_rate=drop_out_rate,
+                keep_prob=keep_prob,
                 n_hidden_list=n_hidden_list,
                 batch_size=128,
                 learning_rate=learning_rate,
@@ -604,7 +604,7 @@ def main():
                     C1_kernal_size=[20, 256], C2_kernal_size=[20, 1],
                     S1_window=4, S2_window=4,
                     S1_strides=2, S2_strides=2,
-                    drop_out=False, drop_out_rate=0.1,
+                    drop_out=False, keep_prob=1,
                     choice='char')
 
     char_cnn = CNNClassifer(**init_dict).train(
@@ -634,7 +634,7 @@ def main():
                     C1_kernal_size=[20, 20], C2_kernal_size=[20, 1],
                     S1_window=4, S2_window=4,
                     S1_strides=2, S2_strides=2,
-                    drop_out=False, drop_out_rate=0.1,
+                    drop_out=False, keep_prob=1,
                     n_words=n_words, embedding_size=20,
                     choice='word')
 
@@ -662,7 +662,7 @@ def main():
     init_dict = arg_rnn_dict(
                     model_save_path='models/b/3_char_rnn',
                     n_hidden_list=[20],
-                    drop_out=False, drop_out_rate=0,
+                    drop_out=False, keep_prob=1,
                     choice='char',
                     rnn_choice='GRU')
 
@@ -689,7 +689,7 @@ def main():
     init_dict = arg_rnn_dict(
                     model_save_path='models/b/4_word_rnn',
                     n_hidden_list=[20],
-                    drop_out=False, drop_out_rate=0,
+                    drop_out=False, keep_prob=1,
                     choice='word', n_words=n_words, embedding_size=20,
                     rnn_choice='GRU')
 
@@ -712,23 +712,23 @@ def main():
     print('Q5 Char/Word CNN/RNN on Dropout Rate - 0.1, 0.3, 0.5, 0.7, 0.9')
     print('='*100)
 
-    drop_out_rates = [0.1, 0.3, 0.5, 0.7, 0.9]
+    keep_probs = [0.1, 0.3, 0.5, 0.7, 0.9]
 
-    for rate in drop_out_rates:
+    for prob in keep_probs:
         print('-'*40)
-        print(rate)
+        print(prob)
         print('-'*40)
 
         # char CNN with dropout
         print('Char CNN')
         tf.reset_default_graph()
         init_dict = arg_cnn_dict(
-                        model_save_path='models/b/5_char_cnn_' + str(rate),
+                        model_save_path='models/b/5_char_cnn_' + str(prob),
                         C1_filters=10, C2_filters=10,
                         C1_kernal_size=[20, 256], C2_kernal_size=[20, 1],
                         S1_window=4, S2_window=4,
                         S1_strides=2, S2_strides=2,
-                        drop_out=True, drop_out_rate=rate,
+                        drop_out=True, keep_prob=prob,
                         choice='char')
 
         char_cnn = CNNClassifer(**init_dict).train(
@@ -740,7 +740,7 @@ def main():
                                     Y_val=y_val)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_cnn.train_err, char_cnn.test_acc, char_cnn.time_taken_one_epoch, char_cnn.early_stop_epoch
 
-        _result_dict = dict(name='q5_char_cnn_'+str(rate), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        _result_dict = dict(name='q5_char_cnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
         result_dict_list.append(_result_dict)
 
         print()
@@ -749,12 +749,12 @@ def main():
         tf.reset_default_graph()
         print('Word CNN')
         init_dict = arg_cnn_dict(
-                        model_save_path='models/b/5_word_cnn_' + str(rate),
+                        model_save_path='models/b/5_word_cnn_' + str(prob),
                         C1_filters=10, C2_filters=10,
                         C1_kernal_size=[20, 20], C2_kernal_size=[20, 1],
                         S1_window=4, S2_window=4,
                         S1_strides=2, S2_strides=2,
-                        drop_out=True, drop_out_rate=rate,
+                        drop_out=True, keep_prob=prob,
                         n_words=n_words, embedding_size=20,
                         choice='word')
 
@@ -767,7 +767,7 @@ def main():
                                     Y_val=y_val_word)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_cnn.train_err, word_cnn.test_acc, word_cnn.time_taken_one_epoch, word_cnn.early_stop_epoch
 
-        _result_dict = dict(name='q5_word_cnn_'+str(rate), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        _result_dict = dict(name='q5_word_cnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
         result_dict_list.append(_result_dict)
 
         print()
@@ -776,9 +776,9 @@ def main():
         tf.reset_default_graph()
         print('Char RNN')
         init_dict = arg_rnn_dict(
-                        model_save_path='models/b/5_char_rnn_' + str(rate),
+                        model_save_path='models/b/5_char_rnn_' + str(prob),
                         n_hidden_list=[20],
-                        drop_out=True, drop_out_rate=rate,
+                        drop_out=True, keep_prob=prob,
                         choice='char',
                         rnn_choice='GRU')
 
@@ -791,7 +791,7 @@ def main():
                                     Y_val=y_val)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
 
-        _result_dict = dict(name='q5_char_rnn_'+str(rate), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        _result_dict = dict(name='q5_char_rnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
         result_dict_list.append(_result_dict)
 
         print()
@@ -800,9 +800,9 @@ def main():
         tf.reset_default_graph()
         print('Word RNN')
         init_dict = arg_rnn_dict(
-                        model_save_path='models/b/5_word_rnn_' + str(rate),
+                        model_save_path='models/b/5_word_rnn_' + str(prob),
                         n_hidden_list=[20],
-                        drop_out=True, drop_out_rate=rate,
+                        drop_out=True, keep_prob=prob,
                         choice='word', n_words=n_words, embedding_size=20,
                         rnn_choice='GRU')
 
@@ -814,7 +814,7 @@ def main():
                                     X_val=x_val_word,
                                     Y_val=y_val_word)
         train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
-        _result_dict = dict(name='q5_word_rnn_'+str(rate), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        _result_dict = dict(name='q5_word_rnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
         result_dict_list.append(_result_dict)
     #end for
 
@@ -837,7 +837,7 @@ def main():
         init_dict = arg_rnn_dict(
                         model_save_path='models/b/6_char_rnn_' + rnn_choice,
                         n_hidden_list=[20],
-                        drop_out=False, drop_out_rate=0,
+                        drop_out=False, keep_prob=1,
                         choice='char',
                         rnn_choice=rnn_choice)
 
@@ -860,7 +860,7 @@ def main():
         init_dict = arg_rnn_dict(
                         model_save_path='models/b/6_word_rnn_' + rnn_choice,
                         n_hidden_list=[20],
-                        drop_out=False, drop_out_rate=0,
+                        drop_out=False, keep_prob=1,
                         choice='word', n_words=n_words, embedding_size=20,
                         rnn_choice=rnn_choice)
 
@@ -889,7 +889,7 @@ def main():
     init_dict = arg_rnn_dict(
                     model_save_path='models/b/6_char_rnn_2_layer',
                     n_hidden_list=[20, 20],
-                    drop_out=False, drop_out_rate=0,
+                    drop_out=False, keep_prob=1,
                     choice='char',
                     rnn_choice='GRU')
 
@@ -911,7 +911,7 @@ def main():
     init_dict = arg_rnn_dict(
                     model_save_path='models/b/6_word_rnn_2_layer',
                     n_hidden_list=[20, 20],
-                    drop_out=False, drop_out_rate=0,
+                    drop_out=False, keep_prob=1,
                     choice='word', n_words=n_words, embedding_size=20,
                     rnn_choice='GRU')
 
@@ -939,7 +939,7 @@ def main():
     init_dict = arg_rnn_dict(
                     model_save_path='models/b/6_char_rnn_clipped',
                     n_hidden_list=[20, 20],
-                    drop_out=False, drop_out_rate=0,
+                    drop_out=False, keep_prob=1,
                     choice='char',
                     rnn_choice='GRU',
                     gradient_clipped=True)
@@ -963,7 +963,7 @@ def main():
     init_dict = arg_rnn_dict(
                     model_save_path='models/b/6_word_rnn_clipped',
                     n_hidden_list=[20, 20],
-                    drop_out=False, drop_out_rate=0,
+                    drop_out=False, keep_prob=1,
                     choice='word', n_words=n_words, embedding_size=20,
                     rnn_choice='GRU',
                     gradient_clipped=True)
