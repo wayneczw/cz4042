@@ -34,7 +34,7 @@ class CNNClassifer():
     def __init__(
         self, save_path,
         input_dim=100, output_dim=15, drop_out=False,
-        drop_out_rate=0.5, hidden_layer_dict=None,
+        keep_prob=0.5, hidden_layer_dict=None,
         batch_size=128, learning_rate=0.01,
         epochs=1000,
         early_stop=False, patience=20, min_delta=0.001,
@@ -46,7 +46,8 @@ class CNNClassifer():
         self.output_dim = output_dim
         self.drop_out = drop_out
         if self.drop_out:
-            self.drop_out_rate = drop_out_rate
+            self._keep_prob = tf.placeholder(tf.float32)
+            self.keep_prob = keep_prob
         self.hidden_layer_dict = hidden_layer_dict
         self.batch_size = batch_size
         self.learning_rate = learning_rate
@@ -66,28 +67,12 @@ class CNNClassifer():
     def _build_layer(self, x, cfilters, ckernel_size, cpadding,
                     pwindow, pstrides, ppadding, **kwargs):
         # Conv
-        # conv = tf.layers.conv2d(
-        #                     x,
-        #                     filters=cfilters,
-        #                     kernel_size=ckernel_size,
-        #                     padding=cpadding,
-        #                     use_bias=True,
-        #                     kernel_initializer=tf.initializers.truncated_normal(seed=seed),
-        #                     bias_initializer=tf.zeros_initializer(),
-        #                     activation=tf.nn.relu)
         conv = tf.layers.conv2d(
                             x,
                             filters=cfilters,
                             kernel_size=ckernel_size,
                             padding=cpadding,
                             activation=tf.nn.relu)
-
-        # # dropout
-        # if self.drop_out:
-        #     conv = tf.layers.dropout(
-        #                         conv,
-        #                         rate=self.drop_out_rate,
-        #                         seed=seed)
         
         # Pool
         pool = tf.layers.max_pooling2d(
@@ -97,11 +82,14 @@ class CNNClassifer():
                             padding=ppadding)
 
         # dropout
+        # if self.drop_out:
+        #     pool = tf.layers.dropout(
+        #                         pool,
+        #                         rate=self.drop_out_rate,
+        #                         seed=seed)
         if self.drop_out:
-            pool = tf.layers.dropout(
-                                pool,
-                                rate=self.drop_out_rate,
-                                seed=seed)
+            pool = tf.nn.dropout(pool, self._keep_prob)
+
         return conv, pool
     #end def
 
@@ -215,15 +203,23 @@ class CNNClassifer():
 
                 t = time.time()
                 for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
-                    self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
+                    if self.drop_out:
+                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end], self._keep_prob: self.keep_prob})
+                    else:
+                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
                 time_to_update += (time.time() - t)
 
-
-                self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
-                self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
+                if self.drop_out:
+                    self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train, self._keep_prob: self.keep_prob}))
+                    self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test, self._keep_prob: 1.0}))
+                else:
+                    self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
+                    self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
                 
                 if self.early_stop:
-                    _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
+                    if self.drop_out: _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val, self._keep_prob: self.keep_prob})
+                    else: _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
+
                     if (tmp_best_val_err - _val_err) < self.min_delta:
                         _patience -= 1
                         if _patience <= 0:
@@ -254,7 +250,7 @@ class RNNClassifer():
     def __init__(
         self, save_path,
         input_dim=100, output_dim=15, drop_out=False,
-        drop_out_rate=0, n_hidden_list=None,
+        keep_prob=0, n_hidden_list=None,
         batch_size=128, learning_rate=0.01,
         epochs=1000,
         early_stop=False, patience=20, min_delta=0.001,
@@ -267,7 +263,9 @@ class RNNClassifer():
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.drop_out = drop_out
-        self.drop_out_rate = drop_out_rate
+        if self.drop_out:
+            self._keep_prob = tf.placeholder(tf.float32)
+            self.keep_prob = keep_prob
         self.n_hidden_list = n_hidden_list
         self.batch_size = batch_size
         self.learning_rate = learning_rate
@@ -288,41 +286,28 @@ class RNNClassifer():
 
     def _build_layer(self, x, n_hidden_list, rnn_choice='GRU', **kwargs):
         # if rnn_choice == 'GRU':
-        #     cells = tf.nn.rnn_cell.GRUCell(n_hidden_list[0])
-        #     cells = tf.nn.rnn_cell.DropoutWrapper(cells, output_keep_prob = 1 - self.drop_out_rate)
-        #     if len(n_hidden_list) > 1:
-        #         cell2 = tf.nn.rnn_cell.GRUCell(n_hidden_list[1])
-        #         cell2 = tf.nn.rnn_cell.DropoutWrapper(cell2, output_keep_prob = 1 - self.drop_out_rate)
-        #         cells = tf.nn.rnn_cell.MultiRNNCell([cells, cell2])
+        #     cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.GRUCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+        #     cells = tf.nn.rnn_cell.MultiRNNCell(cells)
         #     outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
         # elif rnn_choice == 'BASIC':
-        #     cells = tf.nn.rnn_cell.BasicRNNCell(n_hidden_list[0])
-        #     cells = tf.nn.rnn_cell.DropoutWrapper(cells, output_keep_prob = 1 - self.drop_out_rate)
-        #     if len(n_hidden_list) > 1:
-        #         cell2 = tf.nn.rnn_cell.BasicRNNCell(n_hidden_list[1])
-        #         cell2 = tf.nn.rnn_cell.DropoutWrapper(cell2, output_keep_prob = 1 - self.drop_out_rate)
-        #         cells = tf.nn.rnn_cell.MultiRNNCell([cells, cell2])
+        #     cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.BasicRNNCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+        #     cells = tf.nn.rnn_cell.MultiRNNCell(cells)
         #     outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
         # elif rnn_choice == 'LSTM':
-        #     cells = tf.nn.rnn_cell.BasicLSTMCell(n_hidden_list[0])
-        #     cells = tf.nn.rnn_cell.DropoutWrapper(cells, output_keep_prob = 1 - self.drop_out_rate)
-        #     if len(n_hidden_list) > 1:
-        #         cell2 = tf.nn.rnn_cell.BasicLSTMCell(n_hidden_list[1])
-        #         cell2 = tf.nn.rnn_cell.DropoutWrapper(cell2, output_keep_prob = 1 - self.drop_out_rate)
-        #         cells = tf.nn.rnn_cell.MultiRNNCell([cells, cell2])
+        #     cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.LSTMCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+        #     cells = tf.nn.rnn_cell.MultiRNNCell(cells)
         #     outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
-        #     states = states.h
-
+        #     states = states[-1].h
         if rnn_choice == 'GRU':
-            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.GRUCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+            cells = [tf.nn.rnn_cell.GRUCell(n) for n in n_hidden_list]
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
         elif rnn_choice == 'BASIC':
-            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.BasicRNNCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+            cells = [tf.nn.rnn_cell.BasicRNNCell(n) for n in n_hidden_list]
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
         elif rnn_choice == 'LSTM':
-            cells = [tf.nn.rnn_cell.DropoutWrapper(tf.nn.rnn_cell.LSTMCell(n), output_keep_prob = 1 - self.drop_out_rate) for n in n_hidden_list]
+            cells = [tf.nn.rnn_cell.LSTMCell(n) for n in n_hidden_list]
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
             states = states[-1].h
@@ -341,19 +326,10 @@ class RNNClassifer():
                         rnn_choice=self.rnn_choice)
         self.encoding = self._build_layer(self.x_, **input_dict1)
 
-        # if self.drop_out:
-        #     self.encoding = tf.layers.dropout(
-        #                         self.encoding,
-        #                         rate=self.drop_out_rate,
-        #                         seed=seed)
+        if self.drop_out:
+            self.encoding = tf.nn.dropout(self.encoding, self._keep_prob)
 
         self.y = tf.layers.dense(self.encoding, self.output_dim, activation=None)
-        
-        # if self.drop_out:
-        #     self.y = tf.layers.dropout(
-        #                         self.y,
-        #                         rate=self.drop_out_rate,
-        #                         seed=seed)
 
         self.cross_entropy = tf.reduce_mean(
                                 tf.nn.softmax_cross_entropy_with_logits_v2(
@@ -391,19 +367,10 @@ class RNNClassifer():
                         rnn_choice=self.rnn_choice)
         self.encoding = self._build_layer(self.x_, **input_dict1)
 
-        # if self.drop_out:
-        #     self.encoding = tf.layers.dropout(
-        #                         self.encoding,
-        #                         rate=self.drop_out_rate,
-        #                         seed=seed)
+        if self.drop_out:
+            self.encoding = tf.nn.dropout(self.encoding, self._keep_prob)
 
         self.y = tf.layers.dense(self.encoding, self.output_dim, activation=None)
-
-        # if self.drop_out:
-        #     self.y = tf.layers.dropout(
-        #                         self.y,
-        #                         rate=self.drop_out_rate,
-        #                         seed=seed)
 
         self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=tf.one_hot(self.y_, self.output_dim), logits=self.y))
 
@@ -443,15 +410,23 @@ class RNNClassifer():
 
                 t = time.time()
                 for _start, _end in zip(range(0, N, self.batch_size), range(self.batch_size, N, self.batch_size)):
-                    self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
+                    if self.drop_out:
+                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end], self._keep_prob: self.keep_prob})
+                    else:
+                        self.train_op.run(feed_dict={self.x: X_train[_start:_end], self.y_: Y_train[_start:_end]})
                 time_to_update += (time.time() - t)
 
-
-                self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
-                self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
+                if self.drop_out:
+                    self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train, self._keep_prob: self.keep_prob}))
+                    self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test, self._keep_prob: 1.0}))
+                else:
+                    self.train_err.append(self.cross_entropy.eval(feed_dict={self.x: X_train, self.y_: Y_train}))
+                    self.test_acc.append(self.accuracy.eval(feed_dict={self.x: X_test, self.y_: Y_test}))
                 
                 if self.early_stop:
-                    _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
+                    if self.drop_out: _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val, self._keep_prob: self.keep_prob})
+                    else: _val_err = self.cross_entropy.eval(feed_dict={self.x: X_val, self.y_: Y_val})
+
                     if (tmp_best_val_err - _val_err) < self.min_delta:
                         _patience -= 1
                         if _patience <= 0:
