@@ -130,6 +130,7 @@ def run_cnn_model(x_train, y_train, x_val, y_val, x_test, y_test,
         idx = np.arange(N)
         tmp_best_val_err = 1000
         _epoch = 0
+        _patience = patience
         for i in range(no_epochs):
             _epoch += 1
             np.random.shuffle(idx)
@@ -291,6 +292,7 @@ def run_rnn_model(x_train, y_train, x_val, y_val, x_test, y_test,
         idx = np.arange(N)
         tmp_best_val_err = 1000
         _epoch = 0
+        _patience = patience
         for i in range(no_epochs):
             _epoch += 1
             np.random.shuffle(idx)
@@ -358,15 +360,6 @@ def read_data(choice='char'):
                                                     test_size=0.2,
                                                     random_state=seed)
 
-    #to delete
-    x_train = x_train[:200]
-    y_train = y_train[:200]
-    x_val = x_val[:20]
-    y_val = y_val[:20]
-    x_test = x_test[:20]
-    y_test = y_test[:20]
-
-
     x_train = pd.Series(x_train)
     y_train = pd.Series(y_train)
     x_val = pd.Series(x_val)
@@ -424,42 +417,50 @@ def main():
     init_dict_word_rnn_backup = init_dict_word_rnn.copy()
 
     #====Q1====
-    '''
+    
     tf.reset_default_graph()
+    print('training char_cnn_no_dropout:')
     train_err,test_acc,time_to_update,epochs = run_cnn_model(**init_dict_char_cnn)
     train_err_dict['char_cnn_no_dropout'] = train_err
     test_acc_dict['char_cnn_no_dropout'] = test_acc
     time_to_update_dict['char_cnn_no_dropout'] = time_to_update
     epochs_dict['char_cnn_no_dropout'] = epochs
+    print("="*50)
 
     #====Q2====
     tf.reset_default_graph()
+    print('training word_cnn_no_dropout:')
     train_err,test_acc,time_to_update,epochs = run_cnn_model(**init_dict_word_cnn)
     train_err_dict['word_cnn_no_dropout'] = train_err
     test_acc_dict['word_cnn_no_dropout'] = test_acc
     time_to_update_dict['word_cnn_no_dropout'] = time_to_update
     epochs_dict['word_cnn_no_dropout'] = epochs
+    print("="*50)
 
 
     #====Q3====
     tf.reset_default_graph()
+    print('training char_rnn_no_dropout:')
     train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_char_rnn)
     train_err_dict['char_rnn_no_dropout'] = train_err
     test_acc_dict['char_rnn_no_dropout'] = test_acc
     time_to_update_dict['char_rnn_no_dropout'] = time_to_update
     epochs_dict['char_rnn_no_dropout'] = epochs
+    print("="*50)
 
     #====Q4====
     tf.reset_default_graph()
+    print('training word_rnn_no_dropout:')
     train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_word_rnn)
     train_err_dict['word_rnn_no_dropout'] = train_err
     test_acc_dict['word_rnn_no_dropout'] = test_acc
     time_to_update_dict['word_rnn_no_dropout'] = time_to_update
     epochs_dict['word_rnn_no_dropout'] = epochs
-    '''
+    print("="*50)
+    
 
     #====Q5====
-    '''
+    
     init_dict_char_cnn['drop_out'] = True
     init_dict_word_cnn['drop_out'] = True
     init_dict_char_rnn['drop_out'] = True
@@ -472,39 +473,47 @@ def main():
 
         #char_cnn
         tf.reset_default_graph()
+        print('training char_cnn_with_dropout_{}:'.format(keep_prob))
         train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_char_cnn)
         dict_key = 'char_cnn_' + 'dropout_' + str(keep_prob)
         train_err_dict[dict_key] = train_err
         test_acc_dict[dict_key] = test_acc
         time_to_update_dict[dict_key] = time_to_update
         epochs_dict[dict_key] = epochs
+        print("="*50)
 
         #word_cnn
         tf.reset_default_graph()
+        print('training word_cnn_with_dropout_{}:'.format(keep_prob))
         train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_word_cnn)
         dict_key = 'word_cnn_' + 'dropout_' + str(keep_prob)
         train_err_dict[dict_key] = train_err
         test_acc_dict[dict_key] = test_acc
         time_to_update_dict[dict_key] = time_to_update
         epochs_dict[dict_key] = epochs
+        print("="*50)
 
         #char_rnn
         tf.reset_default_graph()
+        print('training char_rnn_with_dropout_{}:'.format(keep_prob))
         train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_char_rnn)
         dict_key = 'char_rnn_' + 'dropout_' + str(keep_prob)
         train_err_dict[dict_key] = train_err
         test_acc_dict[dict_key] = test_acc
         time_to_update_dict[dict_key] = time_to_update
         epochs_dict[dict_key] = epochs
+        print("="*50)
 
         #word_rnn
         tf.reset_default_graph()
+        print('training word_rnn_with_dropout_{}:'.format(keep_prob))
         train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_word_rnn)
         dict_key = 'word_rnn_' + 'dropout_' + str(keep_prob)
         train_err_dict[dict_key] = train_err
         test_acc_dict[dict_key] = test_acc
         time_to_update_dict[dict_key] = time_to_update
         epochs_dict[dict_key] = epochs
+        print("="*50)
 
 
     #====Q6a====
@@ -516,22 +525,26 @@ def main():
         init_dict_char_rnn['rnn_decision'] = rnn_decision
         #char_rnn
         tf.reset_default_graph()
+        print('training char_rnn_with_{}:'.format(rnn_decision))
         train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_char_rnn)
         dict_key = 'char_rnn_' + 'rnn_decision' + str(rnn_decision)
         train_err_dict[dict_key] = train_err
         test_acc_dict[dict_key] = test_acc
         time_to_update_dict[dict_key] = time_to_update
         epochs_dict[dict_key] = epochs
+        print("="*50)
 
         init_dict_word_rnn['rnn_decision'] = rnn_decision
         #word_rnn
         tf.reset_default_graph()
+        print('training word_rnn_with_{}:'.format(rnn_decision))
         train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_word_rnn)
         dict_key = 'word_rnn_' + 'rnn_decision' + str(rnn_decision)
         train_err_dict[dict_key] = train_err
         test_acc_dict[dict_key] = test_acc
         time_to_update_dict[dict_key] = time_to_update
         epochs_dict[dict_key] = epochs
+        print("="*50)
 
     #====Q6b====
     init_dict_char_rnn = init_dict_char_rnn_backup.copy()
@@ -539,23 +552,26 @@ def main():
     init_dict_char_rnn['rnn_layer'] = 2
     #char_rnn
     tf.reset_default_graph()
+    print('training char_rnn_with_2_layers')
     train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_char_rnn)
     dict_key = 'char_rnn_rnn_layer_2'
     train_err_dict[dict_key] = train_err
     test_acc_dict[dict_key] = test_acc
     time_to_update_dict[dict_key] = time_to_update
     epochs_dict[dict_key] = epochs
+    print("="*50)
 
     init_dict_word_rnn['rnn_layer'] = 2
     #word_rnn
     tf.reset_default_graph()
+    print('training word_rnn_with_2_layers')
     train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_word_rnn)
     dict_key = 'word_rnn_rnn_layer_2'
     train_err_dict[dict_key] = train_err
     test_acc_dict[dict_key] = test_acc
     time_to_update_dict[dict_key] = time_to_update
     epochs_dict[dict_key] = epochs
-    '''
+    print("="*50)
 
     #====Q6c====
     init_dict_char_rnn = init_dict_char_rnn_backup.copy()
@@ -565,21 +581,25 @@ def main():
 
     #char_rnn
     tf.reset_default_graph()
+    print('training char_rnn_with_gradient_clipped')
     train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_char_rnn)
     dict_key = 'char_rnn_gradient_clipped'
     train_err_dict[dict_key] = train_err
     test_acc_dict[dict_key] = test_acc
     time_to_update_dict[dict_key] = time_to_update
     epochs_dict[dict_key] = epochs
+    print("="*50)
 
     #word_rnn
     tf.reset_default_graph()
+    print('training word_rnn_with_gradient_clipped')
     train_err,test_acc,time_to_update,epochs = run_rnn_model(**init_dict_word_rnn)
     dict_key = 'word_rnn_gradient_clipped'
     train_err_dict[dict_key] = train_err
     test_acc_dict[dict_key] = test_acc
     time_to_update_dict[dict_key] = time_to_update
     epochs_dict[dict_key] = epochs
+    print("="*50)
 
     df = pd.DataFrame(columns=['dict_key','train_err_list','test_acc_dict','time_to_update_list','epochs_list','converge_test_accuracy'])
     i = 0
