@@ -370,6 +370,10 @@ def grid_search(trainX, trainY,
 #end def
 
 
+trainX, trainY, valX, valY, testX, testY = read_data('data/data_batch_1', 'data/test_batch_trim')
+print(len(trainX),len(valX))
+print(len(testX))
+print(trainX[0])
 def main():
     error_against_epoch = [0, 1000, 0, 2]
     accuracy_against_epoch = [0, 1000, 0, 1]
@@ -614,7 +618,7 @@ def main():
         print('Number of Epochs: {}'.format(early_stop_epoch_dict[key]))
         print('Convergence Test Accuracy: {}'.format(test_acc_dict[key][-1]))
         print('-'*50)
-		
+
 	# --------------------------------------------------
 	# model: GD_50_60 test_acc: 0.507500
 	# model: Optimal_60_60 test_acc: 0.493000
@@ -676,7 +680,7 @@ def main():
 	# Number of Epochs: 401
 	# Convergence Test Accuracy: 0.43700000643730164
 	# --------------------------------------------------
-	
+
 # end def
 
 if __name__ == '__main__': main()

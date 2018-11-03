@@ -340,7 +340,7 @@ def read_data(choice='char'):
     if choice == 'char': row_num = 1
     else: row_num = 2
     x_train, y_train, x_test, y_test = [], [], [], []
-    with open('data/train_medium.csv', encoding='utf-8') as filex:
+    with open('Assignment2/data/train_medium.csv', encoding='utf-8') as filex:
         reader = csv.reader(filex)
         for row in reader:
             x_train.append(row[row_num])
@@ -348,7 +348,7 @@ def read_data(choice='char'):
         #end for
     #end with
 
-    with open('data/test_medium.csv', encoding='utf-8') as filex:
+    with open('Assignment2/data/test_medium.csv', encoding='utf-8') as filex:
         reader = csv.reader(filex)
         for row in reader:
             x_test.append(row[row_num])
@@ -417,7 +417,7 @@ def main():
     init_dict_word_rnn_backup = init_dict_word_rnn.copy()
 
     #====Q1====
-    
+
     tf.reset_default_graph()
     print('training char_cnn_no_dropout:')
     train_err,test_acc,time_to_update,epochs = run_cnn_model(**init_dict_char_cnn)
@@ -457,10 +457,10 @@ def main():
     time_to_update_dict['word_rnn_no_dropout'] = time_to_update
     epochs_dict['word_rnn_no_dropout'] = epochs
     print("="*50)
-    
+
 
     #====Q5====
-    
+
     init_dict_char_cnn['drop_out'] = True
     init_dict_word_cnn['drop_out'] = True
     init_dict_char_rnn['drop_out'] = True
