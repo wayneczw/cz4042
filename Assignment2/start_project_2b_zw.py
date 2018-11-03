@@ -341,11 +341,11 @@ class RNNClassifer():
                         rnn_choice=self.rnn_choice)
         self.encoding = self._build_layer(self.x_, **input_dict1)
 
-        if self.drop_out:
-            self.encoding = tf.layers.dropout(
-                                self.encoding,
-                                rate=self.drop_out_rate,
-                                seed=seed)
+        # if self.drop_out:
+        #     self.encoding = tf.layers.dropout(
+        #                         self.encoding,
+        #                         rate=self.drop_out_rate,
+        #                         seed=seed)
 
         self.y = tf.layers.dense(self.encoding, self.output_dim, activation=None)
         
@@ -391,11 +391,11 @@ class RNNClassifer():
                         rnn_choice=self.rnn_choice)
         self.encoding = self._build_layer(self.x_, **input_dict1)
 
-        if self.drop_out:
-            self.encoding = tf.layers.dropout(
-                                self.encoding,
-                                rate=self.drop_out_rate,
-                                seed=seed)
+        # if self.drop_out:
+        #     self.encoding = tf.layers.dropout(
+        #                         self.encoding,
+        #                         rate=self.drop_out_rate,
+        #                         seed=seed)
 
         self.y = tf.layers.dense(self.encoding, self.output_dim, activation=None)
 
@@ -1005,9 +1005,9 @@ def main():
     result_dict_list.append(_result_dict)
 
     df = pd.DataFrame.from_dict(result_dict_list)
-    df.to_csv('./csv_results/q2222.csv')
+    df.to_csv('./csv_results/q22222222.csv')
 
-    _df = pd.read_csv('./csv_results/q2222.csv')
+    _df = pd.read_csv('./csv_results/q22222222.csv')
     print(_df)
 
 #end def
