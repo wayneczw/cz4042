@@ -592,231 +592,231 @@ def main():
 
     result_dict_list = list()
 
-    # # =========================== Q1
-    # print('='*100)
-    # print('Q1 Char CNN')
-    # print('='*100)
+    # =========================== Q1
+    print('='*100)
+    print('Q1 Char CNN')
+    print('='*100)
 
-    # tf.reset_default_graph()
-    # init_dict = arg_cnn_dict(
-    #                 model_save_path='models/b/1_char_cnn',
-    #                 C1_filters=10, C2_filters=10,
-    #                 C1_kernal_size=[20, 256], C2_kernal_size=[20, 1],
-    #                 S1_window=4, S2_window=4,
-    #                 S1_strides=2, S2_strides=2,
-    #                 drop_out=False, keep_prob=1,
-    #                 choice='char')
+    tf.reset_default_graph()
+    init_dict = arg_cnn_dict(
+                    model_save_path='models/b/1_char_cnn',
+                    C1_filters=10, C2_filters=10,
+                    C1_kernal_size=[20, 256], C2_kernal_size=[20, 1],
+                    S1_window=4, S2_window=4,
+                    S1_strides=2, S2_strides=2,
+                    drop_out=False, keep_prob=1,
+                    choice='char')
 
-    # char_cnn = CNNClassifer(**init_dict).train(
-    #                             X_train=x_train,
-    #                             Y_train=y_train,
-    #                             X_test=x_test,
-    #                             Y_test=y_test,
-    #                             X_val=x_val,
-    #                             Y_val=y_val)
+    char_cnn = CNNClassifer(**init_dict).train(
+                                X_train=x_train,
+                                Y_train=y_train,
+                                X_test=x_test,
+                                Y_test=y_test,
+                                X_val=x_val,
+                                Y_val=y_val)
 
-    # train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_cnn.train_err, char_cnn.test_acc, char_cnn.time_taken_one_epoch, char_cnn.early_stop_epoch
+    train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_cnn.train_err, char_cnn.test_acc, char_cnn.time_taken_one_epoch, char_cnn.early_stop_epoch
 
-    # _result_dict = dict(name='q1_char_cnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
-    # result_dict_list.append(_result_dict)
+    _result_dict = dict(name='q1_char_cnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
 
-    # # =========================== Q2
-    # print()
-    # print()
-    # print('='*100)
-    # print('Q2 Word CNN')
-    # print('='*100)
+    # =========================== Q2
+    print()
+    print()
+    print('='*100)
+    print('Q2 Word CNN')
+    print('='*100)
 
-    # tf.reset_default_graph()
-    # init_dict = arg_cnn_dict(
-    #                 model_save_path='models/b/2_word_cnn',
-    #                 C1_filters=10, C2_filters=10,
-    #                 C1_kernal_size=[20, 20], C2_kernal_size=[20, 1],
-    #                 S1_window=4, S2_window=4,
-    #                 S1_strides=2, S2_strides=2,
-    #                 drop_out=False, keep_prob=1,
-    #                 n_words=n_words, embedding_size=20,
-    #                 choice='word')
+    tf.reset_default_graph()
+    init_dict = arg_cnn_dict(
+                    model_save_path='models/b/2_word_cnn',
+                    C1_filters=10, C2_filters=10,
+                    C1_kernal_size=[20, 20], C2_kernal_size=[20, 1],
+                    S1_window=4, S2_window=4,
+                    S1_strides=2, S2_strides=2,
+                    drop_out=False, keep_prob=1,
+                    n_words=n_words, embedding_size=20,
+                    choice='word')
 
-    # word_cnn = CNNClassifer(**init_dict).train(
-    #                             X_train=x_train_word,
-    #                             Y_train=y_train_word,
-    #                             X_test=x_test_word,
-    #                             Y_test=y_test_word,
-    #                             X_val=x_val_word,
-    #                             Y_val=y_val_word)
+    word_cnn = CNNClassifer(**init_dict).train(
+                                X_train=x_train_word,
+                                Y_train=y_train_word,
+                                X_test=x_test_word,
+                                Y_test=y_test_word,
+                                X_val=x_val_word,
+                                Y_val=y_val_word)
 
-    # train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_cnn.train_err, word_cnn.test_acc, word_cnn.time_taken_one_epoch, word_cnn.early_stop_epoch
+    train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_cnn.train_err, word_cnn.test_acc, word_cnn.time_taken_one_epoch, word_cnn.early_stop_epoch
 
-    # _result_dict = dict(name='q2_word_cnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
-    # result_dict_list.append(_result_dict)
+    _result_dict = dict(name='q2_word_cnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
    
-    # # =========================== Q3
-    # print()
-    # print()
-    # print('='*100)
-    # print('Q3 Char RNN')
-    # print('='*100)
+    # =========================== Q3
+    print()
+    print()
+    print('='*100)
+    print('Q3 Char RNN')
+    print('='*100)
 
-    # tf.reset_default_graph()
-    # init_dict = arg_rnn_dict(
-    #                 model_save_path='models/b/3_char_rnn',
-    #                 n_hidden_list=[20],
-    #                 drop_out=False, keep_prob=1,
-    #                 choice='char',
-    #                 rnn_choice='GRU')
+    tf.reset_default_graph()
+    init_dict = arg_rnn_dict(
+                    model_save_path='models/b/3_char_rnn',
+                    n_hidden_list=[20],
+                    drop_out=False, keep_prob=1,
+                    choice='char',
+                    rnn_choice='GRU')
 
-    # char_rnn = RNNClassifer(**init_dict).train(
-    #                             X_train=x_train,
-    #                             Y_train=y_train,
-    #                             X_test=x_test,
-    #                             Y_test=y_test,
-    #                             X_val=x_val,
-    #                             Y_val=y_val)
-    # train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
+    char_rnn = RNNClassifer(**init_dict).train(
+                                X_train=x_train,
+                                Y_train=y_train,
+                                X_test=x_test,
+                                Y_test=y_test,
+                                X_val=x_val,
+                                Y_val=y_val)
+    train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
 
-    # _result_dict = dict(name='q3_char_rnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
-    # result_dict_list.append(_result_dict)
+    _result_dict = dict(name='q3_char_rnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
 
-    # # =========================== Q4
-    # print()
-    # print()
-    # print('='*100)
-    # print('Q4 Word RNN')
-    # print('='*100)
+    # =========================== Q4
+    print()
+    print()
+    print('='*100)
+    print('Q4 Word RNN')
+    print('='*100)
 
-    # tf.reset_default_graph()
-    # init_dict = arg_rnn_dict(
-    #                 model_save_path='models/b/4_word_rnn',
-    #                 n_hidden_list=[20],
-    #                 drop_out=False, keep_prob=1,
-    #                 choice='word', n_words=n_words, embedding_size=20,
-    #                 rnn_choice='GRU')
+    tf.reset_default_graph()
+    init_dict = arg_rnn_dict(
+                    model_save_path='models/b/4_word_rnn',
+                    n_hidden_list=[20],
+                    drop_out=False, keep_prob=1,
+                    choice='word', n_words=n_words, embedding_size=20,
+                    rnn_choice='GRU')
 
-    # word_rnn = RNNClassifer(**init_dict).train(
-    #                             X_train=x_train_word,
-    #                             Y_train=y_train_word,
-    #                             X_test=x_test_word,
-    #                             Y_test=y_test_word,
-    #                             X_val=x_val_word,
-    #                             Y_val=y_val_word)
-    # train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
+    word_rnn = RNNClassifer(**init_dict).train(
+                                X_train=x_train_word,
+                                Y_train=y_train_word,
+                                X_test=x_test_word,
+                                Y_test=y_test_word,
+                                X_val=x_val_word,
+                                Y_val=y_val_word)
+    train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
 
-    # _result_dict = dict(name='q4_word_rnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
-    # result_dict_list.append(_result_dict)
+    _result_dict = dict(name='q4_word_rnn', train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+    result_dict_list.append(_result_dict)
 
-    # # =========================== Q5
-    # print()
-    # print()
-    # print('='*100)
-    # print('Q5 Char/Word CNN/RNN on Dropout Rate - 0.1, 0.3, 0.5, 0.7, 0.9')
-    # print('='*100)
+    # =========================== Q5
+    print()
+    print()
+    print('='*100)
+    print('Q5 Char/Word CNN/RNN on Keep Prob - 0.1, 0.3, 0.5, 0.7, 0.9')
+    print('='*100)
 
-    # keep_probs = [0.1, 0.3, 0.5, 0.7, 0.9]
+    keep_probs = [0.1, 0.3, 0.5, 0.7, 0.9]
 
-    # for prob in keep_probs:
-    #     print('-'*40)
-    #     print(prob)
-    #     print('-'*40)
+    for prob in keep_probs:
+        print('-'*40)
+        print(prob)
+        print('-'*40)
 
-    #     # char CNN with dropout
-    #     print('Char CNN')
-    #     tf.reset_default_graph()
-    #     init_dict = arg_cnn_dict(
-    #                     model_save_path='models/b/5_char_cnn_' + str(prob),
-    #                     C1_filters=10, C2_filters=10,
-    #                     C1_kernal_size=[20, 256], C2_kernal_size=[20, 1],
-    #                     S1_window=4, S2_window=4,
-    #                     S1_strides=2, S2_strides=2,
-    #                     drop_out=True, keep_prob=prob,
-    #                     choice='char')
+        # char CNN with dropout
+        print('Char CNN')
+        tf.reset_default_graph()
+        init_dict = arg_cnn_dict(
+                        model_save_path='models/b/5_char_cnn_' + str(prob),
+                        C1_filters=10, C2_filters=10,
+                        C1_kernal_size=[20, 256], C2_kernal_size=[20, 1],
+                        S1_window=4, S2_window=4,
+                        S1_strides=2, S2_strides=2,
+                        drop_out=True, keep_prob=prob,
+                        choice='char')
 
-    #     char_cnn = CNNClassifer(**init_dict).train(
-    #                                 X_train=x_train,
-    #                                 Y_train=y_train,
-    #                                 X_test=x_test,
-    #                                 Y_test=y_test,
-    #                                 X_val=x_val,
-    #                                 Y_val=y_val)
-    #     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_cnn.train_err, char_cnn.test_acc, char_cnn.time_taken_one_epoch, char_cnn.early_stop_epoch
+        char_cnn = CNNClassifer(**init_dict).train(
+                                    X_train=x_train,
+                                    Y_train=y_train,
+                                    X_test=x_test,
+                                    Y_test=y_test,
+                                    X_val=x_val,
+                                    Y_val=y_val)
+        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_cnn.train_err, char_cnn.test_acc, char_cnn.time_taken_one_epoch, char_cnn.early_stop_epoch
 
-    #     _result_dict = dict(name='q5_char_cnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
-    #     result_dict_list.append(_result_dict)
+        _result_dict = dict(name='q5_char_cnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        result_dict_list.append(_result_dict)
 
-    #     print()
+        print()
 
-    #     # word CNN with dropout
-    #     tf.reset_default_graph()
-    #     print('Word CNN')
-    #     init_dict = arg_cnn_dict(
-    #                     model_save_path='models/b/5_word_cnn_' + str(prob),
-    #                     C1_filters=10, C2_filters=10,
-    #                     C1_kernal_size=[20, 20], C2_kernal_size=[20, 1],
-    #                     S1_window=4, S2_window=4,
-    #                     S1_strides=2, S2_strides=2,
-    #                     drop_out=True, keep_prob=prob,
-    #                     n_words=n_words, embedding_size=20,
-    #                     choice='word')
+        # word CNN with dropout
+        tf.reset_default_graph()
+        print('Word CNN')
+        init_dict = arg_cnn_dict(
+                        model_save_path='models/b/5_word_cnn_' + str(prob),
+                        C1_filters=10, C2_filters=10,
+                        C1_kernal_size=[20, 20], C2_kernal_size=[20, 1],
+                        S1_window=4, S2_window=4,
+                        S1_strides=2, S2_strides=2,
+                        drop_out=True, keep_prob=prob,
+                        n_words=n_words, embedding_size=20,
+                        choice='word')
 
-    #     word_cnn = CNNClassifer(**init_dict).train(
-    #                                 X_train=x_train_word,
-    #                                 Y_train=y_train_word,
-    #                                 X_test=x_test_word,
-    #                                 Y_test=y_test_word,
-    #                                 X_val=x_val_word,
-    #                                 Y_val=y_val_word)
-    #     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_cnn.train_err, word_cnn.test_acc, word_cnn.time_taken_one_epoch, word_cnn.early_stop_epoch
+        word_cnn = CNNClassifer(**init_dict).train(
+                                    X_train=x_train_word,
+                                    Y_train=y_train_word,
+                                    X_test=x_test_word,
+                                    Y_test=y_test_word,
+                                    X_val=x_val_word,
+                                    Y_val=y_val_word)
+        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_cnn.train_err, word_cnn.test_acc, word_cnn.time_taken_one_epoch, word_cnn.early_stop_epoch
 
-    #     _result_dict = dict(name='q5_word_cnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
-    #     result_dict_list.append(_result_dict)
+        _result_dict = dict(name='q5_word_cnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        result_dict_list.append(_result_dict)
 
-    #     print()
+        print()
 
-    #     # char RNN with dropout
-    #     tf.reset_default_graph()
-    #     print('Char RNN')
-    #     init_dict = arg_rnn_dict(
-    #                     model_save_path='models/b/5_char_rnn_' + str(prob),
-    #                     n_hidden_list=[20],
-    #                     drop_out=True, keep_prob=prob,
-    #                     choice='char',
-    #                     rnn_choice='GRU')
+        # char RNN with dropout
+        tf.reset_default_graph()
+        print('Char RNN')
+        init_dict = arg_rnn_dict(
+                        model_save_path='models/b/5_char_rnn_' + str(prob),
+                        n_hidden_list=[20],
+                        drop_out=True, keep_prob=prob,
+                        choice='char',
+                        rnn_choice='GRU')
 
-    #     char_rnn = RNNClassifer(**init_dict).train(
-    #                                 X_train=x_train,
-    #                                 Y_train=y_train,
-    #                                 X_test=x_test,
-    #                                 Y_test=y_test,
-    #                                 X_val=x_val,
-    #                                 Y_val=y_val)
-    #     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
+        char_rnn = RNNClassifer(**init_dict).train(
+                                    X_train=x_train,
+                                    Y_train=y_train,
+                                    X_test=x_test,
+                                    Y_test=y_test,
+                                    X_val=x_val,
+                                    Y_val=y_val)
+        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = char_rnn.train_err, char_rnn.test_acc, char_rnn.time_taken_one_epoch, char_rnn.early_stop_epoch
 
-    #     _result_dict = dict(name='q5_char_rnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
-    #     result_dict_list.append(_result_dict)
+        _result_dict = dict(name='q5_char_rnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        result_dict_list.append(_result_dict)
 
-    #     print()
+        print()
 
-    #     # word RNN with dropout
-    #     tf.reset_default_graph()
-    #     print('Word RNN')
-    #     init_dict = arg_rnn_dict(
-    #                     model_save_path='models/b/5_word_rnn_' + str(prob),
-    #                     n_hidden_list=[20],
-    #                     drop_out=True, keep_prob=prob,
-    #                     choice='word', n_words=n_words, embedding_size=20,
-    #                     rnn_choice='GRU')
+        # word RNN with dropout
+        tf.reset_default_graph()
+        print('Word RNN')
+        init_dict = arg_rnn_dict(
+                        model_save_path='models/b/5_word_rnn_' + str(prob),
+                        n_hidden_list=[20],
+                        drop_out=True, keep_prob=prob,
+                        choice='word', n_words=n_words, embedding_size=20,
+                        rnn_choice='GRU')
 
-    #     word_rnn = RNNClassifer(**init_dict).train(
-    #                                 X_train=x_train_word,
-    #                                 Y_train=y_train_word,
-    #                                 X_test=x_test_word,
-    #                                 Y_test=y_test_word,
-    #                                 X_val=x_val_word,
-    #                                 Y_val=y_val_word)
-    #     train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
-    #     _result_dict = dict(name='q5_word_rnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
-    #     result_dict_list.append(_result_dict)
-    # #end for
+        word_rnn = RNNClassifer(**init_dict).train(
+                                    X_train=x_train_word,
+                                    Y_train=y_train_word,
+                                    X_test=x_test_word,
+                                    Y_test=y_test_word,
+                                    X_val=x_val_word,
+                                    Y_val=y_val_word)
+        train_err, test_acc, time_taken_one_epoch, early_stop_epoch = word_rnn.train_err, word_rnn.test_acc, word_rnn.time_taken_one_epoch, word_rnn.early_stop_epoch
+        _result_dict = dict(name='q5_word_rnn_'+str(prob), train_err=train_err, test_acc=test_acc, time_taken_one_epoch=time_taken_one_epoch, early_stop_epoch=early_stop_epoch)
+        result_dict_list.append(_result_dict)
+    #end for
 
     # =========================== Q6 a
     print()
