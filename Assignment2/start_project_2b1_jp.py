@@ -116,6 +116,7 @@ def run_cnn_model(x_train, y_train, x_val, y_val, x_test, y_test,
 
     # Optimizer
     train_op = tf.train.AdamOptimizer(lr).minimize(entropy)
+    np.random.seed(10)
 
     with tf.Session() as sess:
 
@@ -146,12 +147,12 @@ def run_cnn_model(x_train, y_train, x_val, y_val, x_test, y_test,
             time_to_update += (time.time() - t)
 
             if drop_out:
-                train_err.append(entropy.eval(feed_dict={x: x_val, y_: y_val, _keep_prob:keep_prob}))
+                train_err.append(entropy.eval(feed_dict={x: x_train, y_: y_train, _keep_prob:keep_prob}))
                 _val_err = entropy.eval(feed_dict={x: x_val, y_: y_val, _keep_prob:keep_prob})
                 test_acc.append(accuracy.eval(feed_dict={x: x_test, y_: y_test, _keep_prob:1.0}))
 
             else:
-                train_err.append(entropy.eval(feed_dict={x: x_val, y_: y_val}))
+                train_err.append(entropy.eval(feed_dict={x: x_train, y_: y_train}))
                 _val_err = entropy.eval(feed_dict={x: x_val, y_: y_val})
                 test_acc.append(accuracy.eval(feed_dict={x: x_test, y_: y_test}))
 
@@ -278,6 +279,8 @@ def run_rnn_model(x_train, y_train, x_val, y_val, x_test, y_test,
 
     else:
         train_op = tf.train.AdamOptimizer(lr).minimize(entropy)
+	
+    np.random.seed(10)
 
     with tf.Session() as sess:
 
@@ -313,12 +316,12 @@ def run_rnn_model(x_train, y_train, x_val, y_val, x_test, y_test,
             time_to_update += (time.time() - t)
 
             if drop_out:
-                train_err.append(entropy.eval(feed_dict={x: x_val, y_: y_val, _keep_prob:keep_prob}))
+                train_err.append(entropy.eval(feed_dict={x: x_train, y_: y_train, _keep_prob:keep_prob}))
                 _val_err = entropy.eval(feed_dict={x: x_val, y_: y_val, _keep_prob:keep_prob})
                 test_acc.append(accuracy.eval(feed_dict={x: x_test, y_: y_test, _keep_prob:1.0}))
 
             else:
-                train_err.append(entropy.eval(feed_dict={x: x_val, y_: y_val}))
+                train_err.append(entropy.eval(feed_dict={x: x_train, y_: y_train}))
                 _val_err = entropy.eval(feed_dict={x: x_val, y_: y_val})
                 test_acc.append(accuracy.eval(feed_dict={x: x_test, y_: y_test}))
 
@@ -398,9 +401,12 @@ def main():
                             model_decision='char',
                             drop_out = False, keep_prob = None,
                             min_delta = 0.0005, patience = 20)
+							
+    init_dict_word_cnn = dict(x_train=x_train_word, y_train=y_train_word, x_val=x_val_word, y_val=y_val_word, x_test=x_test_word, y_test=y_test_word,
+                            model_decision='word',
+                            drop_out = False, keep_prob = None,
+                            min_delta = 0.0005, patience = 20)
 
-    init_dict_word_cnn = init_dict_char_cnn.copy()
-    init_dict_word_cnn['model_decision'] = 'word'
 
     init_dict_char_rnn = dict(x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val, x_test=x_test, y_test=y_test,
                             model_decision='char',rnn_decision='GRU',
@@ -408,8 +414,11 @@ def main():
                             gradient_clipped = False, rnn_layer = 1,
                             min_delta = 0.0005, patience = 20)
 
-    init_dict_word_rnn = init_dict_char_rnn.copy()
-    init_dict_word_rnn['model_decision'] = 'word'
+    init_dict_word_rnn = dict(x_train=x_train_word, y_train=y_train_word, x_val=x_val_word, y_val=y_val_word, x_test=x_test_word, y_test=y_test_word,
+                            model_decision='word',rnn_decision='GRU',
+                            drop_out = False, keep_prob = None,
+                            gradient_clipped = False, rnn_layer = 1,
+                            min_delta = 0.0005, patience = 20)
 
     init_dict_char_cnn_backup = init_dict_char_cnn.copy()
     init_dict_word_cnn_backup = init_dict_word_cnn.copy()
@@ -515,13 +524,11 @@ def main():
         epochs_dict[dict_key] = epochs
         print("="*50)
 
-
     #====Q6a====
     init_dict_char_rnn = init_dict_char_rnn_backup.copy()
     init_dict_word_rnn = init_dict_word_rnn_backup.copy()
 
-    for rnn_decision in ['BASIC' and 'LSTM']:
-
+    for rnn_decision in ['BASIC','LSTM']:
         init_dict_char_rnn['rnn_decision'] = rnn_decision
         #char_rnn
         tf.reset_default_graph()
@@ -547,6 +554,7 @@ def main():
         print("="*50)
 
     #====Q6b====
+ 
     init_dict_char_rnn = init_dict_char_rnn_backup.copy()
     init_dict_word_rnn = init_dict_word_rnn_backup.copy()
     init_dict_char_rnn['rnn_layer'] = 2
