@@ -1,4 +1,4 @@
-import csv
+pimport csv
 import matplotlib
 matplotlib.use('Agg')
 import numpy as np
@@ -307,25 +307,14 @@ class RNNClassifer():
             cells = [tf.nn.rnn_cell.GRUCell(n) for n in n_hidden_list]
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
-            print(type(states))
-            print(len(states))
-            print(states)
         elif rnn_choice == 'BASIC':
             cells = [tf.nn.rnn_cell.BasicRNNCell(n) for n in n_hidden_list]
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
-            print(type(states))
-            print(len(states))
-            print(states)
         elif rnn_choice == 'LSTM':
             cells = [tf.nn.rnn_cell.LSTMCell(n) for n in n_hidden_list]
             cells = tf.nn.rnn_cell.MultiRNNCell(cells)
             outputs, states = tf.nn.dynamic_rnn(cells, x, dtype=tf.float32)
-            print(type(states))
-            print(len(states))
-            print(states)
-            print(type(states[-1]))
-            print(states[-1].h)
             states = states[-1].h
         return states if not isinstance(states, tuple) else states[-1]
     #end def
@@ -471,6 +460,7 @@ class RNNClassifer():
 def read_data(choice='char'):
     if choice == 'char': row_num = 1
     else: row_num = 2
+
     x_train, y_train, x_test, y_test = [], [], [], []
     with open('data/train_medium.csv', encoding='utf-8') as filex:
         reader = csv.reader(filex)
@@ -502,7 +492,7 @@ def read_data(choice='char'):
     y_test = pd.Series(y_test)
     y_train = y_train.values
     y_val = y_val.values
-    y_test = y_test.values   
+    y_test = y_test.values
     
     if choice == 'char':
         char_processor = tf.contrib.learn.preprocessing.ByteProcessor(MAX_DOCUMENT_LENGTH)
