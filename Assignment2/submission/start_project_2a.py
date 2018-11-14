@@ -370,10 +370,6 @@ def grid_search(trainX, trainY,
 #end def
 
 
-trainX, trainY, valX, valY, testX, testY = read_data('data/data_batch_1', 'data/test_batch_trim')
-print(len(trainX),len(valX))
-print(len(testX))
-print(trainX[0])
 def main():
     error_against_epoch = [0, 1000, 0, 2]
     accuracy_against_epoch = [0, 1000, 0, 1]
