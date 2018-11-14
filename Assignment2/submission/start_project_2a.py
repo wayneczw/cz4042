@@ -442,9 +442,9 @@ def main():
                                 C1_range, C2_range)
 
     C1 = optimal_dict['C1']
-    C1_range = [C1-10,C1+10,5]
+    C1_range = [C1-5,C1+10,5]
     C2 = optimal_dict['C2']
-    C2_range = [C1-10,C1+10,5]
+    C2_range = [C2-5,C2+10,5]
     optimal_dict = grid_search(trainX, trainY,
                                 testX, testY,
                                 valX, valY,
